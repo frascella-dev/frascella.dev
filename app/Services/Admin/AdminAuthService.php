@@ -15,29 +15,42 @@ use Illuminate\Validation\ValidationException;
  */
 class AdminAuthService
 {
+    public function __construct(private readonly BruteForceGuard $guard)
+    {
+    }
+
     /**
      * Verify the credentials and return the user ready for the 2FA step.
      *
      * Emits a generic "auth.failed" on either unknown email or wrong password
      * so we don't leak which emails exist.
      */
-    public function authenticate(string $email, string $password): User
+    public function authenticate(string $email, string $password, string $ip): User
     {
+        // Pre-flight: throws if either the IP or account is already locked.
+        $this->guard->assertAllowed($email, $ip);
+
         $user = User::where('email', strtolower($email))->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
+            $this->guard->recordFailure('password', $ip, $email, $user);
+
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
 
         if (!$user->hasConfirmedTwoFactor()) {
-            // A user with no 2FA confirmed shouldn't exist in this admin, but
-            // we still guard in case an artisan setup was abandoned midway.
+            // Not a credentials failure — don't count it toward lockout, but
+            // still refuse the login.
             throw ValidationException::withMessages([
                 'email' => 'This account has no 2FA configured. Ask an admin to re-enroll it.',
             ]);
         }
+
+        // Password correct — wipe the IP's failure budget so a legitimate
+        // user who mistyped a few times isn't left one miss from lockout.
+        $this->guard->clearForIp($ip);
 
         return $user;
     }

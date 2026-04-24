@@ -24,6 +24,11 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+* {cursor: none;}
+*[data-cursor="off"] { cursor: auto; }
+*[data-cursor="off"] a,
+*[data-cursor="off"] button { cursor: auto; }
+
 html[data-scale="m"]   { --hero-scale: 0.82; }
 html[data-scale="l"]   { --hero-scale: 0.92; }
 html[data-scale="xl"]  { --hero-scale: 1;    }

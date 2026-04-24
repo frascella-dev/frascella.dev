@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\PageVisit;
 use App\Services\UserAgentParser;
+use App\Support\IpHasher;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,10 +60,7 @@ class RecordPageVisit
             }
         }
 
-        $ip = $request->ip() ?? '';
-        // Key-salted so an attacker with read access to the DB can't reverse
-        // the hash by brute-forcing the 2^32 IPv4 space.
-        $ipHash = hash('sha256', $ip . config('app.key'));
+        $ipHash = IpHasher::hash($request->ip() ?? '');
 
         PageVisit::create([
             'path' => mb_substr($request->path(), 0, 2048),

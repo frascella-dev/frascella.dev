@@ -27,7 +27,11 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $user = $this->auth->authenticate($credentials['email'], $credentials['password']);
+        $user = $this->auth->authenticate(
+            $credentials['email'],
+            $credentials['password'],
+            $request->ip() ?? '',
+        );
         $this->auth->beginTwoFactorChallenge($request, $user);
 
         return redirect()->route('admin.two-factor.show');

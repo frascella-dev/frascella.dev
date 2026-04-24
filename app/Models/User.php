@@ -26,6 +26,7 @@ class User extends Authenticatable
             'two_factor_secret' => 'encrypted',
             'two_factor_secret_pending' => 'encrypted',
             'two_factor_confirmed_at' => 'datetime',
+            'locked_until' => 'datetime',
         ];
     }
 
@@ -33,6 +34,11 @@ class User extends Authenticatable
     {
         return !is_null($this->two_factor_confirmed_at)
             && !is_null($this->two_factor_secret);
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked_until !== null && $this->locked_until->isFuture();
     }
 
     public function hasPendingTwoFactorRotation(): bool
