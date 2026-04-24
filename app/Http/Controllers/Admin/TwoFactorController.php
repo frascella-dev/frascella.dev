@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Middleware\EnsurePendingTwoFactor;
-use App\Models\User;
+use App\Services\Admin\AdminAuthService;
 use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class TwoFactorController extends Controller
 {
-    public function __construct(private readonly TwoFactorService $twoFactor)
-    {
+    public function __construct(
+        private readonly AdminAuthService $auth,
+        private readonly TwoFactorService $twoFactor,
+    ) {
     }
 
     public function show(): Response
@@ -30,12 +30,11 @@ class TwoFactorController extends Controller
             'code' => ['required', 'string', 'size:6'],
         ]);
 
-        $userId = $request->session()->get(EnsurePendingTwoFactor::SESSION_KEY);
-        $user = User::find($userId);
+        $user = $this->auth->pendingUser($request);
 
         if (!$user || !$user->hasConfirmedTwoFactor()) {
-            // Session was tampered with or the user was deleted mid-flow.
-            $request->session()->forget(EnsurePendingTwoFactor::SESSION_KEY);
+            $this->auth->abandonTwoFactorChallenge($request);
+
             return redirect()->route('admin.login');
         }
 
@@ -45,11 +44,7 @@ class TwoFactorController extends Controller
             ]);
         }
 
-        // OTP valid — promote to a full session, drop the pending marker,
-        // rotate the session id to prevent fixation.
-        Auth::login($user);
-        $request->session()->forget(EnsurePendingTwoFactor::SESSION_KEY);
-        $request->session()->regenerate();
+        $this->auth->completeTwoFactorChallenge($request, $user);
 
         return redirect()->intended(route('admin.dashboard'));
     }

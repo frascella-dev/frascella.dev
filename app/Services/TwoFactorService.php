@@ -91,4 +91,66 @@ class TwoFactorService
 
         return (bool) $this->google2fa->verifyKey($secret, $code, self::VERIFICATION_WINDOW);
     }
+
+    /**
+     * Begin a device rotation — stage a new secret in the pending slot. The
+     * active secret stays unchanged so login keeps working while the user
+     * re-enrolls their authenticator.
+     */
+    public function beginRotation(User $user): void
+    {
+        $user->forceFill([
+            'two_factor_secret_pending' => $this->generateSecret(),
+        ])->save();
+    }
+
+    /**
+     * Finalize a rotation. Returns true when the OTP matched and the pending
+     * secret was promoted to the active slot; false when the user has no
+     * pending rotation or the code didn't verify.
+     */
+    public function confirmRotation(User $user, string $code): bool
+    {
+        if (!$user->hasPendingTwoFactorRotation()) {
+            return false;
+        }
+
+        if (!$this->verify($user->two_factor_secret_pending, $code)) {
+            return false;
+        }
+
+        $user->forceFill([
+            'two_factor_secret' => $user->two_factor_secret_pending,
+            'two_factor_secret_pending' => null,
+            'two_factor_confirmed_at' => now(),
+        ])->save();
+
+        return true;
+    }
+
+    public function cancelRotation(User $user): void
+    {
+        $user->forceFill(['two_factor_secret_pending' => null])->save();
+    }
+
+    /**
+     * Serialized shape for the frontend: QR data URI + the raw otpauth URI.
+     * Returns null when the user has no rotation in progress so controllers
+     * can pass the result straight through.
+     *
+     * @return array{qr: string, uri: string}|null
+     */
+    public function pendingRotationPayload(User $user): ?array
+    {
+        if (!$user->hasPendingTwoFactorRotation()) {
+            return null;
+        }
+
+        $uri = $this->buildOtpauthUri($user, $user->two_factor_secret_pending);
+
+        return [
+            'qr' => $this->renderQrForBrowser($uri),
+            'uri' => $uri,
+        ];
+    }
 }

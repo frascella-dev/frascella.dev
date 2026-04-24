@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import Alert from "@mui/joy/Alert";
-import AspectRatio from "@mui/joy/AspectRatio";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
 import Breadcrumbs from "@mui/joy/Breadcrumbs";
@@ -55,12 +54,15 @@ function formatDate(iso) {
     }
 }
 
-function PersonalInfoCard({ user }) {
+function PersonalInfoCard({ user, avatarUploadLimitKb }) {
     const { data, setData, patch, processing, errors, isDirty, reset } =
         useForm({
             name: user?.name ?? "",
             email: user?.email ?? "",
         });
+    const uploadLimitMb = avatarUploadLimitKb
+        ? (avatarUploadLimitKb / 1024).toFixed(1)
+        : null;
 
     const submit = (e) => {
         e.preventDefault();
@@ -107,16 +109,18 @@ function PersonalInfoCard({ user }) {
             >
                 <Stack
                     direction="column"
-                    spacing={1}
-                    sx={{ position: "relative" }}
+                    spacing={1.5}
+                    sx={{
+                        alignItems: "center",
+                        minWidth: { xs: "auto", sm: 140 },
+                    }}
                 >
-                    <AspectRatio
-                        ratio="1"
-                        maxHeight={160}
+                    <Box
                         sx={{
-                            flex: 1,
-                            minWidth: { xs: 96, sm: 120 },
-                            borderRadius: "100%",
+                            position: "relative",
+                            width: 128,
+                            height: 128,
+                            flexShrink: 0,
                         }}
                     >
                         <Avatar
@@ -124,46 +128,54 @@ function PersonalInfoCard({ user }) {
                             sx={{
                                 width: "100%",
                                 height: "100%",
-                                fontSize: "2rem",
+                                fontSize: "2.25rem",
+                                fontWeight: 600,
+                                border: "3px solid",
+                                borderColor: "background.surface",
+                                boxShadow: "sm",
                             }}
                         >
                             {initialsFrom(user?.name)}
                         </Avatar>
-                    </AspectRatio>
-                    <IconButton
-                        aria-label="Upload new picture"
-                        size="sm"
-                        variant="outlined"
-                        color="neutral"
-                        onClick={onAvatarPick}
-                        loading={avatarForm.processing}
-                        sx={{
-                            bgcolor: "background.body",
-                            position: "absolute",
-                            zIndex: 2,
-                            borderRadius: "50%",
-                            right: -4,
-                            bottom: 24,
-                            boxShadow: "sm",
-                        }}
-                    >
-                        <IconPencil size={16} stroke={1.75} />
-                    </IconButton>
-                    {user?.avatar_url && (
-                        <Button
+                        <IconButton
+                            aria-label="Change photo"
                             size="sm"
-                            variant="plain"
-                            color="danger"
-                            type="button"
-                            onClick={onAvatarDelete}
-                            startDecorator={
-                                <IconTrash size={14} stroke={1.75} />
-                            }
-                            sx={{ alignSelf: "center" }}
+                            variant="solid"
+                            color="primary"
+                            onClick={onAvatarPick}
+                            loading={avatarForm.processing}
+                            sx={{
+                                position: "absolute",
+                                right: 0,
+                                bottom: 0,
+                                borderRadius: "50%",
+                                boxShadow: "md",
+                                "--IconButton-size": "34px",
+                            }}
                         >
-                            Remove
-                        </Button>
-                    )}
+                            <IconPencil size={16} stroke={2} />
+                        </IconButton>
+                        {user?.avatar_url && !avatarForm.processing && (
+                            <IconButton
+                                aria-label="Remove photo"
+                                size="sm"
+                                variant="outlined"
+                                color="danger"
+                                onClick={onAvatarDelete}
+                                sx={{
+                                    position: "absolute",
+                                    left: 0,
+                                    bottom: 0,
+                                    borderRadius: "50%",
+                                    bgcolor: "background.body",
+                                    boxShadow: "sm",
+                                    "--IconButton-size": "30px",
+                                }}
+                            >
+                                <IconTrash size={14} stroke={1.75} />
+                            </IconButton>
+                        )}
+                    </Box>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -171,10 +183,26 @@ function PersonalInfoCard({ user }) {
                         onChange={onAvatarChosen}
                         style={{ display: "none" }}
                     />
-                    {avatarForm.errors.avatar && (
-                        <Typography level="body-xs" color="danger">
+                    {avatarForm.errors.avatar ? (
+                        <Typography
+                            level="body-xs"
+                            color="danger"
+                            sx={{ textAlign: "center" }}
+                        >
                             {avatarForm.errors.avatar}
                         </Typography>
+                    ) : (
+                        uploadLimitMb && (
+                            <Typography
+                                level="body-xs"
+                                sx={{
+                                    textAlign: "center",
+                                    color: "text.tertiary",
+                                }}
+                            >
+                                Max {uploadLimitMb} MB · PNG, JPEG, WEBP, AVIF
+                            </Typography>
+                        )
                     )}
                 </Stack>
                 <Stack spacing={2} sx={{ flexGrow: 1, width: "100%" }}>
@@ -563,6 +591,7 @@ export default function Profile() {
     const page = usePage();
     const user = page.props.auth?.user;
     const twoFactor = page.props.twoFactor;
+    const avatarUploadLimitKb = page.props.avatarUploadLimitKb;
 
     return (
         <AdminDashboardLayout>
@@ -649,7 +678,10 @@ export default function Profile() {
                         py: { xs: 2, md: 3 },
                     }}
                 >
-                    <PersonalInfoCard user={user} />
+                    <PersonalInfoCard
+                        user={user}
+                        avatarUploadLimitKb={avatarUploadLimitKb}
+                    />
                     <SecurityCard />
                     <TwoFactorCard twoFactor={twoFactor} />
                 </Stack>
