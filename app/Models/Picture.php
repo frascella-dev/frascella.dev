@@ -54,6 +54,14 @@ class Picture extends Model
             ->orderByPivot('sort_order');
     }
 
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'picture_project')
+            ->withPivot('role', 'sort_order')
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
+    }
+
     public function url(): ?string
     {
         return Storage::disk($this->disk)->url($this->path);

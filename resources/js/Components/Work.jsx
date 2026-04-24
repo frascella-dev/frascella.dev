@@ -1,64 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from './Hooks.jsx';
 
-export const PROJECTS = [
-    {
-        slug: 'ledger-works',
-        year: '2025',
-        title: 'Ledger Works',
-        client: 'Fintech platform',
-        role: 'Backend lead',
-        tagline: 'Double-entry ledger & treasury API.',
-        stack: ['Node', 'PostgreSQL', 'AWS'],
-        metric: { n: '47ms', l: 'p99 reconciliation' },
-        tone: 'ink',
-    },
-    {
-        slug: 'atlas-routing',
-        year: '2024',
-        title: 'Atlas Routing',
-        client: 'Logistics SaaS',
-        role: 'Backend engineer',
-        tagline: 'Constraint-aware dispatch & last-mile.',
-        stack: ['PHP', 'MySQL', 'Redis'],
-        metric: { n: '4k', l: 'daily stops / tenant' },
-        tone: 'paper',
-    },
-    {
-        slug: 'warden',
-        year: '2024',
-        title: 'Warden',
-        client: 'Internal platform',
-        role: 'Backend + infra',
-        tagline: 'Observability & policy engine, 11 services.',
-        stack: ['Python', 'AWS', 'PostgreSQL'],
-        metric: { n: '18s', l: 'mean time to detect' },
-        tone: 'accent',
-    },
-    {
-        slug: 'relay',
-        year: '2023',
-        title: 'Relay',
-        client: 'Messaging startup',
-        role: 'Backend engineer',
-        tagline: 'Broker + retry, exactly-once delivery.',
-        stack: ['Node', 'RabbitMQ'],
-        metric: { n: '−91%', l: 'dead-letter volume' },
-        tone: 'outline',
-    },
-    {
-        slug: 'glasshouse',
-        year: '2023',
-        title: 'Glasshouse',
-        client: 'Horticulture',
-        role: 'Full stack',
-        tagline: 'Telemetry API for a family greenhouse.',
-        stack: ['Java', 'MySQL'],
-        metric: { n: '24 / 7', l: 'telemetry, 2+ years' },
-        tone: 'paper',
-    },
-];
-
 const LAYOUTS = {
     1: [{ x: 2, y: 1, w: 8, h: 8, tilt: -1.5 }],
     2: [
@@ -137,10 +79,12 @@ function Tile({ p, i, idx, layout, rel, mouse, focused, onFocus, onBlur }) {
             </div>
 
             <footer className="ef-tile-foot">
-                <div className="ef-tile-metric">
-                    <strong>{p.metric.n}</strong>
-                    <em>{p.metric.l}</em>
-                </div>
+                {p.metric && (
+                    <div className="ef-tile-metric">
+                        <strong>{p.metric.n}</strong>
+                        <em>{p.metric.l}</em>
+                    </div>
+                )}
                 <span className="ef-tile-arrow" aria-hidden>
                     <svg viewBox="0 0 24 24" width="16" height="16">
                         <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="square" />
@@ -149,13 +93,13 @@ function Tile({ p, i, idx, layout, rel, mouse, focused, onFocus, onBlur }) {
             </footer>
 
             <ul className="ef-tile-stack" aria-hidden>
-                {p.stack.map((s) => <li key={s}>{s}</li>)}
+                {(p.stack || []).map((s) => <li key={s}>{s}</li>)}
             </ul>
         </div>
     );
 }
 
-export default function Work() {
+export default function Work({ projects = [] }) {
     const [revealRef, shown] = useReveal();
     const sectionRef = useRef(null);
     const [rel, setRel] = useState(0);
@@ -163,7 +107,7 @@ export default function Work() {
     const [focused, setFocused] = useState(null);
     const isMobile = useIsMobile();
 
-    const shown_projects = PROJECTS.slice(0, isMobile ? MOBILE_MAX : DESKTOP_MAX);
+    const shown_projects = projects.slice(0, isMobile ? MOBILE_MAX : DESKTOP_MAX);
     const layout = LAYOUTS[shown_projects.length] || LAYOUTS[5];
 
     const setRefs = (node) => {

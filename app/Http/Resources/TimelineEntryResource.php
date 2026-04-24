@@ -19,7 +19,10 @@ class TimelineEntryResource extends JsonResource
             'title' => $this->title,
             'body' => $this->body,
             'fraction' => $this->fraction,
-            'pictures' => PictureResource::collection($this->whenLoaded('pictures')),
+            'pictures' => $this->whenLoaded(
+                'pictures',
+                fn () => PictureResource::collection($this->pictures)->resolve()
+            ),
         ];
     }
 }
