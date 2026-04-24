@@ -3,48 +3,7 @@ import { useReveal } from './Hooks.jsx';
 import heroLightAvif from '../../images/hero-light.avif';
 import heroLightWebp from '../../images/hero-light.webp';
 
-const TIMELINE = [
-    {
-        year: 2000, kind: 'life',
-        title: 'Born',
-        body: 'My story starts in Taranto — a port town on the Ionian sea.',
-        photo: null,
-    },
-    {
-        year: 2006, kind: 'life',
-        title: 'First PC',
-        body: 'Beige tower, CRT monitor, dial-up noises. Everything suddenly became interesting.',
-        photo: null,
-    },
-    {
-        year: 2011, kind: 'code',
-        title: 'Decompiling Android apps',
-        body: 'Started pulling apart APKs — smali, dex, manifests — and reassembling them. Learned how software is put together by taking it apart.',
-        photo: null,
-    },
-    {
-        year: 2021, kind: 'work',
-        title: 'La Termica srl',
-        body: 'Joined La Termica designing photovoltaic plants. CAD, sun-path math, and learning how real systems survive the weather.',
-        photo: null,
-    },
-    {
-        year: 2023, kind: 'work',
-        title: 'SMED srl',
-        body: 'Moved to SMED, a telemedicine company. Backend-heavy work on clinical data, APIs, and integrations.',
-        photo: null,
-    },
-    {
-        year: 2026, kind: 'now',
-        title: 'Giocaonline srl',
-        body: 'Currently building casino games at Giocaonline — real-time systems, fairness, and a lot of state to keep honest.',
-        photo: null,
-    },
-];
-
-const T_FRACTIONS = [0.16, 0.26, 0.38, 0.58, 0.70, 0.84];
-
-function Timeline() {
+function Timeline({ items }) {
     const wrapRef = useRef(null);
     const pathRef = useRef(null);
     const [active, setActive] = useState(null);
@@ -75,7 +34,8 @@ function Timeline() {
         if (!p) return;
         requestAnimationFrame(() => {
             const total = p.getTotalLength();
-            const pts = T_FRACTIONS.map((t) => {
+            const pts = items.map((entry) => {
+                const t = entry.fraction;
                 const pt = p.getPointAtLength(t * total);
                 const pt2 = p.getPointAtLength(Math.min(total, t * total + 1));
                 const tangent = Math.atan2(pt2.y - pt.y, pt2.x - pt.x);
@@ -156,8 +116,8 @@ function Timeline() {
         }
     }, [mousePx, positions, dims.h]);
 
-    const first = TIMELINE[0]?.year;
-    const last = TIMELINE[TIMELINE.length - 1]?.year;
+    const first = items[0]?.year;
+    const last = items[items.length - 1]?.year;
     const { w, h } = dims;
 
     const baseWaypoints = [
@@ -292,7 +252,7 @@ function Timeline() {
 
                 <ol className="ef-tl-nodes">
                     {positions.map((pos, i) => {
-                        const item = TIMELINE[i];
+                        const item = items[i];
                         if (!item) return null;
                         const isActive = active === i;
                         const vside = pos.y > h * 0.55 ? 'above' : 'below';
@@ -320,7 +280,7 @@ function Timeline() {
                 </ol>
 
                 <FollowCard
-                    item={active != null ? TIMELINE[active] : null}
+                    item={active != null ? items[active] : null}
                     activeIdx={active}
                     mousePx={mousePx}
                     vel={vel}
@@ -330,8 +290,8 @@ function Timeline() {
             </div>
 
             <ol className="ef-tl-mobile" aria-label="Career timeline">
-                {TIMELINE.map((item, i) => {
-                    const isLast = i === TIMELINE.length - 1;
+                {items.map((item, i) => {
+                    const isLast = i === items.length - 1;
                     return (
                         <li
                             key={item.year + item.title}
@@ -420,7 +380,7 @@ function PhotoPlaceholder({ year, kind }) {
     );
 }
 
-export default function About() {
+export default function About({ timeline = [] }) {
     const [revealRef, shown] = useReveal();
     const sectionRef = useRef(null);
     const [rel, setRel] = useState(0);
@@ -559,7 +519,7 @@ export default function About() {
                 </dl>
             </div>
 
-            <Timeline />
+            <Timeline items={timeline} />
 
             <div
                 className="ef-about-bigword"

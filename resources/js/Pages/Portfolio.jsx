@@ -11,7 +11,7 @@ import About from '../Components/About.jsx';
 import Contact from '../Components/Contact.jsx';
 import ProjectPage from '../Components/ProjectPage.jsx';
 
-export default function Portfolio() {
+export default function Portfolio({ timeline = [] }) {
     const [booted, setBooted] = useState(() => {
         try {
             return sessionStorage.getItem('ef-splash-seen') === '1';
@@ -84,7 +84,7 @@ export default function Portfolio() {
                     <>
                         <Hero />
                         <Work />
-                        <About />
+                        <About timeline={timeline} />
                         <Contact />
                     </>
                 )}
