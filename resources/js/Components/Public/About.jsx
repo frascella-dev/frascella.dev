@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from './Hooks.jsx';
-import heroLightAvif from '../../images/hero-light.avif';
-import heroLightWebp from '../../images/hero-light.webp';
+import heroLightAvif from '../../../images/hero-light.avif';
+import heroLightWebp from '../../../images/hero-light.webp';
 
 function Timeline({ items }) {
     const wrapRef = useRef(null);

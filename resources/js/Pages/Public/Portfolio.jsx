@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Head } from '@inertiajs/react';
-import Lenis from 'lenis';
+import "../../../css/app.css";
 
-import CustomCursor from '../Components/CustomCursor.jsx';
-import Nav, { useRoute } from '../Components/Nav.jsx';
-import Splash from '../Components/Splash.jsx';
-import Hero from '../Components/Hero.jsx';
-import Work from '../Components/Work.jsx';
-import About from '../Components/About.jsx';
-import Contact from '../Components/Contact.jsx';
-import ProjectPage from '../Components/ProjectPage.jsx';
+import { useEffect, useState } from "react";
+import { Head } from "@inertiajs/react";
+import Lenis from "lenis";
+
+import CustomCursor from "../../Components/Public/CustomCursor.jsx";
+import Nav, { useRoute } from "../../Components/Public/Nav.jsx";
+import Splash from "../../Components/Public/Splash.jsx";
+import Hero from "../../Components/Public/Hero.jsx";
+import Work from "../../Components/Public/Work.jsx";
+import About from "../../Components/Public/About.jsx";
+import Contact from "../../Components/Public/Contact.jsx";
+import ProjectPage from "../../Components/Public/ProjectPage.jsx";
 
 export default function Portfolio({ timeline = [], projects = [] }) {
     const [booted, setBooted] = useState(() => {
         try {
-            return sessionStorage.getItem('ef-splash-seen') === '1';
+            return sessionStorage.getItem("ef-splash-seen") === "1";
         } catch {
             return false;
         }
@@ -40,7 +42,7 @@ export default function Portfolio({ timeline = [], projects = [] }) {
         const onClick = (e) => {
             const a = e.target.closest('a[href^="#"]');
             if (!a) return;
-            const href = a.getAttribute('href');
+            const href = a.getAttribute("href");
             const id = href.slice(1);
             if (!id) return;
             const el = document.getElementById(id);
@@ -48,20 +50,21 @@ export default function Portfolio({ timeline = [], projects = [] }) {
             e.preventDefault();
             lenis.scrollTo(el, { offset: -20, duration: 1.4 });
         };
-        document.addEventListener('click', onClick);
+        document.addEventListener("click", onClick);
 
-        const fill = document.getElementById('ef-scroll-fill');
+        const fill = document.getElementById("ef-scroll-fill");
         const onScroll = () => {
-            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const max =
+                document.documentElement.scrollHeight - window.innerHeight;
             const p = max > 0 ? window.scrollY / max : 0;
-            if (fill) fill.style.setProperty('--p', p);
+            if (fill) fill.style.setProperty("--p", p);
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener("scroll", onScroll, { passive: true });
         onScroll();
 
         return () => {
-            document.removeEventListener('click', onClick);
-            window.removeEventListener('scroll', onScroll);
+            document.removeEventListener("click", onClick);
+            window.removeEventListener("scroll", onScroll);
             lenis.destroy();
         };
     }, [booted]);
@@ -77,7 +80,12 @@ export default function Portfolio({ timeline = [], projects = [] }) {
             {!booted && <Splash onDone={() => setBooted(true)} />}
             <CustomCursor />
             <Nav />
-            <main style={{ opacity: booted ? 1 : 0, transition: 'opacity 0.6s ease' }}>
+            <main
+                style={{
+                    opacity: booted ? 1 : 0,
+                    transition: "opacity 0.6s ease",
+                }}
+            >
                 {onDetail ? (
                     <ProjectPage />
                 ) : (

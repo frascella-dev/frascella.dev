@@ -19,7 +19,7 @@ class PortfolioController extends Controller
 
     public function __invoke(): Response
     {
-        return Inertia::render('Portfolio', [
+        return Inertia::render('Public/Portfolio', [
             'timeline' => TimelineEntryResource::collection(
                 $this->timeline->getTimeline()
             )->resolve(),

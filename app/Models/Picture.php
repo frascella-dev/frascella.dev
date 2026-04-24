@@ -62,6 +62,12 @@ class Picture extends Model
             ->orderByPivot('sort_order');
     }
 
+    public function avatarUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'pictures_avatars')
+            ->withTimestamps();
+    }
+
     public function url(): ?string
     {
         return Storage::disk($this->disk)->url($this->path);
