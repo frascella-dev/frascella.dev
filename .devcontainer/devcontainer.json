@@ -1,0 +1,33 @@
+{
+    "name": "Laravel PHP 8.3 Dev",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/var/www/html",
+    "remoteUser": "www",
+    "forwardPorts": [8000, 5173, 8080, 3306],
+    "portsAttributes": {
+        "8000": { "label": "Laravel (artisan serve)" },
+        "5173": { "label": "Vite dev server" },
+        "8080": { "label": "phpMyAdmin" },
+        "3306": { "label": "MySQL" }
+    },
+    "postCreateCommand": "composer --version && php --version && node --version",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "xdebug.php-debug",
+                "onecentlin.laravel-blade",
+                "amiralizadeh9480.laravel-extra-intellisense",
+                "ryannaddy.laravel-artisan",
+                "mikestead.dotenv",
+                "editorconfig.editorconfig",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}
