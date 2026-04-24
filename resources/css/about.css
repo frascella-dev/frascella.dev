@@ -1,0 +1,377 @@
+/* ============================================================
+   ABOUT — abstract editorial with parallax field
+   ============================================================ */
+.ef-about {
+  position: relative;
+  background: var(--paper);
+  padding: clamp(80px, 12vh, 160px) clamp(16px, 5vw, 80px) 120px;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ef-about-field { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.ef-about-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
+  background-size: 8.3333% 100%, 100% 96px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 50%, #000 30%, transparent 95%);
+}
+.ef-a-rect--1 { top: 8vh;  right: 8vw;  width: 1px;   height: 32vh; background: var(--ink); opacity: 0.5; }
+.ef-a-rect--2 { top: 42vh; left: 6vw;   width: 140px; height: 90px; border: 1px solid var(--ink); opacity: 0.55; }
+.ef-a-rect--3 { top: 66vh; right: 14vw; width: 36vw;  height: 1px;  background: var(--ink); opacity: 0.3; }
+.ef-a-rect--4 { top: 22vh; right: 22vw; width: 72px;  height: 180px; border: 1px solid var(--ink); opacity: 0.35; }
+.ef-a-rect--5 { top: 88vh; left: 12vw;  width: 96px;  height: 1px;  background: var(--ink); opacity: 0.6; }
+.ef-a-rect--acc {
+  top: 56vh; left: 42vw;
+  width: 28px; height: 28px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.ef-a-rule-v { top: 0; left: 62%; width: 1px; height: 100%; background: var(--ink); opacity: 0.08; }
+.ef-a-rule-h { top: 38%; left: 0; width: 100%; height: 1px; background: var(--ink); opacity: 0.06; }
+.ef-a-dot    { position: absolute; top: 34vh; left: 48vw; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); will-change: transform; }
+.ef-a-cross  { position: absolute; top: 74vh; right: 40vw; width: 24px; height: 24px; stroke: var(--ink); stroke-width: 1; fill: none; opacity: 0.6; will-change: transform; }
+.ef-a-cross circle { fill: var(--accent); stroke: var(--ink); }
+
+/* --- Head --- */
+.ef-about-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 1400px;
+  margin: 0 auto 8vh;
+}
+.ef-about-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(40px, 11vw, 200px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+.ef-about-title .ef-line { display: flex; align-items: baseline; gap: clamp(12px, 2.4vw, 48px); flex-wrap: wrap; }
+.ef-about-title .ef-line--1 { justify-content: flex-start; }
+.ef-about-title .ef-line--2 { justify-content: flex-end; padding-right: clamp(20px, 6vw, 120px); }
+.ef-about-title .ef-line--3 { justify-content: flex-start; padding-left: clamp(40px, 12vw, 220px); }
+.ef-about-title .ef-w--em {
+  font-style: italic;
+  font-weight: 300;
+  position: relative;
+}
+.ef-about-title .ef-w--em::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0.08em;
+  height: 0.18em;
+  background: var(--accent);
+  z-index: -1;
+}
+.ef-about-title .ef-w--thin { font-weight: 200; color: var(--ink-mute); }
+
+/* --- Body --- */
+.ef-about-body-wrap {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-areas:
+    "lead    portrait"
+    "cols    portrait"
+    "facts   facts"
+    "manifesto manifesto";
+  gap: clamp(28px, 5vw, 72px) clamp(28px, 5vw, 80px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ef-about-lead { grid-area: lead; display: flex; flex-direction: column; gap: 16px; }
+.ef-about-lead-text {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(22px, 2.8vw, 40px);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 22ch;
+  text-wrap: pretty;
+}
+.ef-about-lead-text em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink-mute);
+}
+
+.ef-about-portrait {
+  grid-area: portrait;
+  position: relative;
+  align-self: start;
+  justify-self: end;
+  width: min(32vw, 380px);
+  aspect-ratio: 3 / 4;
+  background: var(--paper-2);
+  overflow: hidden;
+  box-shadow: 0 30px 80px -40px rgba(17,17,16,0.35);
+  will-change: transform;
+}
+.ef-about-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: multiply;
+  display: block;
+}
+.ef-about-portrait-tag {
+  position: absolute;
+  bottom: 12px; left: 12px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ef-about-cols {
+  grid-area: cols;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 48px);
+}
+.ef-about-col { display: flex; flex-direction: column; gap: 10px; }
+.ef-about-col p {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  letter-spacing: -0.005em;
+  max-width: 36ch;
+}
+
+/* --- Facts --- */
+.ef-about-facts {
+  grid-area: facts;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.ef-about-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 18px;
+  border-right: 1px solid var(--rule);
+}
+.ef-about-facts > div:last-child { border-right: none; }
+.ef-about-facts dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+.ef-about-facts dd {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ef-dot-live {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 70%);
+  animation: ef-pulse 2.4s ease-in-out infinite;
+}
+
+.ef-about-manifesto {
+  grid-area: manifesto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 16px;
+}
+.ef-about-manifesto ol {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 48px;
+}
+.ef-about-manifesto li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+}
+.ef-principle-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding-top: 6px;
+}
+.ef-about-manifesto h4 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  padding-bottom: 4px;
+}
+.ef-about-manifesto li p {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 36ch;
+}
+
+.ef-about-bigword {
+  position: absolute;
+  left: -2vw; right: -2vw;
+  bottom: -12vw;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 32vw;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+  opacity: 0.04;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+  overflow: hidden;
+  will-change: transform;
+}
+
+@media (max-width: 900px) {
+  .ef-about-title { font-size: clamp(40px, 13vw, 92px); }
+  .ef-about-title .ef-line--2 { padding-right: 0; justify-content: flex-start; }
+  .ef-about-title .ef-line--3 { padding-left: 16px; }
+  .ef-about-body-wrap {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "lead"
+      "portrait"
+      "cols"
+      "facts"
+      "manifesto";
+  }
+  .ef-about-portrait {
+    justify-self: end;
+    width: 90vw;
+    max-width: none;
+    margin-right: calc(-1 * clamp(16px, 5vw, 80px) - 6vw); /* escape parent padding + bleed */
+    margin-left: auto;
+  }
+  .ef-about-cols { grid-template-columns: 1fr; }
+  .ef-about-facts { grid-template-columns: 1fr 1fr; }
+  .ef-about-facts > div { border-bottom: 1px solid var(--rule); padding: 10px 14px; }
+  .ef-about-facts > div:nth-child(even) { border-right: none; }
+  .ef-about-manifesto ol { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .ef-about { padding: 60px 14px 80px; }
+  .ef-about-title .ef-line--3 { padding-left: 0; }
+}
+
+/* ============================================================
+   STACK
+   ============================================================ */
+.ef-stack {
+  position: relative;
+  z-index: 2;
+  padding: 96px 0 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.ef-stack-head {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  padding-bottom: 28px;
+}
+.ef-stack-head h3 em { font-style: italic; font-weight: 300; color: var(--ink-mute); }
+.ef-stack-table { border-top: 1px solid var(--ink); }
+.ef-stack-row {
+  display: grid;
+  grid-template-columns: 60px 1.4fr 1.2fr 1fr 40px;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.35s var(--ease), color 0.35s var(--ease), padding 0.35s var(--ease);
+}
+.ef-stack-row-head { color: var(--ink-mute); padding: 12px 0; border-bottom: 1px solid var(--rule-strong); }
+.ef-stack-row.is-hover {
+  background: var(--ink);
+  color: var(--paper);
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.ef-stack-row.is-hover .ef-stack-arrow { color: var(--accent); }
+.ef-stack-row.is-dim { opacity: 0.35; }
+.ef-stack-name {
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+.ef-stack-arrow {
+  font-family: var(--mono);
+  font-size: 14px;
+  text-align: right;
+  color: var(--ink-mute);
+}
+.ef-bar { display: inline-flex; align-items: center; gap: 10px; width: 100%; position: relative; }
+.ef-bar::before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.15;
+}
+.ef-bar-fill {
+  position: absolute;
+  left: 0; top: 50%;
+  height: 2px;
+  background: var(--accent);
+  transform: translateY(-50%);
+  transition: width 0.6s var(--ease);
+  max-width: calc(100% - 40px);
+}
+.ef-bar-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  z-index: 2;
+  position: relative;
+  background: inherit;
+  padding-left: 8px;
+}
+
+@media (max-width: 900px) {
+  .ef-stack-head { grid-template-columns: 1fr; }
+  .ef-stack-row { grid-template-columns: 40px 1.4fr 1fr 30px; padding: 14px 0; }
+  .ef-stack-row > span:nth-child(4) { display: none; }
+}

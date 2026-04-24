@@ -1,0 +1,162 @@
+/* ============================================================
+   BASE — variables, reset, globals, type, scroll progress
+   ============================================================ */
+
+:root {
+  --paper: #EEEAE0;
+  --paper-2: #E6E1D4;
+  --paper-3: #DCD5C4;
+  --ink: #111110;
+  --ink-2: #2A2824;
+  --ink-mute: #7A7566;
+  --rule: rgba(17,17,16,0.14);
+  --rule-strong: rgba(17,17,16,0.55);
+  --accent: #FF6B1A;
+  --accent-2: #C7F651;
+  --accent-ink: #0B0B08;
+
+  --sans: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --display: "Outfit", "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --term: "Courier Prime", "Courier New", ui-monospace, Menlo, Consolas, monospace;
+
+  --hero-scale: 1;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-scale="m"]   { --hero-scale: 0.82; }
+html[data-scale="l"]   { --hero-scale: 0.92; }
+html[data-scale="xl"]  { --hero-scale: 1;    }
+html[data-scale="xxl"] { --hero-scale: 1.14; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  scroll-behavior: auto;
+  font-feature-settings: "ss01", "cv11";
+}
+
+html[data-cursor="on"] body { cursor: none; }
+html[data-cursor="on"] a,
+html[data-cursor="on"] button { cursor: none; }
+
+body::-webkit-scrollbar { width: 0; height: 0; }
+
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: radial-gradient(rgba(17,17,16,0.04) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+/* Scroll progress bar */
+.ef-scroll-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 200;
+  pointer-events: none;
+  background: transparent;
+}
+.ef-scroll-bar-fill {
+  height: 100%;
+  background: var(--ink);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+  transition: transform 0.1s linear;
+}
+
+/* ============================================================
+   TYPE
+   ============================================================ */
+.ef-mono {
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+}
+.ef-label {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 10.5px;
+  color: var(--ink-mute);
+  font-weight: 400;
+}
+
+.ef-h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(40px, 6.2vw, 96px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.ef-h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(28px, 3.6vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.ef-section-head {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  padding: 120px clamp(28px, 5vw, 80px) 48px;
+  border-bottom: 1px solid var(--rule);
+}
+.ef-section-head > div:first-child { display: flex; flex-direction: column; gap: 22px; }
+.ef-section-note { align-self: end; padding-bottom: 6px; display: flex; flex-direction: column; gap: 16px; }
+.ef-section-note p {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 46ch;
+  letter-spacing: -0.005em;
+  color: var(--ink-2);
+}
+.ef-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--ink-mute);
+}
+.ef-arrow-wrap {
+  position: relative;
+  display: inline-block;
+  width: 120px; height: 1px;
+  background: var(--ink);
+  opacity: 0.2;
+}
+.ef-arrow-line {
+  position: absolute; top: 0; left: 0;
+  height: 1px;
+  background: var(--ink);
+  width: calc(var(--p, 0) * 100%);
+  transition: width 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Global mobile overflow safety */
+@media (max-width: 720px) {
+  html, body { max-width: 100vw; overflow-x: hidden; }
+  img, svg, video { max-width: 100%; height: auto; }
+  * { min-width: 0; }
+}

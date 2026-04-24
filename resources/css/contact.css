@@ -1,0 +1,142 @@
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.ef-contact {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 96px 28px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.ef-contact .ef-label { color: rgba(238,234,224,0.5); }
+.ef-colophon {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(238,234,224,0.14);
+}
+.ef-colophon-lines { display: flex; flex-direction: column; gap: 8px; color: rgba(238,234,224,0.65); }
+
+.ef-contact-h {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(40px, 9.5vw, 168px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  padding: 72px 0 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.ef-contact-h span { display: block; }
+.ef-contact-h-italic em { font-style: normal; color: var(--accent); }
+.ef-contact-h-underline {
+  position: relative;
+  align-self: flex-end;
+}
+.ef-contact-h-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0.08em;
+  height: 0.05em;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.ef-contact.is-in .ef-contact-h-underline::after {
+  animation: efUnderline 1.6s var(--ease) forwards;
+  animation-delay: 0.2s;
+}
+@keyframes efUnderline { to { transform: scaleX(1); } }
+
+.ef-contact-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid rgba(238,234,224,0.14);
+  border-bottom: 1px solid rgba(238,234,224,0.14);
+}
+.ef-contact-email {
+  all: unset;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 0;
+  color: var(--paper);
+}
+.ef-contact-email-main {
+  font-family: var(--display);
+  font-size: clamp(22px, 3.6vw, 48px);
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+  word-break: break-all;
+}
+.ef-contact-email:hover .ef-contact-email-main {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.ef-copied { opacity: 0.5; transition: opacity 0.3s, color 0.3s; }
+.ef-copied.is-in { color: var(--accent); opacity: 1; }
+
+.ef-contact-links { display: flex; flex-direction: column; gap: 12px; }
+.ef-contact-links a {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid rgba(238,234,224,0.22);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.ef-contact-links a:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.ef-contact-links a .ef-label { color: rgba(238,234,224,0.5); }
+.ef-contact-links a:hover .ef-label { color: var(--accent-ink); opacity: 0.6; }
+
+.ef-foot { padding-top: 32px; }
+.ef-foot-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+  color: rgba(238,234,224,0.55);
+  padding-bottom: 28px;
+}
+.ef-foot-row span:nth-child(2) { text-align: center; }
+.ef-foot-row span:last-child { text-align: right; }
+.ef-foot-mono { line-height: 0; }
+.ef-foot-mono svg { display: block; width: 100%; height: auto; }
+.ef-foot-word {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 220px;
+  letter-spacing: -0.05em;
+  fill: none;
+  stroke: rgba(238,234,224,0.12);
+  stroke-width: 1;
+}
+
+@media (max-width: 900px) {
+  .ef-contact { padding: 72px 16px 24px; }
+  .ef-contact-h { padding: 48px 0 32px; }
+  .ef-contact-row { grid-template-columns: 1fr; padding: 24px 0; gap: 24px; }
+  .ef-colophon { grid-template-columns: 1fr; gap: 16px; padding-bottom: 32px; }
+  .ef-foot-row { grid-template-columns: 1fr; gap: 8px; }
+  .ef-foot-row span:nth-child(2), .ef-foot-row span:last-child { text-align: left; }
+  .ef-contact-email { grid-template-columns: 1fr; gap: 6px; }
+  .ef-contact-email-main { font-size: clamp(22px, 7vw, 40px); }
+  .ef-contact-links a { grid-template-columns: 32px 1fr auto; padding: 14px 16px; font-size: 15px; }
+}

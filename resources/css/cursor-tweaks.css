@@ -1,0 +1,126 @@
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+.ef-cursor-dot, .ef-cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+.ef-cursor-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.ef-cursor-ring {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s var(--ease), border-color 0.3s var(--ease);
+  display: grid;
+  place-items: center;
+}
+.ef-cursor-ring * { color: var(--ink); }
+.ef-cursor-link.ef-cursor-ring { width: 44px; height: 44px; background: var(--ink); border-color: var(--ink); }
+.ef-cursor-link.ef-cursor-dot { opacity: 0; }
+.ef-cursor-view.ef-cursor-ring {
+  width: 84px; height: 84px;
+  background: var(--accent);
+  border-color: var(--accent);
+  mix-blend-mode: normal;
+}
+.ef-cursor-view.ef-cursor-dot { opacity: 0; }
+.ef-cursor-label {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  color: var(--accent-ink) !important;
+  white-space: nowrap;
+}
+html[data-cursor="off"] .ef-cursor-dot,
+html[data-cursor="off"] .ef-cursor-ring { display: none; }
+
+/* Hide cursor entirely on touch devices */
+@media (hover: none), (pointer: coarse), (max-width: 900px) {
+  .ef-cursor-dot, .ef-cursor-ring { display: none !important; }
+  html[data-cursor="on"] body,
+  html[data-cursor="on"] a,
+  html[data-cursor="on"] button { cursor: auto; }
+}
+
+/* ============================================================
+   TWEAKS
+   ============================================================ */
+.ef-tweaks {
+  position: fixed;
+  right: 20px; bottom: 20px;
+  z-index: 200;
+  width: 280px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  font-family: var(--sans);
+}
+.ef-tweaks-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+.ef-tweaks-head .ef-mono { font-size: 10px; letter-spacing: 0.1em; }
+.ef-tweaks-toggle { all: unset; cursor: pointer; font-size: 16px; width: 20px; height: 20px; display: grid; place-items: center; }
+.ef-tweaks-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.ef-tw-row { display: flex; flex-direction: column; gap: 8px; }
+.ef-tw-row.ef-tw-check { flex-direction: row; justify-content: space-between; align-items: center; }
+.ef-tw-swatches { display: flex; gap: 6px; }
+.ef-tw-swatch {
+  width: 28px; height: 28px;
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease);
+}
+.ef-tw-swatch.is-on {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink);
+}
+.ef-tw-seg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 0;
+  border: 1px solid var(--ink);
+}
+.ef-tw-seg button {
+  all: unset;
+  text-align: center;
+  padding: 8px 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-right: 1px solid var(--ink);
+  text-transform: uppercase;
+}
+.ef-tw-seg button:last-child { border-right: 0; }
+.ef-tw-seg button.is-on { background: var(--ink); color: var(--paper); }
+.ef-tw-switch {
+  all: unset;
+  cursor: pointer;
+  width: 36px; height: 20px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: background 0.25s var(--ease);
+}
+.ef-tw-switch span { width: 14px; height: 14px; background: var(--ink); border-radius: 50%; transition: transform 0.25s var(--ease); }
+.ef-tw-switch.is-on { background: var(--ink); }
+.ef-tw-switch.is-on span { background: var(--accent); transform: translateX(16px); }
+
+@media (max-width: 900px) {
+  .ef-tweaks { right: 10px; bottom: 10px; width: calc(100vw - 20px); max-width: 280px; }
+}

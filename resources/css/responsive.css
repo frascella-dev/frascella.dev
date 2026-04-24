@@ -1,0 +1,32 @@
+/* ============================================================
+   RESPONSIVE — global breakpoints
+   ============================================================ */
+@media (max-width: 900px) {
+  .ef-nav-items { display: none; }
+  .ef-hero-grid { grid-template-columns: 1fr; }
+  .ef-meta-tr { justify-self: start; margin-top: 4px; }
+  .ef-hero-foot { grid-template-columns: 1fr; gap: 24px; }
+  .ef-foot-col-cta { align-items: flex-start; text-align: left; }
+  .ef-cta { min-width: 100%; }
+  .ef-section-head { grid-template-columns: 1fr; gap: 24px; padding: 80px 20px 32px; }
+  .ef-about-grid { grid-template-columns: 1fr; gap: 32px; padding: 32px 20px; }
+  .ef-about-card { position: static; }
+  .ef-stack-head { grid-template-columns: 1fr; }
+  .ef-stack-row { grid-template-columns: 40px 1.4fr 1fr 30px; padding: 14px 0; }
+  .ef-stack-row > span:nth-child(4) { display: none; }
+  .ef-principles ol { grid-template-columns: 1fr; }
+  .ef-contact-h { font-size: 56px; }
+  .ef-contact-row { grid-template-columns: 1fr; padding: 24px 0; }
+  .ef-colophon { grid-template-columns: 1fr; gap: 16px; padding-bottom: 32px; }
+  .ef-foot-row { grid-template-columns: 1fr; gap: 8px; }
+  .ef-foot-row span:nth-child(2), .ef-foot-row span:last-child { text-align: left; }
+  .ef-proj { width: 78vw; }
+  .ef-work-end { width: 78vw; }
+  .ef-tweaks { right: 12px; bottom: 12px; width: 240px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+

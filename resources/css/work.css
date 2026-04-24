@@ -1,0 +1,399 @@
+/* ============================================================
+   WORK — scattered tile canvas, parallax-driven showcase
+   ============================================================ */
+.ef-work {
+  position: relative;
+  background: var(--paper);
+  padding: clamp(80px, 12vh, 160px) clamp(16px, 5vw, 80px) 180px;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* --- Abstract parallax field --- */
+.ef-work-field { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.ef-work-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
+  background-size: 8.3333% 100%, 100% 96px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 50%, #000 30%, transparent 95%);
+}
+.ef-w-rect--1 { top: 12vh; right: 6vw;  width: 1px;   height: 28vh; background: var(--ink); opacity: 0.5; }
+.ef-w-rect--2 { top: 48vh; left: 10vw;  width: 124px; height: 86px; border: 1px solid var(--ink); opacity: 0.35; }
+.ef-w-rect--3 { top: 72vh; right: 20vw; width: 28vw;  height: 1px;  background: var(--ink); opacity: 0.3; }
+.ef-w-rect--4 { top: 26vh; right: 24vw; width: 64px;  height: 160px; border: 1px solid var(--ink); opacity: 0.25; }
+.ef-w-rect--5 { top: 92vh; left: 16vw;  width: 96px;  height: 1px;  background: var(--ink); opacity: 0.55; }
+.ef-w-rect--acc {
+  top: 58vh; right: 8vw;
+  width: 28px; height: 28px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.ef-w-rule-v { top: 0; left: 38%; width: 1px; height: 100%; background: var(--ink); opacity: 0.08; }
+.ef-w-rule-h { top: 56%; left: 0; width: 100%; height: 1px; background: var(--ink); opacity: 0.06; }
+.ef-w-dot    { position: absolute; top: 40vh; right: 42vw; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); will-change: transform; }
+.ef-w-cross  { position: absolute; top: 80vh; left: 38vw; width: 24px; height: 24px; stroke: var(--ink); stroke-width: 1; fill: none; opacity: 0.6; will-change: transform; }
+.ef-w-cross circle { fill: var(--accent); stroke: var(--ink); }
+
+/* --- Head --- */
+.ef-work-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 1400px;
+  margin: 0 auto 8vh;
+}
+.ef-work-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(40px, 11vw, 200px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+.ef-work-title .ef-line { display: flex; align-items: baseline; gap: clamp(12px, 2.4vw, 48px); flex-wrap: wrap; }
+.ef-work-title .ef-line--1 { justify-content: flex-start; }
+.ef-work-title .ef-line--2 { justify-content: flex-end; padding-right: clamp(20px, 6vw, 120px); }
+.ef-work-title .ef-line--3 { justify-content: flex-start; padding-left: clamp(40px, 12vw, 220px); }
+.ef-work-title .ef-w--em {
+  font-style: italic;
+  font-weight: 300;
+  position: relative;
+}
+.ef-work-title .ef-w--em::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0.08em;
+  height: 0.18em;
+  background: var(--accent);
+  z-index: -1;
+}
+.ef-work-title .ef-w--thin { font-weight: 200; color: var(--ink-mute); }
+.ef-work-head-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  flex-wrap: wrap;
+}
+.ef-work-note {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink-mute);
+  max-width: 52ch;
+  letter-spacing: -0.005em;
+}
+.ef-work-count {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+
+/* --- Scatter canvas --- */
+.ef-work-canvas-wrap {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  max-width: 1600px;
+  aspect-ratio: 10 / 8;
+  min-height: 740px;
+}
+.ef-work-canvas-rules {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  pointer-events: none;
+  z-index: 0;
+}
+.ef-work-canvas-rules span {
+  border-right: 1px dashed rgba(17,17,16,0.06);
+}
+.ef-work-canvas-rules span:first-child { border-left: 1px dashed rgba(17,17,16,0.06); }
+
+.ef-work-canvas {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  gap: 18px;
+  z-index: 1;
+}
+
+/* --- Tile --- */
+.ef-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 22px;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--ink);
+  transition:
+    transform 0.7s var(--ease),
+    opacity 0.45s var(--ease),
+    border-color 0.35s var(--ease),
+    box-shadow 0.45s var(--ease);
+  will-change: transform;
+}
+.ef-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  z-index: -1;
+}
+.ef-tile.is-dimmed { opacity: 0.35; filter: saturate(0.6); }
+.ef-tile.is-focused { z-index: 5; box-shadow: 0 40px 80px -30px rgba(17,17,16,0.4); }
+
+.ef-tile--ink     { background: var(--ink); color: var(--paper); }
+.ef-tile--paper   { background: var(--paper-2); color: var(--ink); }
+.ef-tile--accent  { background: var(--accent); color: var(--ink); border-color: var(--ink); }
+.ef-tile--outline { background: transparent; color: var(--ink); border-color: var(--ink); }
+
+.ef-tile-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: -1;
+  transition: opacity 0.35s var(--ease), transform 1s var(--ease);
+}
+.ef-tile--ink .ef-tile-pattern {
+  background-image:
+    linear-gradient(to right, rgba(238,234,224,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(238,234,224,0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.ef-tile--paper .ef-tile-pattern {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(17,17,16,0.06) 0 1px,
+    transparent 1px 10px
+  );
+}
+.ef-tile--accent .ef-tile-pattern {
+  background-image: radial-gradient(rgba(17,17,16,0.18) 1px, transparent 1.6px);
+  background-size: 12px 12px;
+}
+.ef-tile--outline .ef-tile-pattern {
+  background-image:
+    linear-gradient(to right, rgba(17,17,16,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,16,0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.ef-tile.is-focused .ef-tile-pattern { transform: scale(1.15); }
+
+.ef-tile-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.ef-tile-idx { font-weight: 500; }
+
+.ef-tile-body {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 10%;
+}
+.ef-tile-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(22px, 3vw, 44px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+  text-wrap: balance;
+}
+.ef-tile-tag {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.8;
+  max-width: 28ch;
+}
+
+.ef-tile-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid currentColor;
+  border-top-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+.ef-tile-metric { display: flex; flex-direction: column; gap: 2px; }
+.ef-tile-metric strong {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(20px, 2.4vw, 32px);
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.ef-tile--accent .ef-tile-metric strong { color: var(--ink); }
+.ef-tile-metric em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.ef-tile-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  flex-shrink: 0;
+  transition: transform 0.4s var(--ease), background 0.35s var(--ease), color 0.35s var(--ease);
+}
+.ef-tile.is-focused .ef-tile-arrow {
+  background: currentColor;
+  transform: translateX(4px) rotate(-8deg);
+}
+.ef-tile.is-focused .ef-tile-arrow svg { color: var(--paper); }
+.ef-tile--ink.is-focused .ef-tile-arrow svg { color: var(--ink); }
+.ef-tile--accent.is-focused .ef-tile-arrow svg { color: var(--accent); }
+
+.ef-tile-stack {
+  list-style: none;
+  position: absolute;
+  top: 48px;
+  left: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.35s var(--ease), transform 0.4s var(--ease);
+  pointer-events: none;
+  max-width: 70%;
+}
+.ef-tile.is-focused .ef-tile-stack { opacity: 1; transform: translateY(0); }
+.ef-tile-stack li {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  opacity: 0.85;
+}
+
+.ef-work-bigword {
+  position: absolute;
+  left: -2vw; right: -2vw;
+  bottom: -12vw;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 30vw;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+  opacity: 0.05;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+  will-change: transform;
+}
+
+/* --- Footer strip --- */
+.ef-work-strip {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 80px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--ink);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 28px;
+}
+.ef-work-strip-link {
+  text-decoration: none;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: clamp(16px, 2vw, 26px);
+  letter-spacing: -0.015em;
+  position: relative;
+  justify-self: center;
+}
+.ef-work-strip-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+.ef-work-strip-link:hover::after { transform: scaleX(1); }
+.ef-work-strip-arrow {
+  display: inline-block;
+  transition: transform 0.4s var(--ease);
+}
+.ef-work-strip-link:hover .ef-work-strip-arrow { transform: translate(4px, -4px); }
+.ef-work-strip .ef-mono {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+  justify-self: end;
+}
+
+@media (max-width: 1000px) {
+  .ef-work-title { font-size: clamp(40px, 13vw, 92px); }
+  .ef-work-title .ef-line--2 { padding-right: 0; justify-content: flex-start; }
+  .ef-work-title .ef-line--3 { padding-left: 16px; }
+  .ef-work-canvas-wrap { aspect-ratio: auto; min-height: 0; }
+  .ef-work-canvas-rules { display: none; }
+  .ef-work-canvas {
+    position: relative;
+    inset: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 18px;
+  }
+  .ef-tile {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-height: 240px;
+    transform: none !important;
+  }
+  .ef-tile-stack { position: static; opacity: 1; transform: none; margin-bottom: 10px; margin-top: 10px; }
+  .ef-work-bigword { font-size: 40vw; bottom: -24vw; }
+  .ef-work-strip { grid-template-columns: 1fr; text-align: center; gap: 10px; }
+  .ef-work-strip-link { justify-self: center; }
+  .ef-work-strip .ef-mono { justify-self: center; }
+}
+
+@media (max-width: 560px) {
+  .ef-work { padding: 60px 14px 100px; }
+  .ef-tile { padding: 16px 16px; min-height: 200px; }
+  .ef-tile-body { padding-right: 0; }
+  .ef-tile-stack { max-width: 100%; }
+}
