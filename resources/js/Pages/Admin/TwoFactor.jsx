@@ -154,7 +154,7 @@ export default function TwoFactor() {
                             level="body-xs"
                             sx={{ textAlign: "center" }}
                         >
-                            © Your company {new Date().getFullYear()}
+                            © Emanuele Frascella {new Date().getFullYear()}
                         </Typography>
                     </Box>
                 </Box>
