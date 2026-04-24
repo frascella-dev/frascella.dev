@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from './Hooks.jsx';
+import heroLightAvif from '../../images/hero-light.avif';
+import heroLightWebp from '../../images/hero-light.webp';
 
 const TIMELINE = [
     {
@@ -517,7 +519,11 @@ export default function About() {
                         transform: `translate3d(${(mouse.x - 0.5) * -6}px, ${(rel - 0.5) * -60}px, 0) rotate(-2.5deg)`,
                     }}
                 >
-                    <img src="/assets/hero-light.png" alt="Portrait of Emanuele Frascella" draggable="false" />
+                    <picture>
+                        <source srcSet={heroLightAvif} type="image/avif" />
+                        <source srcSet={heroLightWebp} type="image/webp" />
+                        <img src={heroLightWebp} alt="Portrait of Emanuele Frascella" draggable="false" />
+                    </picture>
                     <div className="ef-about-portrait-tag">
                         <span>e.f.</span>
                         <span>taranto · 2026</span>
