@@ -5,10 +5,13 @@ return [
     |--------------------------------------------------------------------------
     | Security alert recipient
     |--------------------------------------------------------------------------
-    | Where BruteForceGuard sends mail when a new lockout is triggered.
-    | Leave empty to disable alerts entirely.
+    | BruteForceGuard mails this address when a new lockout is triggered.
+    | We deliberately reuse MAIL_FROM_ADDRESS so there's a single mailbox
+    | the site uses for any internal communication — easier to monitor,
+    | one less env var to keep in sync. Leave the from address empty to
+    | disable alerts entirely.
     */
-    'alert_email' => env('SECURITY_ALERT_EMAIL'),
+    'alert_email' => env('MAIL_FROM_ADDRESS'),
 
     /*
     |--------------------------------------------------------------------------

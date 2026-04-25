@@ -41,7 +41,12 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Relative by default so the browser resolves it against whatever
+            // origin the page is served from — saves us from APP_URL drift
+            // in local dev (missing port) and reverse-proxy setups.
+            // Override with FILESYSTEM_PUBLIC_URL when you genuinely need
+            // absolute URLs (e.g. images embedded in emails).
+            'url' => env('FILESYSTEM_PUBLIC_URL', '/storage'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

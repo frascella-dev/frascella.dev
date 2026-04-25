@@ -9,10 +9,10 @@ import { IconChevronRight, IconHome } from "@tabler/icons-react";
 
 import AdminDashboardLayout from "@/Layouts/AdminDashboardLayout.jsx";
 
-export default function Timeline() {
+export default function Timelines() {
     return (
         <AdminDashboardLayout>
-            <Head title="Admin · Timeline" />
+            <Head title="Admin · Timelines" />
             <Box sx={{ flex: 1, width: "100%" }}>
                 <Box sx={{ px: { xs: 2, md: 6 }, pt: { xs: 2, md: 0 } }}>
                     <Breadcrumbs
@@ -31,14 +31,20 @@ export default function Timeline() {
                             <IconHome size={18} stroke={1.75} />
                         </JoyLink>
                         <Typography
+                            color="neutral"
+                            sx={{ fontSize: 12, fontWeight: 500 }}
+                        >
+                            Settings
+                        </Typography>
+                        <Typography
                             color="primary"
                             sx={{ fontWeight: 500, fontSize: 12 }}
                         >
-                            Timeline
+                            Timelines
                         </Typography>
                     </Breadcrumbs>
                     <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-                        Timeline
+                        Timelines
                     </Typography>
                 </Box>
                 <Stack

@@ -70,6 +70,10 @@ class TwoFactorService
             'eccLevel' => EccLevel::L,
             'addQuietzone' => true,
             'quietzoneSize' => 2,
+            // chillerlan v6 ships SVG output as a base64 data URI by default;
+            // turning that off lets us emit raw SVG and own the wrapping
+            // ourselves — otherwise we'd be double-encoding.
+            'outputBase64' => false,
         ]);
 
         $svg = (new QRCode($options))->render($otpauthUri);

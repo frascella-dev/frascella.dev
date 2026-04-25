@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import Alert from "@mui/joy/Alert";
 import Avatar from "@mui/joy/Avatar";
@@ -69,23 +69,32 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
         patch("/admin/profile", { preserveScroll: true });
     };
 
+    // Inertia exposes validation errors from any request on the shared
+    // `errors` prop — we read `avatar` from there instead of a local useForm,
+    // because useForm's setData + immediate post runs into React state-
+    // timing issues that send the request with `avatar: null`.
+    const pageErrors = usePage().props.errors ?? {};
     const fileInputRef = useRef(null);
-    const avatarForm = useForm({ avatar: null });
+    const [uploading, setUploading] = useState(false);
 
     const onAvatarPick = () => fileInputRef.current?.click();
 
     const onAvatarChosen = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        avatarForm.setData("avatar", file);
-        avatarForm.post("/admin/profile/avatar", {
-            preserveScroll: true,
-            forceFormData: true,
-            onFinish: () => {
-                if (fileInputRef.current) fileInputRef.current.value = "";
-                avatarForm.reset();
+        setUploading(true);
+        router.post(
+            "/admin/profile/avatar",
+            { avatar: file },
+            {
+                preserveScroll: true,
+                forceFormData: true,
+                onFinish: () => {
+                    setUploading(false);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                },
             },
-        });
+        );
     };
 
     const onAvatarDelete = () => {
@@ -143,7 +152,7 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                             variant="solid"
                             color="primary"
                             onClick={onAvatarPick}
-                            loading={avatarForm.processing}
+                            loading={uploading}
                             sx={{
                                 position: "absolute",
                                 right: 0,
@@ -155,7 +164,7 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                         >
                             <IconPencil size={16} stroke={2} />
                         </IconButton>
-                        {user?.avatar_url && !avatarForm.processing && (
+                        {user?.avatar_url && !uploading && (
                             <IconButton
                                 aria-label="Remove photo"
                                 size="sm"
@@ -183,13 +192,13 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                         onChange={onAvatarChosen}
                         style={{ display: "none" }}
                     />
-                    {avatarForm.errors.avatar ? (
+                    {pageErrors.avatar ? (
                         <Typography
                             level="body-xs"
                             color="danger"
                             sx={{ textAlign: "center" }}
                         >
-                            {avatarForm.errors.avatar}
+                            {pageErrors.avatar}
                         </Typography>
                     ) : (
                         uploadLimitMb && (
@@ -587,6 +596,7 @@ function TwoFactorCard({ twoFactor }) {
     );
 }
 
+
 export default function Profile() {
     const page = usePage();
     const user = page.props.auth?.user;
@@ -601,7 +611,7 @@ export default function Profile() {
                     sx={{
                         top: { xs: -100, md: -110 },
                         bgcolor: "background.body",
-                        zIndex: 9995,
+                        zIndex: 995,
                     }}
                 >
                     <Box sx={{ px: { xs: 2, md: 6 }, pt: { xs: 2, md: 0 } }}>

@@ -103,6 +103,23 @@ class ProfileController extends Controller
 
     public function uploadAvatar(Request $request): RedirectResponse
     {
+        // Breadcrumb log: lets us tell "request never arrived" apart from
+        // "validation rejected it" when diagnosing a silent failure.
+        \Log::info('avatar.upload.received', [
+            'has_file' => $request->hasFile('avatar'),
+            'mime' => $request->hasFile('avatar')
+                ? $request->file('avatar')->getMimeType()
+                : null,
+            'size_bytes' => $request->hasFile('avatar')
+                ? $request->file('avatar')->getSize()
+                : null,
+            'client_name' => $request->hasFile('avatar')
+                ? $request->file('avatar')->getClientOriginalName()
+                : null,
+            'content_type' => $request->header('content-type'),
+            'all_files' => array_keys($request->allFiles()),
+        ]);
+
         $data = $request->validate([
             // Cap to whatever the current PHP build actually accepts — using
             // a higher limit than the ini just surfaces as a silent
@@ -116,7 +133,19 @@ class ProfileController extends Controller
             ],
         ]);
 
-        $this->avatars->set($request->user(), $data['avatar']);
+        try {
+            $picture = $this->avatars->set($request->user(), $data['avatar']);
+            \Log::info('avatar.upload.stored', [
+                'picture_id' => $picture->id,
+                'path' => $picture->path,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('avatar.upload.failed', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
 
         return redirect()->route('admin.profile.show');
     }

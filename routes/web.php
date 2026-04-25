@@ -30,8 +30,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::redirect('/', '/admin/dashboard');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
-        Route::get('projects', ProjectsController::class)->name('projects');
-        Route::get('timeline', TimelineController::class)->name('timeline');
+
+        Route::prefix('settings')->name('settings.')->group(function () {
+            // Bare /admin/settings lands on the default sub-page.
+            Route::redirect('/', '/admin/settings/projects');
+            Route::get('projects', ProjectsController::class)->name('projects');
+            Route::get('timelines', TimelineController::class)->name('timelines');
+        });
         Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('profile/password', [ProfileController::class, 'updatePassword'])
