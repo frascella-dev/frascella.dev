@@ -71,7 +71,7 @@ class PortfolioController extends Controller
         return collect(config('portfolio.projects', []))
             ->take(self::PROJECT_LIMIT)
             ->values()
-            ->map(fn (array $project, int $i) => array_merge(
+            ->map(fn(array $project, int $i) => array_merge(
                 ['stack' => [], 'preview' => null],
                 $project,
                 ['id' => $i + 1],
