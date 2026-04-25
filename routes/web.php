@@ -35,7 +35,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Bare /admin/settings lands on the default sub-page.
             Route::redirect('/', '/admin/settings/projects');
             Route::get('projects', ProjectsController::class)->name('projects');
-            Route::get('timelines', TimelineController::class)->name('timelines');
+
+            Route::prefix('timelines')->name('timelines.')->group(function () {
+                Route::get('/', [TimelineController::class, 'index'])->name('index');
+                Route::get('create', [TimelineController::class, 'create'])->name('create');
+                Route::post('/', [TimelineController::class, 'store'])->name('store');
+                Route::get('{timeline}/edit', [TimelineController::class, 'edit'])->name('edit');
+                Route::patch('{timeline}', [TimelineController::class, 'update'])->name('update');
+                Route::delete('{timeline}', [TimelineController::class, 'destroy'])->name('destroy');
+                Route::patch('{timeline}/move', [TimelineController::class, 'move'])->name('move');
+            });
         });
         Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
