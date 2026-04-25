@@ -4,8 +4,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\LogoutController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\ProjectsController;
-use App\Http\Controllers\Admin\TimelineController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Middleware\EnsurePendingTwoFactor;
@@ -30,22 +28,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::redirect('/', '/admin/dashboard');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
-
-        Route::prefix('settings')->name('settings.')->group(function () {
-            // Bare /admin/settings lands on the default sub-page.
-            Route::redirect('/', '/admin/settings/projects');
-            Route::get('projects', ProjectsController::class)->name('projects');
-
-            Route::prefix('timelines')->name('timelines.')->group(function () {
-                Route::get('/', [TimelineController::class, 'index'])->name('index');
-                Route::get('create', [TimelineController::class, 'create'])->name('create');
-                Route::post('/', [TimelineController::class, 'store'])->name('store');
-                Route::get('{timeline}/edit', [TimelineController::class, 'edit'])->name('edit');
-                Route::patch('{timeline}', [TimelineController::class, 'update'])->name('update');
-                Route::delete('{timeline}', [TimelineController::class, 'destroy'])->name('destroy');
-                Route::patch('{timeline}/move', [TimelineController::class, 'move'])->name('move');
-            });
-        });
         Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('profile/password', [ProfileController::class, 'updatePassword'])

@@ -46,22 +46,6 @@ class Picture extends Model
         });
     }
 
-    public function timelineEntries(): BelongsToMany
-    {
-        return $this->belongsToMany(TimelineEntry::class, 'picture_timeline_entry')
-            ->withPivot('sort_order')
-            ->withTimestamps()
-            ->orderByPivot('sort_order');
-    }
-
-    public function projects(): BelongsToMany
-    {
-        return $this->belongsToMany(Project::class, 'picture_project')
-            ->withPivot('role', 'sort_order')
-            ->withTimestamps()
-            ->orderByPivot('sort_order');
-    }
-
     public function avatarUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'pictures_avatars')

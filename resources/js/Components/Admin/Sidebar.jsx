@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, router, usePage } from "@inertiajs/react";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import Avatar from "@mui/joy/Avatar";
@@ -14,9 +13,7 @@ import Sheet from "@mui/joy/Sheet";
 import {
     IconLayoutDashboard,
     IconLogout,
-    IconSettings,
     IconUser,
-    IconChevronDown,
 } from "@tabler/icons-react";
 
 import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.jsx";
@@ -29,37 +26,11 @@ const NAV_ITEMS = [
         href: "/admin/dashboard",
         icon: IconLayoutDashboard,
     },
-    { label: "Settings", href: "/admin/settings", icon: IconSettings },
 ];
 
 function initialsFrom(name = "") {
     const parts = name.trim().split(/\s+/).slice(0, 2);
     return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
-
-function Toggler({ defaultExpanded = false, renderToggle, children }) {
-    const [open, setOpen] = React.useState(defaultExpanded);
-    return (
-        <React.Fragment>
-            {renderToggle({ open, setOpen })}
-            <Box
-                sx={[
-                    {
-                        display: "grid",
-                        transition: "0.2s ease",
-                        "& > *": {
-                            overflow: "hidden",
-                        },
-                    },
-                    open
-                        ? { gridTemplateRows: "1fr" }
-                        : { gridTemplateRows: "0fr" },
-                ]}
-            >
-                {children}
-            </Box>
-        </React.Fragment>
-    );
 }
 
 export default function Sidebar() {
@@ -163,76 +134,23 @@ export default function Sidebar() {
                         "--ListItem-radius": (theme) => theme.vars.radius.sm,
                     }}
                 >
-                    <ListItem>
-                        <ListItemButton
-                            component={Link}
-                            href="/admin/dashboard"
-                            selected={isActive("/admin/dashboard")}
-                            onClick={handleNavClick}
-                        >
-                            <IconLayoutDashboard size={20} stroke={1.75} />
-                            <ListItemContent>
-                                <Typography level="title-sm">
-                                    Dashboard
-                                </Typography>
-                            </ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-
-                    <ListItem nested>
-                        <Toggler
-                            renderToggle={({ open, setOpen }) => (
-                                <ListItemButton onClick={() => setOpen(!open)}>
-                                    <IconSettings />
-                                    <ListItemContent>
-                                        <Typography level="title-sm">
-                                            Settings
-                                        </Typography>
-                                    </ListItemContent>
-                                    <IconChevronDown
-                                        size={18}
-                                        sx={[
-                                            open
-                                                ? {
-                                                      transform:
-                                                          "rotate(180deg)",
-                                                  }
-                                                : {
-                                                      transform: "none",
-                                                  },
-                                        ]}
-                                    />
-                                </ListItemButton>
-                            )}
-                        >
-                            <List sx={{ gap: 0.5 }}>
-                                <ListItem sx={{ mt: 0.5 }}>
-                                    <ListItemButton
-                                        component={Link}
-                                        href="/admin/settings/projects"
-                                        selected={isActive(
-                                            "/admin/settings/projects",
-                                        )}
-                                        onClick={handleNavClick}
-                                    >
-                                        Projects
-                                    </ListItemButton>
-                                </ListItem>
-                                <ListItem>
-                                    <ListItemButton
-                                        component={Link}
-                                        href="/admin/settings/timelines"
-                                        selected={isActive(
-                                            "/admin/settings/timelines",
-                                        )}
-                                        onClick={handleNavClick}
-                                    >
-                                        Timelines
-                                    </ListItemButton>
-                                </ListItem>
-                            </List>
-                        </Toggler>
-                    </ListItem>
+                    {NAV_ITEMS.map(({ label, href, icon: Icon }) => (
+                        <ListItem key={href}>
+                            <ListItemButton
+                                component={Link}
+                                href={href}
+                                selected={isActive(href)}
+                                onClick={handleNavClick}
+                            >
+                                <Icon size={20} stroke={1.75} />
+                                <ListItemContent>
+                                    <Typography level="title-sm">
+                                        {label}
+                                    </Typography>
+                                </ListItemContent>
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
                 </List>
             </Box>
             <Divider />
