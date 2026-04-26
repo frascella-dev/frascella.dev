@@ -1,4 +1,17 @@
-export default function Logo({ size = 28, className = '', title = 'Emanuele Frascella' }) {
+// Path data is the canonical mark — kept in sync with public/logo.svg
+// (the static asset used by the favicon and email templates). When you
+// edit one, edit the other.
+type LogoProps = {
+    size?: number;
+    className?: string;
+    title?: string;
+};
+
+export default function Logo({
+    size = 28,
+    className = '',
+    title = 'Emanuele Frascella',
+}: LogoProps) {
     return (
         <span
             className={`ef-logo ${className}`}
