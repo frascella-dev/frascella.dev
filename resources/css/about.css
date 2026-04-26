@@ -3,7 +3,7 @@
    ============================================================ */
 .ef-about {
   position: relative;
-  background: var(--paper);
+  /* background: var(--paper); */
   padding: clamp(80px, 12vh, 160px) clamp(16px, 5vw, 80px) 120px;
   overflow: hidden;
   isolation: isolate;

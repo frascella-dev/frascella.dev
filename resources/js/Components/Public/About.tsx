@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useReveal } from './Hooks.tsx';
-import heroLightAvif from '../../../images/hero-light.avif';
-import heroLightWebp from '../../../images/hero-light.webp';
+import { useEffect, useRef, useState } from "react";
+import { useReveal } from "./Hooks.tsx";
 
 function Timeline({ items }) {
     const wrapRef = useRef(null);
@@ -25,8 +23,8 @@ function Timeline({ items }) {
             setDims({ w, h });
         };
         compute();
-        window.addEventListener('resize', compute);
-        return () => window.removeEventListener('resize', compute);
+        window.addEventListener("resize", compute);
+        return () => window.removeEventListener("resize", compute);
     }, []);
 
     useEffect(() => {
@@ -68,7 +66,8 @@ function Timeline({ items }) {
 
             const px = e.clientX - r.left;
             const py = e.clientY - r.top;
-            const inside = px >= 0 && py >= 0 && px <= r.width && py <= r.height;
+            const inside =
+                px >= 0 && py >= 0 && px <= r.width && py <= r.height;
             setMousePx({ x: px, y: py, inside });
 
             const now = performance.now();
@@ -82,12 +81,12 @@ function Timeline({ items }) {
                 vy: prev.vy * 0.7 + vy * 0.3,
             }));
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('mousemove', onMove, { passive: true });
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("mousemove", onMove, { passive: true });
         onScroll();
         return () => {
-            window.removeEventListener('scroll', onScroll);
-            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener("scroll", onScroll);
+            window.removeEventListener("mousemove", onMove);
         };
     }, []);
 
@@ -121,9 +120,9 @@ function Timeline({ items }) {
     const { w, h } = dims;
 
     const baseWaypoints = [
-        { x: -0.08, y: 0.70 },
+        { x: -0.08, y: 0.7 },
         { x: 0.16, y: 0.22 },
-        { x: 0.30, y: 0.82 },
+        { x: 0.3, y: 0.82 },
         { x: 0.46, y: 0.28 },
         { x: 0.58, y: 0.72 },
         { x: 0.74, y: 0.18 },
@@ -140,7 +139,7 @@ function Timeline({ items }) {
     });
 
     const pathD = (() => {
-        if (wpts.length < 2) return '';
+        if (wpts.length < 2) return "";
         let d = `M ${wpts[0].x} ${wpts[0].y}`;
         for (let i = 0; i < wpts.length - 1; i++) {
             const p0 = wpts[i - 1] || wpts[i];
@@ -166,25 +165,60 @@ function Timeline({ items }) {
                     <em>the way I got here.</em>
                 </h3>
                 <p className="ef-tl-lede">
-                    Hover a year to see what happened. Scroll to pull the thread. {first} → {last}.
+                    Hover a year to see what happened. Scroll to pull the
+                    thread. {first} → {last}.
                 </p>
             </div>
 
             <div
                 className="ef-tl-spline-wrap"
                 ref={wrapRef}
-                onMouseLeave={() => { setActive(null); setMousePx((p) => ({ ...p, inside: false })); }}
+                onMouseLeave={() => {
+                    setActive(null);
+                    setMousePx((p) => ({ ...p, inside: false }));
+                }}
                 style={{ height: h }}
             >
                 <div className="ef-tl-decades" aria-hidden>
-                    <span className="ef-tl-decade ef-tl-decade--1" style={{ transform: `translate3d(${(mouse.x - 0.5) * -24}px, ${(mouse.y - 0.5) * -10}px, 0)` }}>2000s</span>
-                    <span className="ef-tl-decade ef-tl-decade--2" style={{ transform: `translate3d(${(mouse.x - 0.5) * 18}px, ${(mouse.y - 0.5) * -14}px, 0)` }}>2010s</span>
-                    <span className="ef-tl-decade ef-tl-decade--3" style={{ transform: `translate3d(${(mouse.x - 0.5) * -16}px, ${(mouse.y - 0.5) * 12}px, 0)` }}>2020s</span>
+                    <span
+                        className="ef-tl-decade ef-tl-decade--1"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * -24}px, ${(mouse.y - 0.5) * -10}px, 0)`,
+                        }}
+                    >
+                        2000s
+                    </span>
+                    <span
+                        className="ef-tl-decade ef-tl-decade--2"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * 18}px, ${(mouse.y - 0.5) * -14}px, 0)`,
+                        }}
+                    >
+                        2010s
+                    </span>
+                    <span
+                        className="ef-tl-decade ef-tl-decade--3"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * -16}px, ${(mouse.y - 0.5) * 12}px, 0)`,
+                        }}
+                    >
+                        2020s
+                    </span>
                 </div>
 
                 <div className="ef-tl-floaters" aria-hidden>
-                    <span className="ef-tl-floater ef-tl-floater--a" style={{ transform: `translate3d(${(mouse.x - 0.5) * -20}px, ${(mouse.y - 0.5) * -14}px, 0)` }} />
-                    <span className="ef-tl-floater ef-tl-floater--c" style={{ transform: `translate3d(${(mouse.x - 0.5) * 10}px, ${(mouse.y - 0.5) * 18}px, 0)` }} />
+                    <span
+                        className="ef-tl-floater ef-tl-floater--a"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * -20}px, ${(mouse.y - 0.5) * -14}px, 0)`,
+                        }}
+                    />
+                    <span
+                        className="ef-tl-floater ef-tl-floater--c"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * 10}px, ${(mouse.y - 0.5) * 18}px, 0)`,
+                        }}
+                    />
                 </div>
 
                 <svg
@@ -196,13 +230,33 @@ function Timeline({ items }) {
                     aria-hidden
                 >
                     <defs>
-                        <linearGradient id="ef-tl-accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <linearGradient
+                            id="ef-tl-accent-grad"
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="0%"
+                        >
                             <stop offset="0%" stopColor="var(--ink)" />
                             <stop offset="80%" stopColor="var(--ink)" />
                             <stop offset="100%" stopColor="var(--accent)" />
                         </linearGradient>
-                        <pattern id="ef-tl-ticks" x="0" y="0" width="28" height="14" patternUnits="userSpaceOnUse">
-                            <line x1="0" y1="7" x2="4" y2="7" stroke="var(--rule)" strokeWidth="1" />
+                        <pattern
+                            id="ef-tl-ticks"
+                            x="0"
+                            y="0"
+                            width="28"
+                            height="14"
+                            patternUnits="userSpaceOnUse"
+                        >
+                            <line
+                                x1="0"
+                                y1="7"
+                                x2="4"
+                                y2="7"
+                                stroke="var(--rule)"
+                                strokeWidth="1"
+                            />
                         </pattern>
                     </defs>
 
@@ -223,7 +277,7 @@ function Timeline({ items }) {
                         style={{
                             strokeDasharray: 9999,
                             strokeDashoffset: 9999 * (1 - progress),
-                            transition: 'stroke-dashoffset 0.35s linear',
+                            transition: "stroke-dashoffset 0.35s linear",
                         }}
                     />
 
@@ -237,13 +291,20 @@ function Timeline({ items }) {
                         style={{
                             strokeDasharray: 9999,
                             strokeDashoffset: 9999 * (1 - progress),
-                            transition: 'stroke-dashoffset 0.35s linear',
+                            transition: "stroke-dashoffset 0.35s linear",
                         }}
                     />
 
                     {travelPt && progress > 0.01 && progress < 0.99 && (
-                        <g className="ef-tl-traveler" transform={`translate(${travelPt.x}, ${travelPt.y})`}>
-                            <circle r="14" fill="var(--accent)" opacity="0.12" />
+                        <g
+                            className="ef-tl-traveler"
+                            transform={`translate(${travelPt.x}, ${travelPt.y})`}
+                        >
+                            <circle
+                                r="14"
+                                fill="var(--accent)"
+                                opacity="0.12"
+                            />
                             <circle r="7" fill="var(--accent)" opacity="0.28" />
                             <circle r="3.5" fill="var(--accent)" />
                         </g>
@@ -255,11 +316,11 @@ function Timeline({ items }) {
                         const item = items[i];
                         if (!item) return null;
                         const isActive = active === i;
-                        const vside = pos.y > h * 0.55 ? 'above' : 'below';
+                        const vside = pos.y > h * 0.55 ? "above" : "below";
                         return (
                             <li
                                 key={item.year + item.title}
-                                className={`ef-tl-node ef-tl-node--${item.kind} is-${vside} ${isActive ? 'is-active' : ''}`}
+                                className={`ef-tl-node ef-tl-node--${item.kind} is-${vside} ${isActive ? "is-active" : ""}`}
                                 style={{ left: pos.x, top: pos.y }}
                                 onFocus={() => setActive(i)}
                                 tabIndex={0}
@@ -273,7 +334,9 @@ function Timeline({ items }) {
                                     <span className="ef-tl-dot-pulse" />
                                 </span>
                                 <span className="ef-tl-connector" aria-hidden />
-                                <span className="ef-mono ef-tl-year">{item.year}</span>
+                                <span className="ef-mono ef-tl-year">
+                                    {item.year}
+                                </span>
                             </li>
                         );
                     })}
@@ -295,11 +358,15 @@ function Timeline({ items }) {
                     return (
                         <li
                             key={item.year + item.title}
-                            className={`ef-tl-m-item ef-tl-m-item--${item.kind} ${isLast ? 'is-now' : ''}`}
+                            className={`ef-tl-m-item ef-tl-m-item--${item.kind} ${isLast ? "is-now" : ""}`}
                         >
                             <div className="ef-tl-m-meta">
-                                <span className="ef-tl-m-year">{item.year}</span>
-                                <span className="ef-tl-m-kind">{item.kind}</span>
+                                <span className="ef-tl-m-year">
+                                    {item.year}
+                                </span>
+                                <span className="ef-tl-m-kind">
+                                    {item.kind}
+                                </span>
                             </div>
                             <h4 className="ef-tl-m-title">{item.title}</h4>
                             <p className="ef-tl-m-body">{item.body}</p>
@@ -329,7 +396,7 @@ function FollowCard({ item, activeIdx, mousePx, vel, wrapW, wrapH }) {
 
     return (
         <div
-            className={`ef-tl-follow ${visible ? 'is-visible' : ''}`}
+            className={`ef-tl-follow ${visible ? "is-visible" : ""}`}
             style={{
                 transform: `translate3d(${left}px, ${top}px, 0)`,
             }}
@@ -346,7 +413,10 @@ function FollowCard({ item, activeIdx, mousePx, vel, wrapW, wrapH }) {
                         {item.photo ? (
                             <img src={item.photo} alt="" draggable="false" />
                         ) : (
-                            <PhotoPlaceholder year={item.year} kind={item.kind} />
+                            <PhotoPlaceholder
+                                year={item.year}
+                                kind={item.kind}
+                            />
                         )}
                     </div>
                     <div className="ef-tl-card-body-wrap">
@@ -368,12 +438,33 @@ function PhotoPlaceholder({ year, kind }) {
         <div className={`ef-tl-photo-ph ef-tl-photo-ph--${kind}`}>
             <svg viewBox="0 0 120 90" width="100%" height="100%" aria-hidden>
                 <defs>
-                    <pattern id={`ph-${year}`} width="6" height="6" patternUnits="userSpaceOnUse">
-                        <line x1="0" y1="6" x2="6" y2="0" stroke="currentColor" strokeWidth="0.6" opacity="0.35" />
+                    <pattern
+                        id={`ph-${year}`}
+                        width="6"
+                        height="6"
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <line
+                            x1="0"
+                            y1="6"
+                            x2="6"
+                            y2="0"
+                            stroke="currentColor"
+                            strokeWidth="0.6"
+                            opacity="0.35"
+                        />
                     </pattern>
                 </defs>
                 <rect width="120" height="90" fill={`url(#ph-${year})`} />
-                <rect x="8" y="8" width="104" height="74" fill="none" stroke="currentColor" strokeWidth="0.8" />
+                <rect
+                    x="8"
+                    y="8"
+                    width="104"
+                    height="74"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="0.8"
+                />
             </svg>
             <span className="ef-mono ef-tl-photo-label">photo / {year}</span>
         </div>
@@ -402,14 +493,17 @@ export default function About({ timeline = [] }) {
             setRel(Math.max(0, Math.min(1, travelled / total)));
         };
         const onMove = (e) => {
-            setMouse({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+            setMouse({
+                x: e.clientX / window.innerWidth,
+                y: e.clientY / window.innerHeight,
+            });
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('mousemove', onMove);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("mousemove", onMove);
         onScroll();
         return () => {
-            window.removeEventListener('scroll', onScroll);
-            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener("scroll", onScroll);
+            window.removeEventListener("mousemove", onMove);
         };
     }, []);
 
@@ -419,7 +513,7 @@ export default function About({ timeline = [] }) {
 
     return (
         <section
-            className={`ef-about ${shown ? 'is-in' : ''}`}
+            className={`ef-about ${shown ? "is-in" : ""}`}
             id="about"
             ref={setRefs}
             data-screen-label="03 About"
@@ -427,17 +521,33 @@ export default function About({ timeline = [] }) {
             <div className="ef-about-field" aria-hidden>
                 <div className="ef-about-grid-bg" />
 
-                <div className="ef-rect ef-a-rect--1" style={pxy(-10, 0, -140)} />
+                <div
+                    className="ef-rect ef-a-rect--1"
+                    style={pxy(-10, 0, -140)}
+                />
                 <div className="ef-rect ef-a-rect--2" style={pxy(8, 0, -220)} />
                 <div className="ef-rect ef-a-rect--3" style={pxy(-6, 0, -80)} />
-                <div className="ef-rect ef-a-rect--4" style={pxy(14, 0, -300)} />
-                <div className="ef-rect ef-a-rect--5" style={pxy(-4, 0, -180)} />
-                <div className="ef-rect ef-a-rect--acc" style={pxy(-12, 10, -160)} />
+                <div
+                    className="ef-rect ef-a-rect--4"
+                    style={pxy(14, 0, -300)}
+                />
+                <div
+                    className="ef-rect ef-a-rect--5"
+                    style={pxy(-4, 0, -180)}
+                />
+                <div
+                    className="ef-rect ef-a-rect--acc"
+                    style={pxy(-12, 10, -160)}
+                />
 
                 <div className="ef-rect ef-a-rule-v" style={pxy(0, 0, -60)} />
                 <div className="ef-rect ef-a-rule-h" style={pxy(0, 0, -40)} />
 
-                <svg className="ef-a-cross" viewBox="0 0 40 40" style={pxy(-8, 8, -200)}>
+                <svg
+                    className="ef-a-cross"
+                    viewBox="0 0 40 40"
+                    style={pxy(-8, 8, -200)}
+                >
                     <line x1="0" y1="20" x2="40" y2="20" />
                     <line x1="20" y1="0" x2="20" y2="40" />
                     <circle cx="20" cy="20" r="4" />
@@ -466,9 +576,13 @@ export default function About({ timeline = [] }) {
                 <div className="ef-about-lead">
                     <span className="ef-label">idx — 01</span>
                     <p className="ef-about-lead-text">
-                        I build software end-to-end, but my
-                        centre of gravity is the backend —
-                        <em> systems, APIs, and the applications that sit on top of them.</em>
+                        I build software end-to-end, but my centre of gravity is
+                        the backend —
+                        <em>
+                            {" "}
+                            systems, APIs, and the applications that sit on top
+                            of them.
+                        </em>
                     </p>
                 </div>
 
@@ -479,9 +593,19 @@ export default function About({ timeline = [] }) {
                     }}
                 >
                     <picture>
-                        <source srcSet={heroLightAvif} type="image/avif" />
-                        <source srcSet={heroLightWebp} type="image/webp" />
-                        <img src={heroLightWebp} alt="Portrait of Emanuele Frascella" draggable="false" />
+                        <source
+                            srcSet={"/images/hero-light.avif"}
+                            type="image/avif"
+                        />
+                        <source
+                            srcSet={"/images/hero-light.webp"}
+                            type="image/webp"
+                        />
+                        <img
+                            src={"/images/hero-light.jpg"}
+                            alt="Portrait of Emanuele Frascella"
+                            draggable="false"
+                        />
                     </picture>
                     <div className="ef-about-portrait-tag">
                         <span>e.f.</span>
@@ -493,28 +617,38 @@ export default function About({ timeline = [] }) {
                     <div className="ef-about-col">
                         <span className="ef-label">idx — 02</span>
                         <p>
-                            Occasionally I step across to the frontend
-                            when the brief calls for it. I care about
-                            things being well-made — a query that comes
-                            back fast, a deploy that doesn't surprise
-                            anyone on Monday.
+                            Occasionally I step across to the frontend when the
+                            brief calls for it. I care about things being
+                            well-made — a query that comes back fast, a deploy
+                            that doesn't surprise anyone on Monday.
                         </p>
                     </div>
                     <div className="ef-about-col">
                         <span className="ef-label">idx — 03</span>
                         <p>
-                            Currently open to selective collaborations —
-                            product teams, studios, and the occasional
-                            long weekend on something weird.
+                            Side projects keep me honest — the day job gets the
+                            best of me, but not all of me.
                         </p>
                     </div>
                 </div>
 
                 <dl className="ef-about-facts">
-                    <div><dt>name</dt><dd>Emanuele Frascella</dd></div>
-                    <div><dt>based</dt><dd>Taranto, IT</dd></div>
-                    <div><dt>tz</dt><dd>CET / CEST</dd></div>
-                    <div><dt>exp</dt><dd>5+ years</dd></div>
+                    <div>
+                        <dt>name</dt>
+                        <dd>Emanuele Frascella</dd>
+                    </div>
+                    <div>
+                        <dt>based</dt>
+                        <dd>Taranto, IT</dd>
+                    </div>
+                    <div>
+                        <dt>tz</dt>
+                        <dd>CET / CEST</dd>
+                    </div>
+                    <div>
+                        <dt>exp</dt>
+                        <dd>5+ years</dd>
+                    </div>
                 </dl>
             </div>
 
@@ -523,7 +657,9 @@ export default function About({ timeline = [] }) {
             <div
                 className="ef-about-bigword"
                 aria-hidden
-                style={{ transform: `translate3d(${(mouse.x - 0.5) * -10}px, ${(rel - 0.5) * 120}px, 0)` }}
+                style={{
+                    transform: `translate3d(${(mouse.x - 0.5) * -10}px, ${(rel - 0.5) * 120}px, 0)`,
+                }}
             >
                 about
             </div>

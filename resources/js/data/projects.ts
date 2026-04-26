@@ -23,7 +23,16 @@
 const PROJECT_LIMIT = 5;
 
 const entries = [
-    // append projects here
+    {
+        slug: "vitrine",
+        title: "Vitrine",
+        tagline: "A cool system monitor for your desktop",
+        year: 2026,
+        role: "Creator",
+        tone: "ink",
+        stack: ["C#", "WPF", "WebView2", "React"],
+        metric: { n: "∞", l: "themes via React" },
+    },
 ];
 
 export const projects = entries.slice(0, PROJECT_LIMIT).map((project, i) => ({
