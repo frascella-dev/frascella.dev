@@ -7,9 +7,10 @@ use App\Http\Controllers\Admin\RegisterController;
 use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Middleware\EnsurePendingTwoFactor;
+use App\Http\Middleware\TrackPageView;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', PortfolioController::class);
+Route::get('/', PortfolioController::class)->middleware(TrackPageView::class);
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {

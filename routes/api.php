@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AnalyticsController;
 use App\Http\Controllers\Api\Admin\LoginController;
 use App\Http\Controllers\Api\Admin\LogoutController;
 use App\Http\Controllers\Api\Admin\ProfileController;
@@ -41,5 +42,13 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::delete('profile/avatar', [ProfileController::class, 'deleteAvatar'])
             ->name('profile.avatar.delete');
         Route::post('logout', LogoutController::class)->name('logout');
+
+        Route::prefix('analytics')->name('analytics.')->group(function () {
+            Route::get('overview', [AnalyticsController::class, 'overview'])->name('overview');
+            Route::get('visits', [AnalyticsController::class, 'visits'])->name('visits');
+            Route::get('geo', [AnalyticsController::class, 'geo'])->name('geo');
+            Route::get('devices', [AnalyticsController::class, 'devices'])->name('devices');
+            Route::get('referrers', [AnalyticsController::class, 'referrers'])->name('referrers');
+        });
     });
 });

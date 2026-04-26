@@ -65,3 +65,53 @@ export type RegisterPageProps = PageProps & {
 };
 
 export type FieldErrors = Record<string, string>;
+
+// Analytics ─────────────────────────────────────────────────────────────
+
+export type AnalyticsBreakdown = { label: string; count: number };
+
+export type AnalyticsTotals = {
+    views: number;
+    visitors: number;
+    prev_views: number;
+    prev_visitors: number;
+};
+
+export type AnalyticsTimeSeriesPoint = {
+    date: string; // YYYY-MM-DD
+    views: number;
+    visitors: number;
+};
+
+export type AnalyticsRange = 7 | 30 | 90;
+
+export type AnalyticsOverview = {
+    range_days: AnalyticsRange;
+    totals: AnalyticsTotals;
+    time_series: AnalyticsTimeSeriesPoint[];
+    top_countries: AnalyticsBreakdown[];
+    top_pages: AnalyticsBreakdown[];
+};
+
+export type AnalyticsVisits = {
+    range_days: AnalyticsRange;
+    time_series: AnalyticsTimeSeriesPoint[];
+    totals: AnalyticsTotals;
+};
+
+export type AnalyticsGeo = {
+    range_days: AnalyticsRange;
+    countries: AnalyticsBreakdown[];
+};
+
+export type AnalyticsDevices = {
+    range_days: AnalyticsRange;
+    devices: AnalyticsBreakdown[];
+    browsers: AnalyticsBreakdown[];
+    os: AnalyticsBreakdown[];
+};
+
+export type AnalyticsReferrers = {
+    range_days: AnalyticsRange;
+    referrers: AnalyticsBreakdown[];
+};
