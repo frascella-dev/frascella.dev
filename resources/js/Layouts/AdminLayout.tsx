@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
     Experimental_CssVarsProvider as MaterialCssVarsProvider,
     experimental_extendTheme as materialExtendTheme,
@@ -26,6 +26,25 @@ const materialTheme = materialExtendTheme();
  * while Joy components keep using their own.
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        // Register the admin service worker. Without this, Chrome's PWA
+        // install prompt never appears — a fetch-handling SW is part of the
+        // installability checklist alongside the manifest.
+        if (
+            typeof navigator !== "undefined" &&
+            "serviceWorker" in navigator &&
+            window.location.protocol !== "file:"
+        ) {
+            navigator.serviceWorker
+                .register("/admin/sw.js", { scope: "/admin/" })
+                .catch((err) => {
+                    // Don't surface to the user — registration is
+                    // best-effort, the admin still works without it.
+                    console.warn("[admin sw] registration failed", err);
+                });
+        }
+    }, []);
+
     return (
         <MaterialCssVarsProvider theme={{ [MATERIAL_THEME_ID]: materialTheme }}>
             <JoyCssVarsProvider theme={joyTheme} modeStorageKey="ef-admin-mode">

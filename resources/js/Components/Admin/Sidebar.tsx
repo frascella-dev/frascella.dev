@@ -12,11 +12,7 @@ import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import {
-    IconLayoutDashboard,
-    IconLogout,
-    IconUser,
-} from "@tabler/icons-react";
+import { IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
 
 import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.tsx";
 import Logo from "@/Components/Public/Logo.tsx";
@@ -44,9 +40,8 @@ export default function Sidebar() {
 
     const logout = async () => {
         try {
-            const { data } = await api.post<LogoutResponse>(
-                "/api/admin/logout",
-            );
+            const { data } =
+                await api.post<LogoutResponse>("/api/admin/logout");
             router.visit(data.next || "/admin/login");
         } catch {
             // Even if the call fails (e.g. session already gone), bounce

@@ -63,7 +63,10 @@ function formatPctDelta(curr: number, prev: number): string {
     return `${sign}${delta.toFixed(0)}%`;
 }
 
-function deltaColor(curr: number, prev: number): "success" | "danger" | "neutral" {
+function deltaColor(
+    curr: number,
+    prev: number,
+): "success" | "danger" | "neutral" {
     if (prev === 0) return curr > 0 ? "success" : "neutral";
     if (curr > prev) return "success";
     if (curr < prev) return "danger";
@@ -86,7 +89,10 @@ function StatCard({
             <Typography level="body-xs" color="neutral">
                 {label}
             </Typography>
-            <Typography level="h3" sx={{ fontFamily: "display", fontWeight: 600 }}>
+            <Typography
+                level="h3"
+                sx={{ fontFamily: "display", fontWeight: 600 }}
+            >
                 {numberFormat.format(value)}
             </Typography>
             <Typography level="body-xs" color={color}>
@@ -332,10 +338,7 @@ function OverviewTab({ range }: { range: AnalyticsRange }) {
                         <Divider />
                         <TimeSeriesChart data={data.time_series} />
                     </Card>
-                    <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={2}
-                    >
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
                         <Card variant="outlined" sx={{ flex: 1 }}>
                             <Typography level="title-md">
                                 Top countries
@@ -347,9 +350,7 @@ function OverviewTab({ range }: { range: AnalyticsRange }) {
                             />
                         </Card>
                         <Card variant="outlined" sx={{ flex: 1 }}>
-                            <Typography level="title-md">
-                                Top pages
-                            </Typography>
+                            <Typography level="title-md">Top pages</Typography>
                             <Divider />
                             <BreakdownBar data={data.top_pages} />
                         </Card>
@@ -403,14 +404,14 @@ function GeographyTab({ range }: { range: AnalyticsRange }) {
         <TabFrame loading={loading} error={error}>
             <Stack spacing={3}>
                 <Card variant="outlined">
-                    <Typography level="title-md">
-                        Visits by country
-                    </Typography>
+                    <Typography level="title-md">Visits by country</Typography>
                     <Divider />
                     <BreakdownPie data={enriched} />
                 </Card>
                 <Card variant="outlined">
-                    <Typography level="title-md">Country leaderboard</Typography>
+                    <Typography level="title-md">
+                        Country leaderboard
+                    </Typography>
                     <Divider />
                     <BreakdownBar data={enriched} />
                 </Card>
@@ -429,10 +430,7 @@ function DevicesTab({ range }: { range: AnalyticsRange }) {
         <TabFrame loading={loading} error={error}>
             {data && (
                 <Stack spacing={3}>
-                    <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={2}
-                    >
+                    <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
                         <Card variant="outlined" sx={{ flex: 1 }}>
                             <Typography level="title-md">Devices</Typography>
                             <Divider />
@@ -593,15 +591,19 @@ export default function Dashboard() {
                         sx={{ bgcolor: "transparent" }}
                     >
                         <TabList
-                            tabFlex={1}
                             size="sm"
                             sx={{
                                 pl: { xs: 2, md: 4 },
-                                justifyContent: "left",
-                                overflow: "auto",
+                                justifyContent: "flex-start",
+                                overflowX: "auto",
+                                flexWrap: "nowrap",
+                                scrollSnapType: "x mandatory",
+                                "&::-webkit-scrollbar": { display: "none" },
                                 [`&& .${tabClasses.root}`]: {
                                     fontWeight: "600",
-                                    flex: "initial",
+                                    flex: "none",
+                                    flexShrink: 0,
+                                    whiteSpace: "nowrap",
                                     color: "text.tertiary",
                                     [`&.${tabClasses.selected}`]: {
                                         bgcolor: "transparent",
