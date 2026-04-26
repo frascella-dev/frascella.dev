@@ -1,4 +1,6 @@
 import { Link, router, usePage } from "@inertiajs/react";
+import { api } from "@/utils/api.ts";
+import type { LogoutResponse, PageProps } from "@/types.ts";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -16,8 +18,8 @@ import {
     IconUser,
 } from "@tabler/icons-react";
 
-import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.jsx";
-import Logo from "@/Components/Public/Logo.jsx";
+import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.tsx";
+import Logo from "@/Components/Public/Logo.tsx";
 import { closeSidebar } from "@/utils/sidebar";
 
 const NAV_ITEMS = [
@@ -34,13 +36,24 @@ function initialsFrom(name = "") {
 }
 
 export default function Sidebar() {
-    const { props, url } = usePage();
+    const { props, url } = usePage<PageProps>();
     const user = props.auth?.user;
 
-    const isActive = (href) => url === href || url.startsWith(`${href}/`);
+    const isActive = (href: string) =>
+        url === href || url.startsWith(`${href}/`);
 
-    const logout = () => {
-        router.post("/admin/logout");
+    const logout = async () => {
+        try {
+            const { data } = await api.post<LogoutResponse>(
+                "/api/admin/logout",
+            );
+            router.visit(data.next || "/admin/login");
+        } catch {
+            // Even if the call fails (e.g. session already gone), bounce
+            // back to the login screen — staying on the dashboard with a
+            // dead session helps no one.
+            router.visit("/admin/login");
+        }
     };
 
     // Close the off-canvas drawer after an entry is tapped so mobile users

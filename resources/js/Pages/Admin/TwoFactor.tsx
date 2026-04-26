@@ -1,33 +1,78 @@
-import { Head, useForm } from "@inertiajs/react";
-import * as React from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import { Head, router } from "@inertiajs/react";
+import axios from "axios";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import Checkbox from "@mui/joy/Checkbox";
 import FormControl from "@mui/joy/FormControl";
 import FormHelperText from "@mui/joy/FormHelperText";
 import FormLabel from "@mui/joy/FormLabel";
-import Input from "@mui/joy/Input";
 import Typography from "@mui/joy/Typography";
 import Stack from "@mui/joy/Stack";
-import AdminLayout from "../../Layouts/AdminLayout.jsx";
-import Logo from "@/Components/Public/Logo.jsx";
-import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.jsx";
+import AdminLayout from "../../Layouts/AdminLayout.tsx";
+import Logo from "@/Components/Public/Logo.tsx";
+import OtpInput, {
+    type OtpInputHandle,
+} from "@/Components/Admin/OtpInput.tsx";
+import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.tsx";
+import { api, fieldErrors } from "@/utils/api.ts";
+import type { FieldErrors, TwoFactorResponse } from "@/types.ts";
 
-export default function Login() {
-    const { data, setData, post, processing, errors } = useForm({
-        email: "",
-        password: "",
-        remember: false,
-    });
+export default function TwoFactor() {
+    const [code, setCode] = useState("");
+    const [errors, setErrors] = useState<FieldErrors>({});
+    const [processing, setProcessing] = useState(false);
+    const inputRef = useRef<OtpInputHandle | null>(null);
 
-    const submit = (e) => {
+    const submit = async () => {
+        if (processing) return;
+        setProcessing(true);
+        setErrors({});
+        try {
+            const { data: result } = await api.post<TwoFactorResponse>(
+                "/api/admin/2fa",
+                { code },
+            );
+            router.visit(result.next || "/admin/dashboard");
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 410) {
+                const next =
+                    (err.response.data?.next as string | undefined) ??
+                    "/admin/login";
+                router.visit(next);
+                return;
+            }
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                setErrors(fieldErrors(err));
+            } else {
+                const message =
+                    err instanceof Error
+                        ? err.message
+                        : "Something went wrong. Try again.";
+                setErrors({ code: message });
+            }
+            setCode("");
+            setProcessing(false);
+            inputRef.current?.focus();
+        }
+    };
+
+    // Auto-submit the moment we have 6 digits — the OTP flow should feel
+    // instantaneous and users shouldn't need to press Enter.
+    useEffect(() => {
+        if (code.length === 6 && /^\d{6}$/.test(code) && !processing) {
+            submit();
+        }
+    }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post("/admin/login");
+        submit();
     };
 
     return (
         <AdminLayout>
-            <Head title="Admin · Login" />
+            <Head title="Admin · 2FA" />
             <Box
                 sx={(theme) => ({
                     width: "100%",
@@ -95,70 +140,42 @@ export default function Login() {
                             },
                         }}
                     >
+                        <Stack sx={{ gap: 1 }}>
+                            <Typography
+                                level="h3"
+                                sx={{ fontFamily: "display" }}
+                            >
+                                Verification code
+                            </Typography>
+                            <Typography level="body-sm" color="neutral">
+                                Enter the 6-digit code shown in your
+                                authenticator app.
+                            </Typography>
+                        </Stack>
                         <Stack sx={{ gap: 4, mt: 2 }}>
-                            <form onSubmit={submit} noValidate>
-                                <FormControl required error={!!errors.email}>
-                                    <FormLabel>Email</FormLabel>
-                                    <Input
-                                        type="email"
-                                        name="email"
-                                        autoComplete="username"
+                            <form onSubmit={onSubmit} noValidate>
+                                <FormControl required error={!!errors.code}>
+                                    <OtpInput
+                                        ref={inputRef}
+                                        value={code}
+                                        onChange={setCode}
+                                        error={!!errors.code}
+                                        disabled={processing}
                                         autoFocus
-                                        value={data.email}
-                                        onChange={(e) =>
-                                            setData("email", e.target.value)
-                                        }
                                     />
-                                    {errors.email && (
+                                    {errors.code && (
                                         <FormHelperText>
-                                            {errors.email}
-                                        </FormHelperText>
-                                    )}
-                                </FormControl>
-                                <FormControl required error={!!errors.password}>
-                                    <FormLabel>Password</FormLabel>
-                                    <Input
-                                        type="password"
-                                        name="password"
-                                        autoComplete="current-password"
-                                        value={data.password}
-                                        onChange={(e) =>
-                                            setData("password", e.target.value)
-                                        }
-                                    />
-                                    {errors.password && (
-                                        <FormHelperText>
-                                            {errors.password}
+                                            {errors.code}
                                         </FormHelperText>
                                     )}
                                 </FormControl>
                                 <Stack sx={{ gap: 4, mt: 2 }}>
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Checkbox
-                                            size="sm"
-                                            label="Remember me"
-                                            name="remember"
-                                            checked={data.remember}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "remember",
-                                                    e.target.checked,
-                                                )
-                                            }
-                                        />
-                                    </Box>
                                     <Button
                                         type="submit"
                                         fullWidth
                                         loading={processing}
                                     >
-                                        Sign in
+                                        Verify
                                     </Button>
                                 </Stack>
                             </form>

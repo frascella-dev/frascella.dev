@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useReveal } from './Hooks.jsx';
+import { useReveal } from './Hooks.tsx';
 
 const LAYOUTS = {
     1: [{ x: 2, y: 1, w: 8, h: 8, tilt: -1.5 }],
@@ -110,10 +110,9 @@ export default function Work({ projects = [] }) {
     const shown_projects = projects.slice(0, isMobile ? MOBILE_MAX : DESKTOP_MAX);
     const layout = LAYOUTS[shown_projects.length] || LAYOUTS[5];
 
-    const setRefs = (node) => {
+    const setRefs = (node: HTMLElement | null) => {
         sectionRef.current = node;
-        if (typeof revealRef === 'function') revealRef(node);
-        else if (revealRef) revealRef.current = node;
+        if (revealRef) revealRef.current = node;
     };
 
     useEffect(() => {

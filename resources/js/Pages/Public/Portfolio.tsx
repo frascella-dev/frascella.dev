@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { Head } from "@inertiajs/react";
 import Lenis from "lenis";
 
-import CustomCursor from "../../Components/Public/CustomCursor.jsx";
-import Nav, { useRoute } from "../../Components/Public/Nav.jsx";
-import Splash from "../../Components/Public/Splash.jsx";
-import Hero from "../../Components/Public/Hero.jsx";
-import Work from "../../Components/Public/Work.jsx";
-import About from "../../Components/Public/About.jsx";
-import Contact from "../../Components/Public/Contact.jsx";
-import ProjectPage from "../../Components/Public/ProjectPage.jsx";
+import CustomCursor from "../../Components/Public/CustomCursor.tsx";
+import Nav, { useRoute } from "../../Components/Public/Nav.tsx";
+import Splash from "../../Components/Public/Splash.tsx";
+import Hero from "../../Components/Public/Hero.tsx";
+import Work from "../../Components/Public/Work.tsx";
+import About from "../../Components/Public/About.tsx";
+import Contact from "../../Components/Public/Contact.tsx";
+import ProjectPage from "../../Components/Public/ProjectPage.tsx";
+import { timeline } from "../../data/timeline.ts";
+import { projects } from "../../data/projects.ts";
 
-export default function Portfolio({ timeline = [], projects = [] }) {
+export default function Portfolio() {
     const [booted, setBooted] = useState(() => {
         try {
             return sessionStorage.getItem("ef-splash-seen") === "1";
@@ -57,7 +59,7 @@ export default function Portfolio({ timeline = [], projects = [] }) {
             const max =
                 document.documentElement.scrollHeight - window.innerHeight;
             const p = max > 0 ? window.scrollY / max : 0;
-            if (fill) fill.style.setProperty("--p", p);
+            if (fill) fill.style.setProperty("--p", String(p));
         };
         window.addEventListener("scroll", onScroll, { passive: true });
         onScroll();

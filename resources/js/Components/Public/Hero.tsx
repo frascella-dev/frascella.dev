@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useClock } from './Hooks.jsx';
+import { useClock } from './Hooks.tsx';
 
 export default function Hero() {
     const time = useClock();

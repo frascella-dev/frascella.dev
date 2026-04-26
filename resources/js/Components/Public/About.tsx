@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useReveal } from './Hooks.jsx';
+import { useReveal } from './Hooks.tsx';
 import heroLightAvif from '../../../images/hero-light.avif';
 import heroLightWebp from '../../../images/hero-light.webp';
 
@@ -386,10 +386,9 @@ export default function About({ timeline = [] }) {
     const [rel, setRel] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
 
-    const setRefs = (node) => {
+    const setRefs = (node: HTMLElement | null) => {
         sectionRef.current = node;
-        if (typeof revealRef === 'function') revealRef(node);
-        else if (revealRef) revealRef.current = node;
+        if (revealRef) revealRef.current = node;
     };
 
     useEffect(() => {

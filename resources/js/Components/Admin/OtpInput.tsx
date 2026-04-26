@@ -1,8 +1,29 @@
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import {
+    forwardRef,
+    useImperativeHandle,
+    useRef,
+    type ChangeEvent,
+    type ClipboardEvent,
+    type KeyboardEvent,
+} from "react";
 import Box from "@mui/joy/Box";
 import Input from "@mui/joy/Input";
 
-const OtpInput = forwardRef(function OtpInput(
+export type OtpInputHandle = {
+    focus: () => void;
+};
+
+export type OtpInputProps = {
+    length?: number;
+    value?: string;
+    onChange?: (next: string) => void;
+    autoFocus?: boolean;
+    disabled?: boolean;
+    error?: boolean;
+    name?: string;
+};
+
+const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpInput(
     {
         length = 6,
         value = "",
@@ -14,10 +35,10 @@ const OtpInput = forwardRef(function OtpInput(
     },
     ref,
 ) {
-    const inputs = useRef([]);
+    const inputs = useRef<Array<HTMLInputElement | null>>([]);
     const digits = value.replace(/\D/g, "").slice(0, length);
 
-    const focusAt = (idx) => {
+    const focusAt = (idx: number) => {
         const clamped = Math.max(0, Math.min(idx, length - 1));
         inputs.current[clamped]?.focus();
     };
@@ -26,17 +47,16 @@ const OtpInput = forwardRef(function OtpInput(
         focus: () => focusAt(0),
     }));
 
-    const emit = (next) => onChange?.(next.replace(/\D/g, "").slice(0, length));
+    const emit = (next: string) =>
+        onChange?.(next.replace(/\D/g, "").slice(0, length));
 
-    const handleKeyDown = (i, e) => {
+    const handleKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Backspace") {
             e.preventDefault();
             if (digits[i]) {
-                // Cancella la cifra nella posizione corrente
                 const next = digits.slice(0, i) + digits.slice(i + 1);
                 emit(next);
             } else if (i > 0) {
-                // Slot vuoto: torna indietro e cancella il precedente
                 const next = digits.slice(0, i - 1) + digits.slice(i);
                 emit(next);
                 focusAt(i - 1);
@@ -58,33 +78,33 @@ const OtpInput = forwardRef(function OtpInput(
 
         if (/^[0-9]$/.test(e.key)) {
             e.preventDefault();
-            let next;
+            let next: string;
             if (i < digits.length) {
-                // Sostituisci la cifra esistente allo slot i
                 next = digits.slice(0, i) + e.key + digits.slice(i + 1);
             } else if (digits.length < length) {
-                // Appendi (siamo alla fine)
                 next = digits + e.key;
             } else {
-                return; // Tutti gli slot pieni
+                return;
             }
             emit(next);
             if (i < length - 1) focusAt(i + 1);
         }
     };
 
-    const handleChange = (_i, e) => {
-        // Gestisce solo autofill (iOS SMS, password manager)
-        // che iniettano il codice completo in un singolo slot
+    const handleChange = (
+        _i: number,
+        e: ChangeEvent<HTMLInputElement>,
+    ) => {
+        // Handles autofill (iOS SMS, password manager) injecting the full
+        // code into a single slot — single keystrokes go through keydown.
         const raw = e.target.value.replace(/\D/g, "");
         if (raw.length > 1) {
             emit(raw.slice(0, length));
             focusAt(Math.min(raw.length, length - 1));
         }
-        // Le cifre singole sono già gestite da handleKeyDown
     };
 
-    const handlePaste = (e) => {
+    const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
         const text = (e.clipboardData?.getData("text") ?? "")
             .replace(/\D/g, "")
             .slice(0, length);
@@ -115,7 +135,9 @@ const OtpInput = forwardRef(function OtpInput(
                     autoFocus={autoFocus && i === 0}
                     slotProps={{
                         input: {
-                            ref: (el) => (inputs.current[i] = el),
+                            ref: (el: HTMLInputElement | null) => {
+                                inputs.current[i] = el;
+                            },
                             inputMode: "numeric",
                             pattern: "[0-9]*",
                             autoComplete: i === 0 ? "one-time-code" : "off",

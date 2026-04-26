@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { useReveal, useMagnetic } from './Hooks.jsx';
+import { useReveal, useMagnetic } from './Hooks.tsx';
 
 export default function Contact() {
     const [revealRef, shown] = useReveal();
     const [copied, setCopied] = useState(false);
     const email = 'emanuele@frascella.dev';
 
-    const magRef1 = useMagnetic(0.25);
-    const magRef2 = useMagnetic(0.25);
-    const magRef3 = useMagnetic(0.25);
+    const magRef1 = useMagnetic<HTMLAnchorElement>(0.25);
+    const magRef2 = useMagnetic<HTMLAnchorElement>(0.25);
+    const magRef3 = useMagnetic<HTMLAnchorElement>(0.25);
 
     const copy = () => {
         navigator.clipboard?.writeText(email);

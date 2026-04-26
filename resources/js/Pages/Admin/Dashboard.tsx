@@ -12,14 +12,15 @@ import {
     IconHome,
 } from "@tabler/icons-react";
 
-import AdminDashboardLayout from "@/Layouts/AdminDashboardLayout.jsx";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.tsx";
+import type { PageProps } from "@/types.ts";
 
 export default function Dashboard() {
-    const user = usePage().props.auth?.user;
+    const user = usePage<PageProps>().props.auth?.user;
     const firstName = user?.name?.split(/\s+/)[0] ?? "there";
 
     return (
-        <AdminDashboardLayout>
+        <AuthenticatedLayout>
             <Head title="Admin · Dashboard" />
             <Box sx={{ flex: 1, width: "100%" }}>
                 <Box
@@ -117,6 +118,6 @@ export default function Dashboard() {
                     </Card>
                 </Stack>
             </Box>
-        </AdminDashboardLayout>
+        </AuthenticatedLayout>
     );
 }

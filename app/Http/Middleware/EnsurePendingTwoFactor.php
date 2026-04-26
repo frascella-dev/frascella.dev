@@ -18,6 +18,13 @@ class EnsurePendingTwoFactor
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->session()->has(self::SESSION_KEY)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'challenge_expired',
+                    'next' => route('admin.login'),
+                ], 410);
+            }
+
             return redirect()->route('admin.login');
         }
 

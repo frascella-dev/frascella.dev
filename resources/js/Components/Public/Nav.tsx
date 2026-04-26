@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import Logo from './Logo.jsx';
-import { useScrollY } from './Hooks.jsx';
-import { PROJECT_DB } from './ProjectPage.jsx';
+import Logo from './Logo.tsx';
+import { useScrollY } from './Hooks.tsx';
+import { PROJECT_DB } from './ProjectPage.tsx';
 
 // Reactive hash route — returns the slug if on #/project/:slug, else null
 export function useRoute() {

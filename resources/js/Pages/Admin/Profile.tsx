@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
+import type { ChangeEvent, FormEvent } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import Alert from "@mui/joy/Alert";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -33,15 +34,29 @@ import {
     IconX,
 } from "@tabler/icons-react";
 
-import AdminDashboardLayout from "@/Layouts/AdminDashboardLayout.jsx";
-import OtpInput from "@/Components/Admin/OtpInput.jsx";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.tsx";
+import OtpInput, {
+    type OtpInputHandle,
+} from "@/Components/Admin/OtpInput.tsx";
+import axios from "axios";
+import { api, fieldErrors } from "@/utils/api.ts";
+import type {
+    FieldErrors,
+    PageProps,
+    ProfilePayload,
+} from "@/types.ts";
 
-function initialsFrom(name = "") {
+type CardProps = {
+    profile: ProfilePayload;
+    onProfile: (next: ProfilePayload) => void;
+};
+
+function initialsFrom(name: string | undefined = ""): string {
     const parts = name.trim().split(/\s+/).slice(0, 2);
     return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
-function formatDate(iso) {
+function formatDate(iso: string | null | undefined): string {
     if (!iso) return "";
     try {
         return new Date(iso).toLocaleDateString(undefined, {
@@ -54,51 +69,106 @@ function formatDate(iso) {
     }
 }
 
-function PersonalInfoCard({ user, avatarUploadLimitKb }) {
-    const { data, setData, patch, processing, errors, isDirty, reset } =
-        useForm({
-            name: user?.name ?? "",
-            email: user?.email ?? "",
-        });
+function PersonalInfoCard({ profile, onProfile }: CardProps) {
+    const user = profile?.user;
+    const avatarUploadLimitKb = profile?.avatarUploadLimitKb;
+    const [data, setData] = useState<{ name: string; email: string }>({
+        name: user?.name ?? "",
+        email: user?.email ?? "",
+    });
+    const [errors, setErrors] = useState<FieldErrors>({});
+    const [processing, setProcessing] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const uploadLimitMb = avatarUploadLimitKb
         ? (avatarUploadLimitKb / 1024).toFixed(1)
         : null;
 
-    const submit = (e) => {
+    useEffect(() => {
+        setData({ name: user?.name ?? "", email: user?.email ?? "" });
+    }, [user?.name, user?.email]);
+
+    const isDirty =
+        data.name !== (user?.name ?? "") ||
+        data.email !== (user?.email ?? "");
+
+    const submit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        patch("/admin/profile", { preserveScroll: true });
+        if (processing) return;
+        setProcessing(true);
+        setErrors({});
+        try {
+            const { data: next } = await api.patch<ProfilePayload>(
+                "/api/admin/profile",
+                data,
+            );
+            onProfile(next);
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                setErrors(fieldErrors(err));
+            } else {
+                const message =
+                    err instanceof Error ? err.message : "Could not save changes.";
+                setErrors({ name: message });
+            }
+        } finally {
+            setProcessing(false);
+        }
     };
 
-    // Inertia exposes validation errors from any request on the shared
-    // `errors` prop — we read `avatar` from there instead of a local useForm,
-    // because useForm's setData + immediate post runs into React state-
-    // timing issues that send the request with `avatar: null`.
-    const pageErrors = usePage().props.errors ?? {};
-    const fileInputRef = useRef(null);
-    const [uploading, setUploading] = useState(false);
+    const reset = () => {
+        setData({ name: user?.name ?? "", email: user?.email ?? "" });
+        setErrors({});
+    };
 
     const onAvatarPick = () => fileInputRef.current?.click();
 
-    const onAvatarChosen = (e) => {
+    const onAvatarChosen = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         setUploading(true);
-        router.post(
-            "/admin/profile/avatar",
-            { avatar: file },
-            {
-                preserveScroll: true,
-                forceFormData: true,
-                onFinish: () => {
-                    setUploading(false);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                },
-            },
-        );
+        setErrors((prev) => {
+            const { avatar: _omit, ...rest } = prev;
+            return rest;
+        });
+        const form = new FormData();
+        form.append("avatar", file);
+        try {
+            const { data: next } = await api.post<ProfilePayload>(
+                "/api/admin/profile/avatar",
+                form,
+            );
+            onProfile(next);
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                setErrors((prev) => ({
+                    ...prev,
+                    ...fieldErrors(err),
+                }));
+            } else {
+                const message =
+                    err instanceof Error ? err.message : "Upload failed.";
+                setErrors((prev) => ({ ...prev, avatar: message }));
+            }
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
     };
 
-    const onAvatarDelete = () => {
-        router.delete("/admin/profile/avatar", { preserveScroll: true });
+    const onAvatarDelete = async () => {
+        try {
+            const { data: next } = await api.delete<ProfilePayload>(
+                "/api/admin/profile/avatar",
+            );
+            onProfile(next);
+        } catch (err) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Could not remove the avatar.";
+            setErrors((prev) => ({ ...prev, avatar: message }));
+        }
     };
 
     return (
@@ -192,13 +262,13 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                         onChange={onAvatarChosen}
                         style={{ display: "none" }}
                     />
-                    {pageErrors.avatar ? (
+                    {errors.avatar ? (
                         <Typography
                             level="body-xs"
                             color="danger"
                             sx={{ textAlign: "center" }}
                         >
-                            {pageErrors.avatar}
+                            {errors.avatar}
                         </Typography>
                     ) : (
                         uploadLimitMb && (
@@ -220,7 +290,9 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                         <Input
                             size="sm"
                             value={data.name}
-                            onChange={(e) => setData("name", e.target.value)}
+                            onChange={(e) =>
+                                setData((p) => ({ ...p, name: e.target.value }))
+                            }
                             placeholder="Full name"
                         />
                         {errors.name && (
@@ -236,7 +308,12 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                                 <IconMail size={16} stroke={1.75} />
                             }
                             value={data.email}
-                            onChange={(e) => setData("email", e.target.value)}
+                            onChange={(e) =>
+                                setData((p) => ({
+                                    ...p,
+                                    email: e.target.value,
+                                }))
+                            }
                             placeholder="you@example.com"
                         />
                         {errors.email && (
@@ -261,7 +338,7 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
                         variant="outlined"
                         color="neutral"
                         type="button"
-                        onClick={() => reset()}
+                        onClick={reset}
                         disabled={!isDirty || processing}
                     >
                         Cancel
@@ -281,20 +358,49 @@ function PersonalInfoCard({ user, avatarUploadLimitKb }) {
     );
 }
 
+type PasswordData = {
+    current_password: string;
+    password: string;
+    password_confirmation: string;
+};
+
 function SecurityCard() {
-    const { data, setData, put, processing, errors, reset } = useForm({
+    const empty: PasswordData = {
         current_password: "",
         password: "",
         password_confirmation: "",
-    });
-
-    const submit = (e) => {
-        e.preventDefault();
-        put("/admin/profile/password", {
-            preserveScroll: true,
-            onSuccess: () => reset(),
-        });
     };
+    const [data, setData] = useState<PasswordData>(empty);
+    const [errors, setErrors] = useState<FieldErrors>({});
+    const [processing, setProcessing] = useState(false);
+
+    const submit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (processing) return;
+        setProcessing(true);
+        setErrors({});
+        try {
+            await api.put("/api/admin/profile/password", data);
+            setData(empty);
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                setErrors(fieldErrors(err));
+            } else {
+                const message =
+                    err instanceof Error
+                        ? err.message
+                        : "Could not change the password.";
+                setErrors({ current_password: message });
+            }
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const setField =
+        <K extends keyof PasswordData>(key: K) =>
+        (e: ChangeEvent<HTMLInputElement>) =>
+            setData((p) => ({ ...p, [key]: e.target.value }));
 
     return (
         <Card component="form" onSubmit={submit}>
@@ -313,9 +419,7 @@ function SecurityCard() {
                         type="password"
                         autoComplete="current-password"
                         value={data.current_password}
-                        onChange={(e) =>
-                            setData("current_password", e.target.value)
-                        }
+                        onChange={setField("current_password")}
                     />
                     {errors.current_password && (
                         <FormHelperText>
@@ -330,7 +434,7 @@ function SecurityCard() {
                         type="password"
                         autoComplete="new-password"
                         value={data.password}
-                        onChange={(e) => setData("password", e.target.value)}
+                        onChange={setField("password")}
                     />
                     {errors.password && (
                         <FormHelperText>{errors.password}</FormHelperText>
@@ -343,9 +447,7 @@ function SecurityCard() {
                         type="password"
                         autoComplete="new-password"
                         value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData("password_confirmation", e.target.value)
-                        }
+                        onChange={setField("password_confirmation")}
                     />
                 </FormControl>
             </Stack>
@@ -365,7 +467,10 @@ function SecurityCard() {
                         variant="outlined"
                         color="neutral"
                         type="button"
-                        onClick={() => reset()}
+                        onClick={() => {
+                            setData(empty);
+                            setErrors({});
+                        }}
                         disabled={processing}
                     >
                         Cancel
@@ -384,39 +489,82 @@ function SecurityCard() {
     );
 }
 
-function TwoFactorCard({ twoFactor }) {
+function TwoFactorCard({ profile, onProfile }: CardProps) {
+    const twoFactor = profile?.twoFactor;
     const pending = twoFactor?.pending ?? null;
     const confirmed = Boolean(twoFactor?.confirmed_at);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        code: "",
-    });
-    const otpRef = useRef(null);
+    const [code, setCode] = useState("");
+    const [errors, setErrors] = useState<FieldErrors>({});
+    const [processing, setProcessing] = useState(false);
+    const otpRef = useRef<OtpInputHandle | null>(null);
+
+    const confirm = async () => {
+        if (processing) return;
+        setProcessing(true);
+        setErrors({});
+        try {
+            const { data: next } = await api.post<ProfilePayload>(
+                "/api/admin/profile/2fa/confirm",
+                { code },
+            );
+            setCode("");
+            onProfile(next);
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                setErrors(fieldErrors(err));
+            } else {
+                const message =
+                    err instanceof Error
+                        ? err.message
+                        : "Could not verify the code.";
+                setErrors({ code: message });
+            }
+            setCode("");
+            otpRef.current?.focus();
+        } finally {
+            setProcessing(false);
+        }
+    };
 
     // Auto-submit once six digits are entered — mirrors the login 2FA flow.
     useEffect(() => {
         if (!pending) return;
-        if (
-            data.code.length === 6 &&
-            /^\d{6}$/.test(data.code) &&
-            !processing
-        ) {
-            post("/admin/profile/2fa/confirm", {
-                preserveScroll: true,
-                onError: () => {
-                    reset("code");
-                    otpRef.current?.focus();
-                },
-            });
+        if (code.length === 6 && /^\d{6}$/.test(code) && !processing) {
+            confirm();
         }
-    }, [data.code]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const startRotation = () => {
-        router.post("/admin/profile/2fa/reset", {}, { preserveScroll: true });
+    const startRotation = async () => {
+        try {
+            const { data: next } = await api.post<ProfilePayload>(
+                "/api/admin/profile/2fa/reset",
+            );
+            onProfile(next);
+        } catch (err) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Could not start the rotation.";
+            setErrors({ code: message });
+        }
     };
 
-    const cancelRotation = () => {
-        router.delete("/admin/profile/2fa", { preserveScroll: true });
+    const cancelRotation = async () => {
+        try {
+            const { data: next } = await api.delete<ProfilePayload>(
+                "/api/admin/profile/2fa",
+            );
+            setCode("");
+            setErrors({});
+            onProfile(next);
+        } catch (err) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : "Could not cancel the rotation.";
+            setErrors({ code: message });
+        }
     };
 
     return (
@@ -518,8 +666,8 @@ function TwoFactorCard({ twoFactor }) {
                         </FormLabel>
                         <OtpInput
                             ref={otpRef}
-                            value={data.code}
-                            onChange={(next) => setData("code", next)}
+                            value={code}
+                            onChange={setCode}
                             error={!!errors.code}
                             disabled={processing}
                             autoFocus
@@ -543,7 +691,7 @@ function TwoFactorCard({ twoFactor }) {
                     <Box sx={{ flex: 1 }}>
                         <Typography level="body-sm">
                             {confirmed
-                                ? `Enrolled ${formatDate(twoFactor.confirmed_at)}.`
+                                ? `Enrolled ${formatDate(twoFactor?.confirmed_at)}.`
                                 : "No authenticator enrolled yet."}
                         </Typography>
                         <Typography level="body-xs" color="neutral">
@@ -596,15 +744,47 @@ function TwoFactorCard({ twoFactor }) {
     );
 }
 
-
 export default function Profile() {
-    const page = usePage();
-    const user = page.props.auth?.user;
-    const twoFactor = page.props.twoFactor;
-    const avatarUploadLimitKb = page.props.avatarUploadLimitKb;
+    const page = usePage<PageProps>();
+    const fallbackUser = page.props.auth?.user;
+    const [profile, setProfile] = useState<ProfilePayload | null>(() =>
+        fallbackUser
+            ? {
+                  user: {
+                      id: fallbackUser.id,
+                      name: fallbackUser.name,
+                      email: fallbackUser.email,
+                      avatar_url: fallbackUser.avatar_url ?? null,
+                  },
+                  twoFactor: { confirmed_at: null, pending: null },
+                  avatarUploadLimitKb: null,
+              }
+            : null,
+    );
+    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        api.get<ProfilePayload>("/api/admin/profile")
+            .then(({ data }) => {
+                if (!cancelled) setProfile(data);
+            })
+            .catch((err: unknown) => {
+                if (!cancelled) {
+                    const message =
+                        err instanceof Error
+                            ? err.message
+                            : "Could not load profile.";
+                    setLoadError(message);
+                }
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     return (
-        <AdminDashboardLayout>
+        <AuthenticatedLayout>
             <Head title="Admin · Profile" />
             <Box sx={{ flex: 1, width: "100%" }}>
                 <Box
@@ -688,14 +868,26 @@ export default function Profile() {
                         py: { xs: 2, md: 3 },
                     }}
                 >
-                    <PersonalInfoCard
-                        user={user}
-                        avatarUploadLimitKb={avatarUploadLimitKb}
-                    />
-                    <SecurityCard />
-                    <TwoFactorCard twoFactor={twoFactor} />
+                    {loadError && (
+                        <Alert color="danger" variant="soft">
+                            {loadError}
+                        </Alert>
+                    )}
+                    {profile && (
+                        <>
+                            <PersonalInfoCard
+                                profile={profile}
+                                onProfile={setProfile}
+                            />
+                            <SecurityCard />
+                            <TwoFactorCard
+                                profile={profile}
+                                onProfile={setProfile}
+                            />
+                        </>
+                    )}
                 </Stack>
             </Box>
-        </AdminDashboardLayout>
+        </AuthenticatedLayout>
     );
 }
