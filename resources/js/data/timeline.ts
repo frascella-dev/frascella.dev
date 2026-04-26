@@ -13,24 +13,60 @@
 //       ],
 //   }
 
-const FRACTION_START = 0.16;
-const FRACTION_END = 0.84;
-
 const entries = [
-    // append entries here
+    {
+        year: 2000,
+        kind: "life",
+        title: "Born",
+        body: "My story starts in Taranto — a port town on the Ionian sea.",
+        fraction: 0.16,
+    },
+    {
+        year: 2006,
+        kind: "life",
+        title: "First PC",
+        body: "A Pentium 4 running Windows XP — the point of no return. Taking things apart, reinstalling, breaking stuff, and figuring out how it all worked.",
+        fraction: 0.3,
+    },
+    {
+        year: 2012,
+        kind: "life",
+        title: "Android Hacking",
+        body: "First steps with Android Studio, decompiled APKs, and improvised mods. Reverse engineering before I even knew what forward engineering was.",
+        fraction: 0.44,
+    },
+    {
+        year: 2019,
+        kind: "life",
+        title: "High School Diploma",
+        body: "Graduated from liceo scientifico. Five years of physics and math that would only start making sense later.",
+        fraction: 0.58,
+    },
+    {
+        year: 2021,
+        kind: "work",
+        title: "La Termica srl",
+        body: "Joined La Termica designing photovoltaic plants. CAD, sun-path math, and learning how real systems survive the weather.",
+        fraction: 0.66,
+    },
+    {
+        year: 2023,
+        kind: "work",
+        title: "SMED srl",
+        body: "Moved to SMED, a telemedicine company. Backend-heavy work on clinical data, APIs, and integrations.",
+        fraction: 0.75,
+    },
+    {
+        year: 2026,
+        kind: "now",
+        title: "Giocaonline srl",
+        body: "Currently building casino games at Giocaonline — real-time systems, fairness, and a lot of state to keep honest.",
+        fraction: 0.84,
+    },
 ];
-
-function fractionFor(index, count) {
-    if (count === 1) {
-        return (FRACTION_START + FRACTION_END) / 2;
-    }
-    const step = (FRACTION_END - FRACTION_START) / (count - 1);
-    return FRACTION_START + index * step;
-}
 
 export const timeline = entries.map((entry, i) => ({
     pictures: [],
     ...entry,
     id: i + 1,
-    fraction: fractionFor(i, entries.length),
 }));
