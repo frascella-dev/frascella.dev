@@ -1,34 +1,68 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useReveal } from "./Hooks.tsx";
+import { QuestionBlock } from "./Blocks.tsx";
+import { Tile } from "./Tile.tsx";
 
-const LAYOUTS = {
-    1: [{ x: 2, y: 3, w: 7, h: 6, tilt: -1.5 }],
-    2: [
-        { x: 1, y: 1, w: 6, h: 6, tilt: -2 },
-        { x: 7, y: 4, w: 5, h: 6, tilt: 2 },
-    ],
-    3: [
-        { x: 1, y: 1, w: 5, h: 5, tilt: -2.5 },
-        { x: 7, y: 2, w: 5, h: 4, tilt: 2 },
-        { x: 3, y: 6, w: 6, h: 4, tilt: 1.2 },
-    ],
-    4: [
-        { x: 1, y: 1, w: 5, h: 4, tilt: -3 },
-        { x: 7, y: 1, w: 5, h: 3, tilt: 2 },
-        { x: 2, y: 6, w: 4, h: 4, tilt: 1.5 },
-        { x: 7, y: 5, w: 5, h: 5, tilt: -2 },
-    ],
-    5: [
-        { x: 1, y: 1, w: 5, h: 4, tilt: -3 },
-        { x: 7, y: 2, w: 5, h: 3, tilt: 2.2 },
-        { x: 2, y: 6, w: 4, h: 4, tilt: 1.5 },
-        { x: 7, y: 6, w: 3, h: 3, tilt: -2.5 },
-        { x: 10, y: 6, w: 3, h: 4, tilt: 3 },
-    ],
-};
-
-const DESKTOP_MAX = 5;
-const MOBILE_MAX = 3;
+const BLOCKS = [
+    {
+        desktop: { size: 192, top: "14%", left: "20%" },
+        mobile: { size: 104, top: "12%", left: "10%" },
+        mouse: { x: -32, y: -22 },
+        scroll: -110,
+        tilt: -5,
+        amp: { x: 18, y: 14, r: 3 },
+        speed: 2800,
+        phase: 0,
+        tile: {
+            slug: "wip-01",
+            tone: "ink",
+            title: "Untitled · 01",
+            tagline: "A project parked behind this block. Coming soon.",
+            year: "2026",
+            metric: { n: "WIP", l: "Status" },
+            stack: ["TypeScript", "React"],
+        },
+    },
+    {
+        desktop: { size: 176, top: "44%", left: "62%" },
+        mobile: { size: 88, top: "40%", left: "60%" },
+        mouse: { x: 44, y: 28 },
+        scroll: -60,
+        tilt: 6,
+        amp: { x: 22, y: 18, r: 4 },
+        speed: 2100,
+        phase: 1.7,
+        tile: {
+            slug: "wip-02",
+            tone: "paper",
+            title: "Untitled · 02",
+            tagline: "Locked for now — case study soon.",
+            year: "2026",
+            metric: { n: "WIP", l: "Status" },
+            stack: ["Go", "Postgres"],
+        },
+    },
+    {
+        desktop: { size: 160, top: "62%", left: "30%" },
+        mobile: { size: 72, top: "70%", left: "22%" },
+        mouse: { x: 18, y: -36 },
+        scroll: -180,
+        tilt: -2,
+        amp: { x: 14, y: 20, r: 5 },
+        speed: 3400,
+        phase: 3.4,
+        tile: {
+            slug: "wip-03",
+            tone: "accent",
+            title: "Untitled · 03",
+            tagline: "Drafting. Drop a line if you want a preview.",
+            year: "2026",
+            metric: { n: "WIP", l: "Status" },
+            stack: ["Laravel", "Inertia"],
+        },
+    },
+];
 
 function useIsMobile(bp = 1000) {
     const [mob, setMob] = useState(
@@ -42,91 +76,137 @@ function useIsMobile(bp = 1000) {
     return mob;
 }
 
-function Tile({ p, i, idx, layout, rel, mouse, focused, onFocus, onBlur }) {
-    const tileRef = useRef(null);
+function MobileDialog({ tile, onClose }: { tile: any; onClose: () => void }) {
+    useEffect(() => {
+        if (!tile) return;
+        const prevBody = document.body.style.overflow;
+        const prevHtml = document.documentElement.style.overflow;
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        const lenis = (window as any).__lenis;
+        lenis?.stop?.();
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => {
+            document.body.style.overflow = prevBody;
+            document.documentElement.style.overflow = prevHtml;
+            lenis?.start?.();
+            window.removeEventListener("keydown", onKey);
+        };
+    }, [tile, onClose]);
 
-    const depth = 1 + (i % 3) * 0.4;
-    const mouseTx = (mouse.x - 0.5) * 14 * depth;
-    const mouseTy = (mouse.y - 0.5) * 10 * depth;
-    const scrollTy = (rel - 0.5) * -90 * depth;
-    const idle = Math.sin((Date.now() / 2400 + i) % (Math.PI * 2)) * 3;
+    if (!tile) return null;
 
-    const isFocused = focused === p.slug;
-    const isDimmed = focused && !isFocused;
+    return createPortal(
+        <div
+            className="ef-work-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label={tile.title}
+        >
+            <Tile
+                p={tile}
+                i={0}
+                idx="01"
+                layout={{ x: 1, y: 1, w: 1, h: 1, tilt: 0 }}
+                rel={0.5}
+                mouse={{ x: 0.5, y: 0.5 }}
+                focused={tile.slug}
+                onFocus={() => {}}
+                onBlur={() => {}}
+                onClose={onClose}
+            />
+        </div>,
+        document.body,
+    );
+}
+
+function FollowTile({
+    tile,
+    mousePx,
+    vel,
+    wrapW,
+    wrapH,
+}: {
+    tile: any;
+    mousePx: { x: number; y: number };
+    vel: { vx: number; vy: number };
+    wrapW: number;
+    wrapH: number;
+}) {
+    const W = 380;
+    const H = 300;
+    let left = mousePx.x - W / 2;
+    let top = mousePx.y - H / 2;
+    const m = 16;
+    if (left < m) left = m;
+    if (top < m) top = m;
+    if (left + W > wrapW - m) left = wrapW - m - W;
+    if (top + H > wrapH - m) top = wrapH - m - H;
+
+    const rot = Math.max(-8, Math.min(8, vel.vx * 50));
+    const visible = tile != null;
 
     return (
         <div
-            ref={tileRef}
-            className={`ef-tile ef-tile--${p.tone} ${isFocused ? "is-focused" : ""} ${isDimmed ? "is-dimmed" : ""}`}
-            style={{
-                gridColumn: `${layout.x} / span ${layout.w}`,
-                gridRow: `${layout.y} / span ${layout.h}`,
-                transform: `translate3d(${mouseTx}px, ${scrollTy + mouseTy + idle}px, 0) rotate(${layout.tilt}deg)`,
-            }}
-            onMouseEnter={() => onFocus(p.slug)}
-            onMouseLeave={() => onBlur()}
-            data-cursor="view"
-            data-cursor-label={"View"}
+            className={`ef-work-follow ${visible ? "is-visible" : ""}`}
+            style={{ transform: `translate3d(${left}px, ${top}px, 0)` }}
+            aria-hidden={!visible}
         >
-            <span className="ef-tile-pattern" aria-hidden />
-
-            <header className="ef-tile-head">
-                <span className="ef-mono ef-tile-idx">№ {idx}</span>
-                <span className="ef-mono ef-tile-year">{p.year}</span>
-            </header>
-
-            <div className="ef-tile-body">
-                <h3 className="ef-tile-title">{p.title}</h3>
-                <p className="ef-tile-tag">{p.tagline}</p>
-            </div>
-
-            <footer className="ef-tile-foot">
-                {p.metric && (
-                    <div className="ef-tile-metric">
-                        <strong>{p.metric.n}</strong>
-                        <em>{p.metric.l}</em>
-                    </div>
-                )}
-                <span className="ef-tile-arrow" aria-hidden>
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                        <path
-                            d="M5 12h14M13 6l6 6-6 6"
-                            stroke="currentColor"
-                            strokeWidth="1.4"
-                            fill="none"
-                            strokeLinecap="square"
-                        />
-                    </svg>
-                </span>
-            </footer>
-
-            <ul className="ef-tile-stack" aria-hidden>
-                {(p.stack || []).map((s) => (
-                    <li key={s}>{s}</li>
-                ))}
-            </ul>
+            {tile && (
+                <div
+                    className="ef-work-follow-inner"
+                    style={{ transform: `rotate(${rot}deg)` }}
+                >
+                    <Tile
+                        p={tile}
+                        i={0}
+                        idx="01"
+                        layout={{ x: 1, y: 1, w: 1, h: 1, tilt: 0 }}
+                        rel={0.5}
+                        mouse={{ x: 0.5, y: 0.5 }}
+                        focused={tile.slug}
+                        onFocus={() => {}}
+                        onBlur={() => {}}
+                        showArrow={false}
+                    />
+                </div>
+            )}
         </div>
     );
 }
 
-export default function Work({ projects = [] }) {
+export default function Work() {
     const [revealRef, shown] = useReveal();
-    const sectionRef = useRef(null);
+    const sectionRef = useRef<HTMLElement | null>(null);
+    const wrapRef = useRef<HTMLDivElement | null>(null);
     const [rel, setRel] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
-    const [focused, setFocused] = useState(null);
+    const [mousePx, setMousePx] = useState({ x: 0, y: 0 });
+    const lastMouseRef = useRef({ x: 0, y: 0, t: 0 });
+    const [vel, setVel] = useState({ vx: 0, vy: 0 });
+    const [wrapDims, setWrapDims] = useState({ w: 0, h: 0 });
+    const [hovered, setHovered] = useState<number | null>(null);
+    const [dialogTile, setDialogTile] = useState<any | null>(null);
     const isMobile = useIsMobile();
-
-    const shown_projects = projects.slice(
-        0,
-        isMobile ? MOBILE_MAX : DESKTOP_MAX,
-    );
-    const layout = LAYOUTS[shown_projects.length] || LAYOUTS[5];
 
     const setRefs = (node: HTMLElement | null) => {
         sectionRef.current = node;
         if (revealRef) revealRef.current = node;
     };
+
+    useEffect(() => {
+        const compute = () => {
+            const el = wrapRef.current;
+            if (!el) return;
+            setWrapDims({ w: el.clientWidth, h: el.clientHeight });
+        };
+        compute();
+        window.addEventListener("resize", compute);
+        return () => window.removeEventListener("resize", compute);
+    }, []);
 
     useEffect(() => {
         const onScroll = () => {
@@ -138,17 +218,41 @@ export default function Work({ projects = [] }) {
             const travelled = vh - r.top;
             setRel(Math.max(0, Math.min(1, travelled / total)));
         };
-        const onMove = (e) => {
-            const el = sectionRef.current;
-            if (!el) return;
-            const r = el.getBoundingClientRect();
-            setMouse({
-                x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
-                y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)),
-            });
+        const onMove = (e: MouseEvent) => {
+            const sec = sectionRef.current;
+            if (sec) {
+                const sr = sec.getBoundingClientRect();
+                setMouse({
+                    x: Math.max(
+                        0,
+                        Math.min(1, (e.clientX - sr.left) / sr.width),
+                    ),
+                    y: Math.max(
+                        0,
+                        Math.min(1, (e.clientY - sr.top) / sr.height),
+                    ),
+                });
+            }
+            const wr = wrapRef.current;
+            if (wr) {
+                const wrr = wr.getBoundingClientRect();
+                const px = e.clientX - wrr.left;
+                const py = e.clientY - wrr.top;
+                setMousePx({ x: px, y: py });
+                const now = performance.now();
+                const last = lastMouseRef.current;
+                const dt = Math.max(1, now - last.t);
+                const vx = (px - last.x) / dt;
+                const vy = (py - last.y) / dt;
+                lastMouseRef.current = { x: px, y: py, t: now };
+                setVel((prev) => ({
+                    vx: prev.vx * 0.7 + vx * 0.3,
+                    vy: prev.vy * 0.7 + vy * 0.3,
+                }));
+            }
         };
         window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mousemove", onMove, { passive: true });
         onScroll();
         return () => {
             window.removeEventListener("scroll", onScroll);
@@ -158,7 +262,7 @@ export default function Work({ projects = [] }) {
 
     const [, force] = useState(0);
     useEffect(() => {
-        let raf;
+        let raf: number;
         const loop = () => {
             force((n) => (n + 1) % 1000);
             raf = requestAnimationFrame(loop);
@@ -167,9 +271,11 @@ export default function Work({ projects = [] }) {
         return () => cancelAnimationFrame(raf);
     }, []);
 
-    const pxy = (mx, my, sy) => ({
+    const pxy = (mx: number, my: number, sy: number) => ({
         transform: `translate3d(${(mouse.x - 0.5) * mx}px, ${(mouse.y - 0.5) * my + (rel - 0.5) * sy}px, 0)`,
     });
+
+    const t = Date.now();
 
     return (
         <section
@@ -239,42 +345,73 @@ export default function Work({ projects = [] }) {
                     <p className="ef-work-note">
                         A partial record — click to open the case study.
                     </p>
-                    <span className="ef-mono ef-work-count">
-                        {String(
-                            focused
-                                ? shown_projects.findIndex(
-                                      (p) => p.slug === focused,
-                                  ) + 1
-                                : 0,
-                        ).padStart(2, "0")}{" "}
-                        / {String(shown_projects.length).padStart(2, "0")}
-                    </span>
+                    <span className="ef-mono ef-work-count">soon</span>
                 </div>
             </div>
 
-            <div className="ef-work-canvas-wrap">
+            <div
+                className="ef-work-canvas-wrap"
+                ref={wrapRef}
+                onMouseLeave={() => setHovered(null)}
+            >
                 <div className="ef-work-canvas-rules" aria-hidden>
                     {Array.from({ length: 12 }).map((_, i) => (
                         <span key={`v${i}`} />
                     ))}
                 </div>
 
-                <div className="ef-work-canvas">
-                    {shown_projects.map((p, i) => (
-                        <Tile
-                            key={p.slug}
-                            p={p}
-                            i={i}
-                            idx={String(i + 1).padStart(2, "0")}
-                            layout={layout[i]}
-                            rel={rel}
-                            mouse={mouse}
-                            focused={focused}
-                            onFocus={setFocused}
-                            onBlur={() => setFocused(null)}
-                        />
-                    ))}
+                <div className="ef-work-blocks">
+                    {BLOCKS.map((b, i) => {
+                        const pos = isMobile ? b.mobile : b.desktop;
+                        const phase = t / b.speed + b.phase;
+                        const driftX = Math.sin(phase) * b.amp.x;
+                        const driftY = Math.cos(phase * 0.85) * b.amp.y;
+                        const driftR = Math.sin(phase * 0.6) * b.amp.r;
+                        const mx = (mouse.x - 0.5) * b.mouse.x;
+                        const my =
+                            (mouse.y - 0.5) * b.mouse.y +
+                            (rel - 0.5) * b.scroll;
+                        return (
+                            <div
+                                key={i}
+                                className="ef-work-block"
+                                style={{
+                                    top: pos.top,
+                                    left: pos.left,
+                                    transform: `translate3d(${mx + driftX}px, ${my + driftY}px, 0) rotate(${b.tilt + driftR}deg)`,
+                                }}
+                                onMouseEnter={
+                                    isMobile ? undefined : () => setHovered(i)
+                                }
+                                onMouseLeave={
+                                    isMobile
+                                        ? undefined
+                                        : () => setHovered(null)
+                                }
+                                onClick={
+                                    isMobile
+                                        ? () => setDialogTile(b.tile)
+                                        : undefined
+                                }
+                            >
+                                <QuestionBlock size={pos.size} />
+                            </div>
+                        );
+                    })}
                 </div>
+
+                <FollowTile
+                    tile={hovered != null ? BLOCKS[hovered].tile : null}
+                    mousePx={mousePx}
+                    vel={vel}
+                    wrapW={wrapDims.w}
+                    wrapH={wrapDims.h}
+                />
+
+                <MobileDialog
+                    tile={dialogTile}
+                    onClose={() => setDialogTile(null)}
+                />
 
                 <div
                     className="ef-work-bigword"

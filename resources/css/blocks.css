@@ -1,0 +1,93 @@
+/* ============================================================
+   PIXEL BLOCKS (Mario-style)
+   ============================================================ */
+.ef-block {
+  all: unset;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px;
+  position: relative;
+  cursor: pointer;
+  color: var(--ink);
+  transition: transform 0.18s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.ef-block.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ef-block-svg-wrap {
+  display: inline-block;
+  position: relative;
+  transition: transform 0.18s var(--ease);
+}
+.ef-block-svg-wrap svg { display: block; }
+
+.ef-block-shadow {
+  position: absolute;
+  inset: auto 6px 0 6px;
+  height: 6px;
+  background: rgba(17,17,16,0.18);
+  filter: blur(2px);
+  border-radius: 50%;
+  transform: scaleX(0.85);
+  transform-origin: center;
+  transition: transform 0.18s var(--ease), opacity 0.18s var(--ease);
+  z-index: -1;
+}
+
+.ef-block:hover:not(.is-disabled) .ef-block-svg-wrap {
+  transform: translateY(-4px);
+}
+.ef-block:hover:not(.is-disabled) .ef-block-shadow {
+  transform: scaleX(0.7);
+  opacity: 0.6;
+}
+.ef-block:active:not(.is-disabled) .ef-block-svg-wrap,
+.ef-block.is-active .ef-block-svg-wrap {
+  transform: translateY(2px);
+}
+.ef-block.is-active .ef-block-shadow {
+  transform: scaleX(0.95);
+  opacity: 1;
+}
+
+.ef-block-caption {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: currentColor;
+  opacity: 0.7;
+}
+
+/* keyboard focus */
+.ef-block:focus-visible .ef-block-svg-wrap {
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+}
+
+/* tiny float idle animation (only when not disabled) */
+@keyframes efBlockFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.ef-block:not(.is-disabled):not(:hover):not(:active) .ef-block-svg-wrap {
+  animation: efBlockFloat 3.4s var(--ease) infinite;
+}
+.ef-block.is-active .ef-block-svg-wrap { animation: none; }
+
+/* "bump" anim — used after click on Question block */
+@keyframes efBlockBump {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-10px); }
+  60% { transform: translateY(0); }
+}
+.ef-block.is-bumping .ef-block-svg-wrap {
+  animation: efBlockBump 0.45s var(--ease);
+}

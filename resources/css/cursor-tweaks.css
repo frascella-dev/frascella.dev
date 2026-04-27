@@ -41,6 +41,16 @@
 html[data-cursor="off"] .ef-cursor-dot,
 html[data-cursor="off"] .ef-cursor-ring { display: none; }
 
+/* dark scheme — invert cursor on dark backgrounds */
+.ef-cursor-dot.ef-cursor-scheme-dark { background: var(--paper); }
+.ef-cursor-ring.ef-cursor-scheme-dark { border-color: var(--paper); }
+.ef-cursor-ring.ef-cursor-scheme-dark * { color: var(--paper); }
+.ef-cursor-link.ef-cursor-ring.ef-cursor-scheme-dark {
+  background: var(--paper);
+  border-color: var(--paper);
+}
+.ef-cursor-link.ef-cursor-ring.ef-cursor-scheme-dark * { color: var(--ink); }
+
 /* Hide cursor entirely on touch devices */
 @media (hover: none), (pointer: coarse), (max-width: 900px) {
   .ef-cursor-dot, .ef-cursor-ring { display: none !important; }

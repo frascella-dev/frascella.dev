@@ -13,7 +13,6 @@ import About from "../../Components/Public/About.tsx";
 import Contact from "../../Components/Public/Contact.tsx";
 import ProjectPage from "../../Components/Public/ProjectPage.tsx";
 import { timeline } from "../../data/timeline.ts";
-import { projects } from "../../data/projects.ts";
 
 export default function Portfolio() {
     const [booted, setBooted] = useState(() => {
@@ -35,6 +34,7 @@ export default function Portfolio() {
             wheelMultiplier: 1,
             touchMultiplier: 1.4,
         });
+        (window as any).__lenis = lenis;
         const raf = (time) => {
             lenis.raf(time);
             requestAnimationFrame(raf);
@@ -68,6 +68,9 @@ export default function Portfolio() {
             document.removeEventListener("click", onClick);
             window.removeEventListener("scroll", onScroll);
             lenis.destroy();
+            if ((window as any).__lenis === lenis) {
+                delete (window as any).__lenis;
+            }
         };
     }, [booted]);
 
@@ -93,7 +96,7 @@ export default function Portfolio() {
                 ) : (
                     <>
                         <Hero />
-                        <Work projects={projects} />
+                        <Work />
                         <About timeline={timeline} />
                         <Contact />
                     </>

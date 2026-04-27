@@ -5,6 +5,7 @@ export default function CustomCursor() {
     const ringRef = useRef(null);
     const [label, setLabel] = useState('');
     const [variant, setVariant] = useState('default');
+    const [scheme, setScheme] = useState('light');
 
     useEffect(() => {
         const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -40,6 +41,8 @@ export default function CustomCursor() {
                 setVariant('default');
                 setLabel('');
             }
+            const schemeEl = e.target.closest('[data-cursor-scheme]');
+            setScheme(schemeEl?.dataset.cursorScheme || 'light');
         };
 
         window.addEventListener('mousemove', onMove);
@@ -53,8 +56,14 @@ export default function CustomCursor() {
 
     return (
         <>
-            <div ref={dotRef} className={`ef-cursor-dot ef-cursor-${variant}`} />
-            <div ref={ringRef} className={`ef-cursor-ring ef-cursor-${variant}`}>
+            <div
+                ref={dotRef}
+                className={`ef-cursor-dot ef-cursor-${variant} ef-cursor-scheme-${scheme}`}
+            />
+            <div
+                ref={ringRef}
+                className={`ef-cursor-ring ef-cursor-${variant} ef-cursor-scheme-${scheme}`}
+            >
                 {label && <span className="ef-cursor-label">{label}</span>}
             </div>
         </>

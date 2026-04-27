@@ -103,8 +103,8 @@
   z-index: 1;
   margin: 0 auto;
   max-width: 1600px;
-  aspect-ratio: 10 / 8;
-  min-height: 740px;
+  aspect-ratio: 12 / 5;
+  min-height: 460px;
 }
 .ef-work-canvas-rules {
   position: absolute;
@@ -128,6 +128,88 @@
   gap: 18px;
   z-index: 1;
 }
+
+/* --- Question blocks scatter --- */
+.ef-work-blocks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.ef-work-block {
+  position: absolute;
+  color: var(--accent);
+  will-change: transform;
+  pointer-events: auto;
+}
+
+/* --- Follow tile (mirrors About.tsx FollowCard) --- */
+.ef-work-follow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 380px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 5;
+  will-change: transform, opacity;
+  transition: opacity 0.18s;
+}
+.ef-work-follow.is-visible { opacity: 1; }
+.ef-work-follow-inner {
+  transform-origin: center center;
+  transition: transform 0.25s cubic-bezier(.2,.7,.2,1);
+}
+.ef-work-follow .ef-tile {
+  width: 100%;
+  height: 300px;
+  box-shadow: 0 30px 60px -25px rgba(17,17,16,0.45);
+}
+
+/* --- Mobile dialog (full-screen tile) --- */
+.ef-work-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  animation: efSheetUp 0.34s cubic-bezier(0.22, 0.8, 0.22, 1);
+  will-change: transform;
+}
+.ef-work-dialog .ef-tile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none !important;
+  padding: 28px 24px;
+}
+
+.ef-tile-close {
+  all: unset;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 6;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+.ef-tile-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes efSheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.ef-work-block .ef-block-svg-wrap svg rect:first-of-type { fill: var(--paper); }
 
 /* --- Tile --- */
 .ef-tile {
@@ -208,6 +290,7 @@
 
 .ef-tile-body {
   margin-top: auto;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -369,7 +452,8 @@
   .ef-work-title { font-size: clamp(40px, 13vw, 92px); }
   .ef-work-title .ef-line--2 { padding-right: 0; justify-content: flex-start; }
   .ef-work-title .ef-line--3 { padding-left: 16px; }
-  .ef-work-canvas-wrap { aspect-ratio: auto; min-height: 0; }
+  .ef-work-canvas-wrap { aspect-ratio: auto; min-height: 320px; height: 320px; }
+  .ef-work-follow { display: none; }
   .ef-work-canvas-rules { display: none; }
   .ef-work-canvas {
     position: relative;
