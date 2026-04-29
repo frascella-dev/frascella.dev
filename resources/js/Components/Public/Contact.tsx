@@ -139,11 +139,24 @@ function Marquee({ words, speed = 40 }: { words: string[]; speed?: number }) {
     );
 }
 
+function useIsMobile(bp = 1000) {
+    const [mob, setMob] = useState(
+        () => typeof window !== "undefined" && window.innerWidth < bp,
+    );
+    useEffect(() => {
+        const onResize = () => setMob(window.innerWidth < bp);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, [bp]);
+    return mob;
+}
+
 export default function Contact() {
     const [revealRef, shown] = useReveal();
     const sectionRef = useRef<HTMLElement | null>(null);
     const [rel, setRel] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+    const isMobile = useIsMobile();
 
     const setRefs = (node: HTMLElement | null) => {
         sectionRef.current = node;
@@ -170,13 +183,15 @@ export default function Contact() {
             });
         };
         window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("mousemove", onMove, { passive: true });
+        if (!isMobile) {
+            window.addEventListener("mousemove", onMove, { passive: true });
+        }
         onScroll();
         return () => {
             window.removeEventListener("scroll", onScroll);
             window.removeEventListener("mousemove", onMove);
         };
-    }, []);
+    }, [isMobile]);
 
     const { data, setData, reset } = useForm({
         name: "",

@@ -6,7 +6,7 @@ import { Tile } from "./Tile.tsx";
 
 const BLOCKS = [
     {
-        desktop: { size: 192, top: "14%", left: "20%" },
+        desktop: { size: 256, top: "4%", left: "20%" },
         mobile: { size: 104, top: "12%", left: "10%" },
         mouse: { x: -32, y: -22 },
         scroll: -110,
@@ -25,7 +25,7 @@ const BLOCKS = [
         },
     },
     {
-        desktop: { size: 176, top: "44%", left: "62%" },
+        desktop: { size: 212, top: "44%", left: "62%" },
         mobile: { size: 88, top: "40%", left: "60%" },
         mouse: { x: 44, y: 28 },
         scroll: -60,
@@ -44,7 +44,7 @@ const BLOCKS = [
         },
     },
     {
-        desktop: { size: 160, top: "62%", left: "30%" },
+        desktop: { size: 172, top: "80%", left: "30%" },
         mobile: { size: 72, top: "70%", left: "22%" },
         mouse: { x: 18, y: -36 },
         scroll: -180,
@@ -76,7 +76,21 @@ function useIsMobile(bp = 1000) {
     return mob;
 }
 
+const MOBILE_DIALOG_CLOSE_MS = 320;
+
 function MobileDialog({ tile, onClose }: { tile: any; onClose: () => void }) {
+    const [closing, setClosing] = useState(false);
+    const closeTimerRef = useRef<number | null>(null);
+
+    const requestClose = () => {
+        if (closing) return;
+        setClosing(true);
+        closeTimerRef.current = window.setTimeout(() => {
+            setClosing(false);
+            onClose();
+        }, MOBILE_DIALOG_CLOSE_MS);
+    };
+
     useEffect(() => {
         if (!tile) return;
         const prevBody = document.body.style.overflow;
@@ -86,7 +100,7 @@ function MobileDialog({ tile, onClose }: { tile: any; onClose: () => void }) {
         const lenis = (window as any).__lenis;
         lenis?.stop?.();
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") requestClose();
         };
         window.addEventListener("keydown", onKey);
         return () => {
@@ -94,14 +108,18 @@ function MobileDialog({ tile, onClose }: { tile: any; onClose: () => void }) {
             document.documentElement.style.overflow = prevHtml;
             lenis?.start?.();
             window.removeEventListener("keydown", onKey);
+            if (closeTimerRef.current != null) {
+                clearTimeout(closeTimerRef.current);
+                closeTimerRef.current = null;
+            }
         };
-    }, [tile, onClose]);
+    }, [tile]);
 
     if (!tile) return null;
 
     return createPortal(
         <div
-            className="ef-work-dialog"
+            className={`ef-work-dialog ${closing ? "is-closing" : ""}`}
             role="dialog"
             aria-modal="true"
             aria-label={tile.title}
@@ -116,7 +134,7 @@ function MobileDialog({ tile, onClose }: { tile: any; onClose: () => void }) {
                 focused={tile.slug}
                 onFocus={() => {}}
                 onBlur={() => {}}
-                onClose={onClose}
+                onClose={requestClose}
             />
         </div>,
         document.body,
@@ -252,13 +270,15 @@ export default function Work() {
             }
         };
         window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("mousemove", onMove, { passive: true });
+        if (!isMobile) {
+            window.addEventListener("mousemove", onMove, { passive: true });
+        }
         onScroll();
         return () => {
             window.removeEventListener("scroll", onScroll);
             window.removeEventListener("mousemove", onMove);
         };
-    }, []);
+    }, [isMobile]);
 
     const [, force] = useState(0);
     useEffect(() => {

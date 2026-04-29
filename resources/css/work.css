@@ -103,8 +103,8 @@
   z-index: 1;
   margin: 0 auto;
   max-width: 1600px;
-  aspect-ratio: 12 / 5;
-  min-height: 460px;
+  aspect-ratio: 12 / 6.5;
+  min-height: 580px;
 }
 .ef-work-canvas-rules {
   position: absolute;
@@ -205,9 +205,16 @@
   outline-offset: 2px;
 }
 
+.ef-work-dialog.is-closing {
+  animation: efSheetDown 0.32s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
 @keyframes efSheetUp {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
+}
+@keyframes efSheetDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
 }
 .ef-work-block .ef-block-svg-wrap svg rect:first-of-type { fill: var(--paper); }
 
