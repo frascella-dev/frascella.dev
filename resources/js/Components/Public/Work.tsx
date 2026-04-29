@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 import { QuestionBlock } from "./Blocks.tsx";
 import { Tile } from "./Tile.tsx";
@@ -455,7 +456,7 @@ export default function Work() {
                 >
                     <span>more projects on github.com/manuto276</span>
                     <span className="ef-work-strip-arrow" aria-hidden>
-                        ↗
+                        <IconArrowUpRight size={20} stroke={1.6} />
                     </span>
                 </a>
                 <span className="ef-mono">EST. 2021 — ∞</span>

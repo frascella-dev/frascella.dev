@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 
 function Timeline({ items }) {
@@ -166,7 +167,13 @@ function Timeline({ items }) {
                 </h3>
                 <p className="ef-tl-lede">
                     Hover a year to see what happened. Scroll to pull the
-                    thread. {first} → {last}.
+                    thread. {first}{" "}
+                    <IconArrowRight
+                        size={14}
+                        stroke={1.6}
+                        style={{ verticalAlign: "middle" }}
+                    />{" "}
+                    {last}.
                 </p>
             </div>
 

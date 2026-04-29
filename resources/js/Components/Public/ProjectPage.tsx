@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { IconArrowRight } from '@tabler/icons-react';
 
 export const PROJECT_DB = {
     'ledger-works': {
@@ -415,7 +416,9 @@ export default function ProjectPage() {
                     </span>
                 </a>
                 <a href={`#/project/${next}`} className="ef-pp-nav-side ef-pp-nav-side--r" data-cursor="link">
-                    <span className="ef-mono">next →</span>
+                    <span className="ef-mono ef-pp-nav-next">
+                        next <IconArrowRight size={14} stroke={1.6} />
+                    </span>
                     <strong>{PROJECT_DB[next].title}</strong>
                 </a>
             </nav>

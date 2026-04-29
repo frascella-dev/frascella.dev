@@ -502,6 +502,7 @@
 .ef-pp-nav-side--r { align-items: flex-end; text-align: right; }
 .ef-pp-nav-side--r:hover { transform: translateX(6px); }
 .ef-pp-nav-side .ef-mono { font-size: 11px; letter-spacing: 0.14em; color: var(--ink-mute); }
+.ef-pp-nav-next { display: inline-flex; align-items: center; gap: 4px; }
 .ef-pp-nav-side strong {
   font-family: var(--display);
   font-weight: 500;

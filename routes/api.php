@@ -6,8 +6,14 @@ use App\Http\Controllers\Api\Admin\LogoutController;
 use App\Http\Controllers\Api\Admin\ProfileController;
 use App\Http\Controllers\Api\Admin\RegisterController;
 use App\Http\Controllers\Api\Admin\TwoFactorController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Middleware\EnsurePendingTwoFactor;
 use Illuminate\Support\Facades\Route;
+
+// Public contact form — DB-side cooldowns layered on top of the throttle.
+Route::post('contact', ContactController::class)
+    ->middleware('throttle:5,60')
+    ->name('api.contact.store');
 
 Route::prefix('admin')->name('api.admin.')->group(function () {
     Route::middleware('guest')->group(function () {

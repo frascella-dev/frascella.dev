@@ -59,6 +59,14 @@
   padding: 40px 0;
 }
 .ef-cform { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.ef-cform-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
 .ef-contact-aside {
   position: relative;
   min-height: 420px;
@@ -458,7 +466,11 @@
 .ef-cfield-err {
   color: var(--accent);
   margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
+.ef-cfield-err svg { flex-shrink: 0; }
 
 /* footer of form */
 .ef-cform-foot {
@@ -508,7 +520,17 @@
 }
 .ef-cform-submit:hover:not(:disabled) .ef-label { color: var(--accent-ink); opacity: 0.7; }
 .ef-cform-submit-label { font-family: var(--sans); font-size: 15px; letter-spacing: -0.005em; }
-.ef-cform-submit-arrow { font-family: var(--sans); font-size: 16px; transition: transform 0.4s var(--ease); }
+.ef-cform-submit .ef-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ef-cform-submit-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s var(--ease);
+}
 .ef-cform-submit:hover:not(:disabled) .ef-cform-submit-arrow { transform: translateX(4px); }
 .ef-cform-submit:disabled { cursor: default; }
 .ef-cform-submit.is-sending {

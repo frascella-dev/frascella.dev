@@ -197,7 +197,6 @@
   border-radius: 999px;
   color: inherit;
   background: transparent;
-  cursor: pointer;
   transition: background 0.2s var(--ease);
 }
 .ef-tile-close:focus-visible {
@@ -446,6 +445,11 @@
 .ef-work-strip-arrow {
   display: inline-block;
   transition: transform 0.4s var(--ease);
+}
+.ef-work-strip-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .ef-work-strip-link:hover .ef-work-strip-arrow { transform: translate(4px, -4px); }
 .ef-work-strip .ef-mono {

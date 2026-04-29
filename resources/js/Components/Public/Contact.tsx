@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { useForm } from "@inertiajs/react";
+import { IconArrowRight, IconCornerDownRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 import { GithubBlock, LinkedinBlock } from "./Blocks.tsx";
+import { Toast, type ToastState } from "./Toast.tsx";
+import { api, fieldErrors } from "@/utils/api.ts";
 
 type FieldKey = "name" | "email" | "message";
 
@@ -197,23 +201,32 @@ export default function Contact() {
         name: "",
         email: "",
         message: "",
+        website: "", // honeypot — must stay empty
     });
 
-    const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+    const [status, setStatus] = useState<"idle" | "sending">("idle");
     const [touched, setTouched] = useState<Record<FieldKey, boolean>>({
         name: false,
         email: false,
         message: false,
     });
+    const [serverErrors, setServerErrors] = useState<
+        Partial<Record<FieldKey, string>>
+    >({});
+    const [toast, setToast] = useState<ToastState>(null);
 
     const update =
         (key: FieldKey) =>
-        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+        (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             setData(key, e.target.value);
+            if (serverErrors[key]) {
+                setServerErrors((s) => ({ ...s, [key]: undefined }));
+            }
+        };
     const blur = (key: FieldKey) => () =>
         setTouched((t) => ({ ...t, [key]: true }));
 
-    const errors = {
+    const localErrors = {
         name:
             data.name.trim().length === 0
                 ? null
@@ -233,28 +246,66 @@ export default function Contact() {
                   ? "At least 10 characters"
                   : null,
     };
+    const errors = {
+        name: serverErrors.name ?? localErrors.name,
+        email: serverErrors.email ?? localErrors.email,
+        message: serverErrors.message ?? localErrors.message,
+    };
     const allFilled =
         data.name.trim().length > 0 &&
         data.email.trim().length > 0 &&
         data.message.trim().length > 0;
     const isValid =
-        allFilled && !errors.name && !errors.email && !errors.message;
+        allFilled && !localErrors.name && !localErrors.email && !localErrors.message;
 
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!isValid || status !== "idle") {
             setTouched({ name: true, email: true, message: true });
             return;
         }
         setStatus("sending");
-        setTimeout(() => {
-            setStatus("sent");
-            setTimeout(() => {
-                setStatus("idle");
-                reset();
-                setTouched({ name: false, email: false, message: false });
-            }, 3200);
-        }, 1100);
+        setServerErrors({});
+        try {
+            await api.post("/api/contact", {
+                name: data.name,
+                email: data.email,
+                message: data.message,
+                website: data.website,
+            });
+            reset();
+            setTouched({ name: false, email: false, message: false });
+            setStatus("idle");
+            setToast({
+                kind: "success",
+                message: "Message sent — I'll get back to you soon.",
+            });
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 422) {
+                const fields = fieldErrors(err) as Partial<
+                    Record<FieldKey, string>
+                >;
+                setServerErrors(fields);
+                setTouched({ name: true, email: true, message: true });
+                const first =
+                    fields.message ?? fields.email ?? fields.name ?? null;
+                if (first) {
+                    setToast({ kind: "error", message: first });
+                }
+            } else if (axios.isAxiosError(err) && err.response?.status === 429) {
+                setToast({
+                    kind: "error",
+                    message:
+                        "Too many requests — please wait a moment before trying again.",
+                });
+            } else {
+                setToast({
+                    kind: "error",
+                    message: "Something went wrong. Please try again later.",
+                });
+            }
+            setStatus("idle");
+        }
     };
 
     const filled = [data.name, data.email, data.message].filter(
@@ -291,6 +342,17 @@ export default function Contact() {
 
             <div className="ef-contact-row">
                 <form className="ef-cform" onSubmit={submit} noValidate>
+                    {/* Honeypot — humans don't see or fill this. */}
+                    <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={data.website}
+                        onChange={(e) => setData("website", e.target.value)}
+                        className="ef-cform-honeypot"
+                        aria-hidden="true"
+                    />
                     <div className="ef-cform-fields">
                         {/* NAME */}
                         <label
@@ -314,7 +376,7 @@ export default function Contact() {
                             <span className="ef-cfield-bar" aria-hidden />
                             {touched.name && errors.name && (
                                 <span className="ef-mono ef-cfield-err">
-                                    ↳ {errors.name}
+                                    <IconCornerDownRight size={14} stroke={1.6} /> {errors.name}
                                 </span>
                             )}
                         </label>
@@ -341,7 +403,7 @@ export default function Contact() {
                             <span className="ef-cfield-bar" aria-hidden />
                             {touched.email && errors.email && (
                                 <span className="ef-mono ef-cfield-err">
-                                    ↳ {errors.email}
+                                    <IconCornerDownRight size={14} stroke={1.6} /> {errors.email}
                                 </span>
                             )}
                         </label>
@@ -374,7 +436,7 @@ export default function Contact() {
                             <span className="ef-cfield-bar" aria-hidden />
                             {touched.message && errors.message && (
                                 <span className="ef-mono ef-cfield-err">
-                                    ↳ {errors.message}
+                                    <IconCornerDownRight size={14} stroke={1.6} /> {errors.message}
                                 </span>
                             )}
                         </label>
@@ -406,27 +468,23 @@ export default function Contact() {
                             type="submit"
                             className={`ef-cform-submit ${
                                 status === "sending" ? "is-sending" : ""
-                            } ${status === "sent" ? "is-sent" : ""}`}
+                            }`}
                             disabled={status !== "idle"}
                             data-cursor="link"
                             data-cursor-label={
-                                status === "sent"
-                                    ? "Sent"
-                                    : status === "sending"
-                                      ? "Sending"
-                                      : "Send"
+                                status === "sending" ? "Sending" : "Send"
                             }
                         >
-                            <span className="ef-mono ef-label">↳</span>
+                            <span className="ef-mono ef-label" aria-hidden>
+                                <IconCornerDownRight size={14} stroke={1.6} />
+                            </span>
                             <span className="ef-cform-submit-label">
-                                {status === "sent"
-                                    ? "Message sent"
-                                    : status === "sending"
-                                      ? "Transmitting…"
-                                      : "Send message"}
+                                {status === "sending"
+                                    ? "Transmitting…"
+                                    : "Send message"}
                             </span>
                             <span className="ef-cform-submit-arrow" aria-hidden>
-                                {status === "sent" ? "✓" : "→"}
+                                <IconArrowRight size={18} stroke={1.6} />
                             </span>
                         </button>
                     </div>
@@ -455,6 +513,8 @@ export default function Contact() {
                 </div>
                 <div className="ef-foot-mono" aria-hidden></div>
             </footer>
+
+            <Toast toast={toast} onClose={() => setToast(null)} />
         </section>
     );
 }
