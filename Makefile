@@ -1,13 +1,29 @@
-.PHONY: start serve dev build
+.PHONY: install dev api client build build-api build-client clean
 
-start:
-	@$(MAKE) -j 2 serve dev
+# Install dependencies for both services.
+install:
+	cd services/api && npm install
+	cd services/public && npm install
 
-serve:
-	php artisan serve --host=0.0.0.0 --port=8000
-
+# Run both dev servers together (API on :3000, client on :5173).
 dev:
-	npm run dev
+	@$(MAKE) -j 2 api client
 
-build:
-	npm run build
+api:
+	cd services/api && npm run dev
+
+client:
+	cd services/public && npm run dev
+
+# Production builds.
+build: build-api build-client
+
+build-api:
+	cd services/api && npm run build
+
+build-client:
+	cd services/public && npm run build
+
+clean:
+	rm -rf services/api/dist services/api/node_modules
+	rm -rf services/public/dist services/public/node_modules
