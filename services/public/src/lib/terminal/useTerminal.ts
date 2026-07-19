@@ -2,7 +2,26 @@ import { useEffect, useRef } from "react";
 import { Terminal, type ITerminalOptions } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
-import { TERMINAL_THEME, TERMINAL_FONT } from "./theme";
+import { TERMINAL_THEME, TERMINAL_FONT, TERMINAL_FONT_PRIMARY } from "./theme";
+
+// Ensure the web font is loaded before xterm measures its cell grid. A cold
+// page load otherwise measures a fallback font (taller cells → stretched
+// output) that only corrects on the next reflow — the "works, then breaks on
+// refresh" bug. Races a timeout so boot never blocks on a slow/absent font.
+async function waitForTerminalFont(): Promise<void> {
+    if (typeof document === "undefined" || !document.fonts) return;
+    try {
+        await Promise.race([
+            Promise.all([
+                document.fonts.load(`400 14px ${TERMINAL_FONT_PRIMARY}`),
+                document.fonts.load(`700 14px ${TERMINAL_FONT_PRIMARY}`),
+            ]).then(() => document.fonts.ready),
+            new Promise((resolve) => setTimeout(resolve, 1500)),
+        ]);
+    } catch {
+        /* fall back to whatever font is available */
+    }
+}
 
 type ReadyHandler = (term: Terminal, fit: FitAddon) => void | (() => void);
 
@@ -25,44 +44,57 @@ export function useTerminal({ onReady, options }: UseTerminalOptions) {
         const el = containerRef.current;
         if (!el) return;
 
-        const term = new Terminal({
-            convertEol: true,
-            cursorBlink: true,
-            cursorStyle: "block",
-            fontFamily: TERMINAL_FONT,
-            fontSize: 14,
-            lineHeight: 1.0,
-            letterSpacing: 0,
-            theme: TERMINAL_THEME,
-            allowProposedApi: true,
-            scrollback: 2000,
-            ...options,
-        });
+        let disposed = false;
+        let term: Terminal | null = null;
+        let ro: ResizeObserver | null = null;
+        let cleanupFromReady: void | (() => void);
 
-        const fit = new FitAddon();
-        term.loadAddon(fit);
-        term.open(el);
-        try {
-            fit.fit();
-        } catch {
-            /* container not laid out yet — the resize observer will catch up */
-        }
+        const start = async () => {
+            await waitForTerminalFont();
+            if (disposed || !containerRef.current) return;
 
-        const ro = new ResizeObserver(() => {
+            term = new Terminal({
+                convertEol: true,
+                cursorBlink: true,
+                cursorStyle: "block",
+                fontFamily: TERMINAL_FONT,
+                fontSize: 14,
+                lineHeight: 1.0,
+                letterSpacing: 0,
+                theme: TERMINAL_THEME,
+                allowProposedApi: true,
+                scrollback: 2000,
+                ...options,
+            });
+
+            const fit = new FitAddon();
+            term.loadAddon(fit);
+            term.open(el);
             try {
                 fit.fit();
             } catch {
-                /* ignore transient zero-size */
+                /* container not laid out yet — the resize observer catches up */
             }
-        });
-        ro.observe(el);
 
-        const cleanupFromReady = onReady?.(term, fit);
+            ro = new ResizeObserver(() => {
+                try {
+                    fit.fit();
+                } catch {
+                    /* ignore transient zero-size */
+                }
+            });
+            ro.observe(el);
+
+            cleanupFromReady = onReady?.(term, fit);
+        };
+
+        start();
 
         return () => {
+            disposed = true;
             if (typeof cleanupFromReady === "function") cleanupFromReady();
-            ro.disconnect();
-            term.dispose();
+            ro?.disconnect();
+            term?.dispose();
         };
         // Mount once; consumers pass stable callbacks.
         // eslint-disable-next-line react-hooks/exhaustive-deps

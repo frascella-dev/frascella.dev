@@ -45,6 +45,11 @@ export const TERMINAL_THEME: ITheme = {
 export const TERMINAL_FONT =
     '"Courier Prime", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace';
 
+// The primary family, on its own — used to wait for the web font before the
+// terminal measures its cell size (otherwise a cold load measures a fallback
+// and the grid is wrong until the next reflow).
+export const TERMINAL_FONT_PRIMARY = '"Courier Prime"';
+
 // ── Truecolor ANSI helpers ─────────────────────────────────────────────
 // 24-bit escapes so the terminal renders the exact palette hexes rather
 // than an approximated 16-color mapping.
