@@ -49,30 +49,6 @@ const SYSINFO: [string, string][] = [
     ["theme", "paper / ink / acid-lime"],
 ];
 
-// Terminal cells are taller than wide, so the raw ASCII art renders stretched
-// vertically. Fold every two source rows into one with half-block glyphs — the
-// neofetch/fastfetch trick — which halves the height back to ~1:1 proportions.
-// It's also font-metric-agnostic: the blocks fill whole cells, so it stays
-// correct no matter which font xterm ends up measuring.
-function halveLogo(lines: string[]): string[] {
-    const w = Math.max(...lines.map((l) => l.length));
-    const out: string[] = [];
-    for (let r = 0; r < lines.length; r += 2) {
-        const top = lines[r] ?? "";
-        const bot = lines[r + 1] ?? "";
-        let row = "";
-        for (let c = 0; c < w; c++) {
-            const t = (top[c] ?? " ") !== " ";
-            const b = (bot[c] ?? " ") !== " ";
-            row += t && b ? "█" : t ? "▀" : b ? "▄" : " ";
-        }
-        out.push(row.replace(/\s+$/, ""));
-    }
-    return out;
-}
-
-const LOGO = halveLogo(ASCII_LOGO);
-
 const PALETTE_SWATCHES = [
     "#0A0B0A",
     "#7A7566",
@@ -118,15 +94,15 @@ function writeNeofetch(term: Terminal, cols: number) {
     // Narrow terminals can't hold logo + info side by side — stack them,
     // mirroring the old mobile layout. Side-by-side rows run ~96 cols wide.
     if (cols < 100) {
-        for (const line of LOGO) term.writeln(fg(PALETTE.lime, line));
+        for (const line of ASCII_LOGO) term.writeln(fg(PALETTE.lime, line));
         term.writeln("");
         for (const line of info) term.writeln(line);
         return;
     }
-    const offset = 1; // nudge info down so it reads centered against the logo
-    const rows = Math.max(LOGO.length, info.length + offset);
+    const offset = 4; // nudge info down so it reads centered against the logo
+    const rows = Math.max(ASCII_LOGO.length, info.length + offset);
     for (let i = 0; i < rows; i++) {
-        const logo = (LOGO[i] ?? "").padEnd(LOGO_W);
+        const logo = (ASCII_LOGO[i] ?? "").padEnd(LOGO_W);
         const line = info[i - offset] ?? "";
         term.writeln(fg(PALETTE.lime, logo) + "  " + line);
     }
