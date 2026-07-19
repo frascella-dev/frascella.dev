@@ -1,0 +1,146 @@
+/* ============================================================
+   CONSOLE — side launcher tab + draggable terminal window
+   ============================================================ */
+
+/* --- side launcher tab (flush to the right edge) --- */
+.ef-console-tab {
+  position: fixed;
+  right: 0;
+  bottom: 16%;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 9px;
+  border: 1px solid var(--rule-strong);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  transition: background 0.25s var(--ease), padding-right 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.ef-console-tab:hover {
+  padding-right: 14px;
+  color: var(--accent-2);
+}
+.ef-console-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-2);
+  /* keep the dot round despite the rotated writing-mode */
+  writing-mode: horizontal-tb;
+}
+.ef-console-tab-label { display: block; }
+
+/* --- window shell --- */
+.ef-window {
+  position: fixed;
+  z-index: 6000;
+  display: flex;
+  flex-direction: column;
+  background: #050605;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  box-shadow:
+    0 24px 60px -12px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.ef-window.is-max {
+  left: 16px !important;
+  top: 16px !important;
+  width: calc(100vw - 32px) !important;
+  height: calc(100vh - 32px) !important;
+}
+.ef-window.is-min {
+  display: none;
+}
+
+/* --- title bar (site-styled: paper / ink / mono) --- */
+.ef-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 8px 0 14px;
+  height: 38px;
+  flex: 0 0 auto;
+  background: var(--paper);
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+.ef-window-bar:active { cursor: grabbing; }
+.ef-window-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ef-window-controls { display: flex; align-items: center; gap: 6px; }
+.ef-window-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s var(--ease), color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.ef-window-btn:hover { border-color: var(--rule-strong); background: var(--paper-3); }
+.ef-window-btn.is-close:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.ef-window-btn.is-max:hover { color: var(--ink); }
+
+/* --- body / terminal --- */
+.ef-window-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  background: #050605;
+}
+.ef-console-term {
+  position: absolute;
+  inset: 0;
+  padding: 12px 14px 8px;
+}
+.ef-console-term .xterm { height: 100%; }
+.ef-console-term .xterm .xterm-viewport { background: transparent !important; }
+.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar { width: 8px; }
+.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+  .ef-window:not(.is-max) {
+    left: 12px !important;
+    top: 12px !important;
+    width: calc(100vw - 24px) !important;
+    height: min(70vh, 460px) !important;
+  }
+}

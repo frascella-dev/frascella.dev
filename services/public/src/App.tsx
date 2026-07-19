@@ -11,6 +11,7 @@ import Work from "./components/Work.tsx";
 import About from "./components/About.tsx";
 import Contact from "./components/Contact.tsx";
 import ProjectPage from "./components/ProjectPage.tsx";
+import Console from "./components/Console.tsx";
 import { timeline } from "./data/timeline.ts";
 
 export default function App() {
@@ -99,6 +100,8 @@ export default function App() {
                     </>
                 )}
             </main>
+
+            {booted && <Console />}
         </>
     );
 }
