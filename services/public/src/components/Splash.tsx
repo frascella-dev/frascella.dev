@@ -1,250 +1,279 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from "react";
+import type { Terminal } from "@xterm/xterm";
+import type { FitAddon } from "@xterm/addon-fit";
+import { useTerminal } from "../lib/terminal/useTerminal.ts";
+import { PALETTE, fg, bold, bgBlock } from "../lib/terminal/theme.ts";
 
 const ASCII_LOGO = [
-    '          ------:                                    ',
-    '          -------------                              ',
-    '          -------------------                        ',
-    '         :-------------------     -:                 ',
-    '        -------    ---------:    ------              ',
-    '        ------        ------:    --------:           ',
-    '       :------       ------:    -----------          ',
-    '       -------       ------:   --------------        ',
-    '      :------       :-----:    :-----:--------       ',
-    '      -------        :----:   -------  :-------      ',
-    '     =------                  -------   =------:     ',
-    '     :----------:-:           ------     :------     ',
-    '     --------------------    -------      ------     ',
-    '     -------------------     ------                  ',
-    '    -------    :-------:    --------:---             ',
-    '     ------          ::     ------------------       ',
-    '     ------                :--------------------     ',
-    '     -------               -----:   :----------:     ',
-    '     :------:             -------         -----:     ',
-    '      :-------            -------                    ',
-    '       -------:          :-----:                     ',
-    '        :--------        ------                      ',
-    '          :---------    :-----:                      ',
-    '           ::------     :-----                       ',
-    '              ----:    -------                       ',
-    '                 -     ------         -:             ',
-    '                       ------        ------          ',
-    '                                    -------          ',
-    '                                    ------:          ',
+    "          ------:                                    ",
+    "          -------------                              ",
+    "          -------------------                        ",
+    "         :-------------------     -:                 ",
+    "        -------    ---------:    ------              ",
+    "        ------        ------:    --------:           ",
+    "       :------       ------:    -----------          ",
+    "       -------       ------:   --------------        ",
+    "      :------       :-----:    :-----:--------       ",
+    "      -------        :----:   -------  :-------      ",
+    "     =------                  -------   =------:     ",
+    "     :----------:-:           ------     :------     ",
+    "     --------------------    -------      ------     ",
+    "     -------------------     ------                  ",
+    "    -------    :-------:    --------:---             ",
+    "     ------          ::     ------------------       ",
+    "     ------                :--------------------     ",
+    "     -------               -----:   :----------:     ",
+    "     :------:             -------         -----:     ",
+    "      :-------            -------                    ",
+    "       -------:          :-----:                     ",
+    "        :--------        ------                      ",
+    "          :---------    :-----:                      ",
+    "           ::------     :-----                       ",
+    "              ----:    -------                       ",
+    "                 -     ------         -:             ",
+    "                       ------        ------          ",
+    "                                    -------          ",
+    "                                    ------:          ",
 ];
 
-const SYSINFO = [
-    ['user', 'emanuele@frascella.dev'],
-    ['os', 'frascella.dev 2026.04 LTS x86_64'],
-    ['kernel', '6.8.0-portfolio'],
-    ['shell', 'zsh 5.9'],
-    ['term', 'alacritty'],
-    ['role', 'backend engineer'],
-    ['based', 'taranto, italy'],
-    ['stack', 'php · node · python · aws'],
-    ['uptime', '5 years, 2 months'],
-    ['theme', 'paper / ink / acid-lime'],
+const SYSINFO: [string, string][] = [
+    ["user", "emanuele@frascella.dev"],
+    ["os", "frascella.dev 2026.04 LTS x86_64"],
+    ["kernel", "6.8.0-portfolio"],
+    ["shell", "zsh 5.9"],
+    ["term", "xterm.js"],
+    ["role", "backend engineer"],
+    ["based", "taranto, italy"],
+    ["stack", "php · node · python · aws"],
+    ["uptime", "5 years, 2 months"],
+    ["theme", "paper / ink / acid-lime"],
 ];
 
-function Block({ b, sysinfo }) {
-    if (b.k === 'boot') return <div className="ef-l ef-l-boot"><span>{b.t}</span></div>;
-    if (b.k === 'blank') return <div className="ef-l ef-l-blank">&nbsp;</div>;
-    if (b.k === 'welcome') return <div className="ef-l ef-l-welcome"><span>{b.t}</span></div>;
-    if (b.k === 'welcome-sub') return <div className="ef-l ef-l-welcome-sub"><span>{b.t}</span></div>;
-    if (b.k === 'system') return <div className="ef-l ef-l-sys"><span>{b.t}</span></div>;
-    if (b.k === 'ls') {
-        return (
-            <div className="ef-l ef-l-ls">
-                {b.items.map((it, i) => (
-                    <span key={i} className={it.endsWith('/') ? 'ef-ls-dir' : it.startsWith('.') ? 'ef-ls-hidden' : 'ef-ls-file'}>
-                        {it}
-                    </span>
-                ))}
-            </div>
-        );
+// Terminal cells (narrow Courier Prime) are ~2× taller than wide, so the raw
+// ASCII art renders vertically stretched. Fold every two source rows into one
+// using half-block glyphs — the neofetch/fastfetch trick — which halves the
+// height and restores ~1:1 proportions while keeping it real terminal text.
+function halveLogo(lines: string[]): string[] {
+    const w = Math.max(...lines.map((l) => l.length));
+    const out: string[] = [];
+    for (let r = 0; r < lines.length; r += 2) {
+        const top = lines[r] ?? "";
+        const bot = lines[r + 1] ?? "";
+        let row = "";
+        for (let c = 0; c < w; c++) {
+            const t = (top[c] ?? " ") !== " ";
+            const b = (bot[c] ?? " ") !== " ";
+            row += t && b ? "█" : t ? "▀" : b ? "▄" : " ";
+        }
+        out.push(row.replace(/\s+$/, ""));
     }
-    if (b.k === 'prompt-static') {
-        return (
-            <div className="ef-l ef-l-prompt">
-                <span className="ef-p-user">{b.user}</span>
-                <span className="ef-p-at">@</span>
-                <span className="ef-p-host">{b.host}</span>
-                <span className="ef-p-colon">:</span>
-                <span className="ef-p-path">{b.path}</span>
-                <span className="ef-p-dollar">$ </span>
-                <span className="ef-p-cmd">{b.cmd}</span>
-            </div>
-        );
-    }
-    if (b.k === 'neofetch') {
-        return (
-            <div className="ef-neofetch">
-                <pre className="ef-neo-logo">{ASCII_LOGO.join('\n')}</pre>
-                <div className="ef-neo-info">
-                    <div className="ef-neo-title">
-                        <span className="ef-p-user">emanuele</span>
-                        <span className="ef-p-at">@</span>
-                        <span className="ef-p-host">frascella.dev</span>
-                    </div>
-                    <div className="ef-neo-rule" />
-                    {sysinfo.map(([k, v]) => (
-                        <div className="ef-neo-row" key={k}>
-                            <span className="ef-neo-k">{k}</span>
-                            <span className="ef-neo-v">{v}</span>
-                        </div>
-                    ))}
-                    <div className="ef-neo-palette" aria-hidden>
-                        <span style={{ background: '#0A0B0A' }} />
-                        <span style={{ background: '#7A7566' }} />
-                        <span style={{ background: '#E9E6DC' }} />
-                        <span style={{ background: '#C7F651' }} />
-                        <span style={{ background: '#FF8AD8' }} />
-                        <span style={{ background: '#8FD4FF' }} />
-                        <span style={{ background: '#FFB86B' }} />
-                        <span style={{ background: '#EEEAE0' }} />
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    return null;
+    return out;
 }
 
-export default function Splash({ onDone }) {
-    const [rendered, setRendered] = useState([]);
+const LOGO = halveLogo(ASCII_LOGO);
+
+const PALETTE_SWATCHES = [
+    "#0A0B0A",
+    "#7A7566",
+    "#E9E6DC",
+    "#C7F651",
+    "#FF8AD8",
+    "#8FD4FF",
+    "#FFB86B",
+    "#EEEAE0",
+];
+
+const LOGO_W = 54;
+
+function promptPrefix(user: string, host: string, path: string): string {
+    return (
+        bold(fg(PALETTE.lime, user)) +
+        fg(PALETTE.dim, "@") +
+        bold(fg(PALETTE.blue, host)) +
+        fg(PALETTE.dim, ":") +
+        bold(fg(PALETTE.orange, path)) +
+        fg(PALETTE.dim, "$ ")
+    );
+}
+
+function buildInfoLines(): string[] {
+    const lines: string[] = [];
+    lines.push(
+        bold(fg(PALETTE.lime, "emanuele")) +
+            fg(PALETTE.dim, "@") +
+            bold(fg(PALETTE.blue, "frascella.dev")),
+    );
+    lines.push(fg(PALETTE.dim, "─".repeat(34)));
+    for (const [k, v] of SYSINFO) {
+        lines.push(bold(fg(PALETTE.lime, k.padEnd(8))) + " " + v);
+    }
+    lines.push("");
+    lines.push(PALETTE_SWATCHES.map((c) => bgBlock(c, 3)).join(""));
+    return lines;
+}
+
+function writeNeofetch(term: Terminal, cols: number) {
+    const info = buildInfoLines();
+    // Narrow terminals can't hold logo + info side by side — stack them,
+    // mirroring the old mobile layout. Side-by-side rows run ~96 cols wide.
+    if (cols < 100) {
+        for (const line of LOGO) term.writeln(fg(PALETTE.lime, line));
+        term.writeln("");
+        for (const line of info) term.writeln(line);
+        return;
+    }
+    const offset = 1; // nudge info down so it reads centered against the logo
+    const rows = Math.max(LOGO.length, info.length + offset);
+    for (let i = 0; i < rows; i++) {
+        const logo = (LOGO[i] ?? "").padEnd(LOGO_W);
+        const line = info[i - offset] ?? "";
+        term.writeln(fg(PALETTE.lime, logo) + "  " + line);
+    }
+}
+
+export default function Splash({ onDone }: { onDone?: () => void }) {
     const [closing, setClosing] = useState(false);
-    const [typed, setTyped] = useState({ id: null, text: '', done: false, user: '', host: '', path: '' });
-    const [output, setOutput] = useState([]);
-    const scrollerRef = useRef(null);
+    const onDoneRef = useRef(onDone);
+    onDoneRef.current = onDone;
 
-    useEffect(() => {
-        if (scrollerRef.current) {
-            scrollerRef.current.scrollTop = scrollerRef.current.scrollHeight;
-        }
-    }, [rendered, typed, output]);
+    // On phones the ASCII logo (~54 cols) only fits without wrapping at a
+    // smaller cell size; desktop stays at a comfortable 14px.
+    const fontSize =
+        typeof window !== "undefined" && window.innerWidth < 720 ? 10 : 14;
 
-    useEffect(() => {
-        try {
-            if (sessionStorage.getItem('ef-splash-seen') === '1') {
-                setClosing(true);
-                setTimeout(() => onDone?.(), 50);
-                return;
-            }
-        } catch {}
+    const { containerRef } = useTerminal({
+        options: { fontSize, disableStdin: true },
+        onReady: (term: Terminal, fit: FitAddon) => {
+            let cancelled = false;
+            const timeouts: ReturnType<typeof setTimeout>[] = [];
+            const wait = (ms: number) =>
+                new Promise<void>((r) => timeouts.push(setTimeout(r, ms)));
 
-        let cancelled = false;
-        const timeouts = [];
-        const wait = (ms) => new Promise((r) => timeouts.push(setTimeout(r, ms)));
-        const push = (block) => setRendered((prev) => [...prev, block]);
+            const type = async (
+                user: string,
+                host: string,
+                path: string,
+                cmd: string,
+            ) => {
+                term.write(promptPrefix(user, host, path));
+                for (const ch of cmd) {
+                    if (cancelled) return;
+                    term.write(ch);
+                    await wait(40 + Math.random() * 32);
+                }
+                await wait(120);
+                term.write("\n");
+                await wait(160);
+            };
 
-        const typeCommand = async (id, user, host, path, cmd) => {
-            setTyped({ id, text: '', done: false, user, host, path });
-            for (let i = 0; i < cmd.length; i++) {
-                if (cancelled) break;
-                setTyped((t) => ({ ...t, text: cmd.slice(0, i + 1) }));
-                await wait(40 + Math.random() * 32);
-            }
-            await wait(120);
-            setTyped((t) => ({ ...t, done: true }));
-            push({ k: 'prompt-static', user, host, path, cmd });
-            setTyped({ id: null, text: '', done: false, user: '', host: '', path: '' });
-            await wait(160);
-        };
+            const run = async () => {
+                const cols = fit.proposeDimensions()?.cols ?? term.cols;
 
-        const run = async () => {
-            push({ k: 'boot', t: '[    0.000000] Booting frascella.dev 2026.04 (tty1)' });
-            await wait(120);
-            push({ k: 'boot', t: '[    0.214881] Loaded modules: node/22, php/8.3, aws-cli, docker' });
-            await wait(140);
-            push({ k: 'boot', t: '[    0.482110] Systemd services ready. Welcome.' });
-            await wait(240);
-            push({ k: 'blank' });
+                term.writeln(
+                    fg(PALETTE.dim, "[    0.000000] Booting frascella.dev 2026.04 (tty1)"),
+                );
+                await wait(120);
+                term.writeln(
+                    fg(PALETTE.dim, "[    0.214881] Loaded modules: node/22, php/8.3, aws-cli, docker"),
+                );
+                await wait(140);
+                term.writeln(
+                    fg(PALETTE.dim, "[    0.482110] Systemd services ready. Welcome."),
+                );
+                await wait(240);
+                term.writeln("");
 
-            push({ k: 'welcome', t: 'Welcome to frascella.dev 2026.04 LTS (GNU/Linux 6.8.0-portfolio x86_64)' });
-            push({ k: 'welcome-sub', t: ' * Documentation:  https://github.com/manuto276' });
-            push({ k: 'welcome-sub', t: ' * Support:        https://linkedin.com/in/efrascella256' });
-            push({ k: 'blank' });
-            await wait(240);
+                term.writeln(
+                    "Welcome to frascella.dev 2026.04 LTS (GNU/Linux 6.8.0-portfolio x86_64)",
+                );
+                term.writeln(
+                    fg(PALETTE.dim, " * Documentation:  https://github.com/manuto276"),
+                );
+                term.writeln(
+                    fg(PALETTE.dim, " * Support:        https://linkedin.com/in/efrascella256"),
+                );
+                term.writeln("");
+                await wait(240);
 
-            push({ k: 'neofetch' });
-            await wait(900);
+                writeNeofetch(term, cols);
+                await wait(900);
 
-            push({ k: 'blank' });
-            push({ k: 'system', t: 'Last login: Thu Apr 16 09:42:18 2026 on tty1' });
-            await wait(220);
-            push({ k: 'blank' });
+                term.writeln("");
+                term.writeln(fg(PALETTE.dim, "Last login: Thu Apr 16 09:42:18 2026 on tty1"));
+                term.writeln("");
+                if (cancelled) return;
 
-            await typeCommand('cd', 'emanuele', 'frascella.dev', '~', 'cd portfolio && ls');
-            push({ k: 'ls', items: ['public/', 'src/', 'package.json', 'tsconfig.json', 'README.md', '.env'] });
-            await wait(280);
-            push({ k: 'blank' });
+                await type("emanuele", "frascella.dev", "~", "cd portfolio && ls");
+                const ls = ["public/", "src/", "package.json", "tsconfig.json", "README.md", ".env"];
+                term.writeln(
+                    ls
+                        .map((it) =>
+                            it.endsWith("/")
+                                ? bold(fg(PALETTE.blue, it))
+                                : it.startsWith(".")
+                                  ? fg(PALETTE.dim, it)
+                                  : it,
+                        )
+                        .join("   "),
+                );
+                await wait(280);
+                term.writeln("");
 
-            await typeCommand('dev', 'emanuele', 'frascella.dev', '~/portfolio', 'npm run dev');
+                await type("emanuele", "frascella.dev", "~/portfolio", "npm run dev");
 
-            const out = [
-                { k: 'out', t: '' },
-                { k: 'out', t: '> portfolio@2026.4.0 dev' },
-                { k: 'out', t: '> next dev --turbo --port 2026' },
-                { k: 'out', t: '' },
-                { k: 'out-dim', t: '  ▲ Next.js 15.1.0  (turbo)' },
-                { k: 'out-dim', t: '  - Local:        http://localhost:2026' },
-                { k: 'out-dim', t: '  - Network:      http://10.0.0.42:2026' },
-                { k: 'out-dim', t: '  - Environments: .env.local' },
-                { k: 'out', t: '' },
-                { k: 'out-ok', t: ' ✓ Starting...' },
-                { k: 'out-ok', t: ' ✓ Ready in 842ms' },
-                { k: 'out', t: '' },
-                { k: 'out-dim', t: ' ○ Compiling / ...' },
-                { k: 'out-ok', t: ' ✓ Compiled / in 312ms' },
-                { k: 'out', t: '' },
-                { k: 'out-launch', t: '→ Opening http://localhost:2026 …' },
-            ];
-            for (const line of out) {
-                if (cancelled) break;
-                setOutput((prev) => [...prev, line]);
-                await wait(line.k === 'out-ok' ? 160 : line.k === 'out-launch' ? 240 : 70);
-            }
+                const out: [string, string][] = [
+                    ["", ""],
+                    ["fg", "> portfolio@2026.4.0 dev"],
+                    ["fg", "> vite"],
+                    ["", ""],
+                    ["dim", "  VITE v5.4  ready in 312 ms"],
+                    ["dim", "  ➜  Local:    http://localhost:2026/"],
+                    ["dim", "  ➜  Network:  http://10.0.0.42:2026/"],
+                    ["", ""],
+                    ["ok", " ✓ Starting…"],
+                    ["ok", " ✓ Ready in 842ms"],
+                    ["", ""],
+                    ["launch", "→ Opening http://localhost:2026 …"],
+                ];
+                for (const [kind, text] of out) {
+                    if (cancelled) return;
+                    const color =
+                        kind === "ok"
+                            ? PALETTE.lime
+                            : kind === "launch"
+                              ? PALETTE.orange
+                              : kind === "dim"
+                                ? PALETTE.dim
+                                : null;
+                    term.writeln(color ? fg(color, text) : text);
+                    await wait(kind === "ok" ? 160 : kind === "launch" ? 240 : 70);
+                }
 
-            await wait(320);
-            if (!cancelled) {
+                await wait(320);
+                if (cancelled) return;
                 setClosing(true);
                 await wait(700);
-                try { sessionStorage.setItem('ef-splash-seen', '1'); } catch {}
-                onDone?.();
-            }
-        };
-        run();
+                try {
+                    sessionStorage.setItem("ef-splash-seen", "1");
+                } catch {
+                    /* private mode — the splash simply replays next visit */
+                }
+                onDoneRef.current?.();
+            };
 
-        return () => {
-            cancelled = true;
-            timeouts.forEach(clearTimeout);
-        };
-    }, [onDone]);
+            run();
+
+            return () => {
+                cancelled = true;
+                timeouts.forEach(clearTimeout);
+            };
+        },
+    });
 
     return (
-        <div className={`ef-splash ${closing ? 'is-closing' : ''}`}>
-            <div className="ef-splash-body" ref={scrollerRef}>
-                <div className="ef-splash-stream">
-                    {rendered.map((b, i) => <Block key={i} b={b} sysinfo={SYSINFO} />)}
-
-                    {typed.id && (
-                        <div className="ef-l ef-l-prompt">
-                            <span className="ef-p-user">{typed.user}</span>
-                            <span className="ef-p-at">@</span>
-                            <span className="ef-p-host">{typed.host}</span>
-                            <span className="ef-p-colon">:</span>
-                            <span className="ef-p-path">{typed.path}</span>
-                            <span className="ef-p-dollar">$ </span>
-                            <span className="ef-p-cmd">{typed.text}</span>
-                            {!typed.done && <span className="ef-caret" />}
-                        </div>
-                    )}
-
-                    {output.map((l, i) => (
-                        <div key={i} className={`ef-l ef-l-${l.k}`}>
-                            <span className="ef-o">{l.t}</span>
-                        </div>
-                    ))}
-                </div>
+        <div className={`ef-splash ${closing ? "is-closing" : ""}`}>
+            <div className="ef-splash-body">
+                <div className="ef-term" ref={containerRef} />
             </div>
         </div>
     );
