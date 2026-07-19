@@ -14,15 +14,13 @@ single endpoint (`POST /api/contact`).
 
 ## Quick start
 
-```bash
-make install        # install both services' deps
-make dev            # run API (:3000) and client (:5173) together
-```
-
-Or per service:
+Run each service in its own terminal:
 
 ```bash
+# API — http://localhost:3000/api
 cd services/api    && cp .env.example .env && npm install && npm run dev
+
+# Public site — http://localhost:5173
 cd services/public && cp .env.example .env && npm install && npm run dev
 ```
 
@@ -32,8 +30,8 @@ The API logs contact messages to the console instead of sending them until
 ## Build
 
 ```bash
-make build          # builds both
-# or: make build-api / make build-client
+cd services/api    && npm run build
+cd services/public && npm run build
 ```
 
 ## Layout
