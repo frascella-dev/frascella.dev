@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AnalyticsController;
+use App\Http\Controllers\Api\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Api\Admin\LoginController;
 use App\Http\Controllers\Api\Admin\LogoutController;
 use App\Http\Controllers\Api\Admin\ProfileController;
@@ -48,6 +49,10 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::delete('profile/avatar', [ProfileController::class, 'deleteAvatar'])
             ->name('profile.avatar.delete');
         Route::post('logout', LogoutController::class)->name('logout');
+
+        Route::prefix('contact-submissions')->name('contact-submissions.')->group(function () {
+            Route::get('/', [ContactSubmissionsController::class, 'index'])->name('index');
+        });
 
         Route::prefix('analytics')->name('analytics.')->group(function () {
             Route::get('overview', [AnalyticsController::class, 'overview'])->name('overview');

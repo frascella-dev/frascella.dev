@@ -12,7 +12,12 @@ import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
 import Typography from "@mui/joy/Typography";
 import Sheet from "@mui/joy/Sheet";
-import { IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
+import {
+    IconLayoutDashboard,
+    IconLogout,
+    IconMail,
+    IconUser,
+} from "@tabler/icons-react";
 
 import ColorSchemeToggle from "@/Components/Admin/ColorSchemeToggle.tsx";
 import Logo from "@/Components/Public/Logo.tsx";
@@ -23,6 +28,11 @@ const NAV_ITEMS = [
         label: "Dashboard",
         href: "/admin/dashboard",
         icon: IconLayoutDashboard,
+    },
+    {
+        label: "Contact",
+        href: "/admin/contact-submissions",
+        icon: IconMail,
     },
 ];
 

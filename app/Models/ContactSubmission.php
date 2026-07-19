@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
     'message',
     'visitor_hash',
     'sent_at',
+    'failed_at',
 ])]
 class ContactSubmission extends Model
 {
@@ -18,6 +19,7 @@ class ContactSubmission extends Model
     {
         return [
             'sent_at' => 'datetime',
+            'failed_at' => 'datetime',
         ];
     }
 }

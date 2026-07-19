@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', PortfolioController::class)->middleware(TrackPageView::class);
 
 Route::prefix('admin')->name('admin.')->group(function () {
+    // /admin lands on the dashboard for everyone; the auth middleware on the
+    // target route bounces guests to login, while authed users go straight in.
+    Route::redirect('/', '/admin/dashboard');
+
     Route::middleware('guest')->group(function () {
         Route::get('login', LoginController::class)->name('login');
         Route::get('register/{token}', [RegisterController::class, 'show'])
@@ -24,8 +28,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('auth')->group(function () {
-        Route::redirect('/', '/admin/dashboard');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::get('profile', ProfileController::class)->name('profile.show');
+        Route::get('contact-submissions', [
+            \App\Http\Controllers\Admin\ContactSubmissionsController::class,
+            'index',
+        ])->name('contact-submissions.index');
     });
 });

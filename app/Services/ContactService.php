@@ -47,28 +47,31 @@ class ContactService
         $recipient = config('mail.contact_to');
         if (!$recipient) {
             // Misconfiguration is a server fault, never a 4xx for the user.
-            // Still log the attempt so we don't lose the message in dev.
+            // Mark the row as failed straight away so it shows up red in the
+            // admin list without waiting for a queue event that never fires.
             ContactSubmission::create([
                 'name' => $name,
                 'email' => $email,
                 'message' => $body,
                 'visitor_hash' => $visitorHash,
-                'sent_at' => null,
+                'failed_at' => CarbonImmutable::now(),
             ]);
 
             return ['ok' => false, 'reason' => 'mail_not_configured'];
         }
 
+        // sent_at / failed_at start null and get filled in by the listener
+        // wired in AppServiceProvider when the queued notification finishes.
         $submission = ContactSubmission::create([
             'name' => $name,
             'email' => $email,
             'message' => $body,
             'visitor_hash' => $visitorHash,
-            'sent_at' => CarbonImmutable::now(),
         ]);
 
         Notification::route('mail', $recipient)->notify(
             new ContactMessageNotification(
+                submissionId: $submission->id,
                 senderName: $submission->name,
                 senderEmail: $submission->email,
                 body: $submission->message,

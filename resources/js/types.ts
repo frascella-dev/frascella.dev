@@ -115,3 +115,33 @@ export type AnalyticsReferrers = {
     range_days: AnalyticsRange;
     referrers: AnalyticsBreakdown[];
 };
+
+// Contact submissions ──────────────────────────────────────────────────
+
+export type ContactSubmissionStatus = "sent" | "failed" | "queued";
+
+export type ContactSubmission = {
+    id: number;
+    name: string;
+    email: string;
+    message: string;
+    status: ContactSubmissionStatus;
+    created_at: string;
+    sent_at: string | null;
+    failed_at: string | null;
+};
+
+export type ContactSubmissionsResponse = {
+    data: ContactSubmission[];
+    meta: {
+        current_page: number;
+        per_page: number;
+        last_page: number;
+        total: number;
+        totals_by_status: {
+            sent: number;
+            failed: number;
+            queued: number;
+        };
+    };
+};

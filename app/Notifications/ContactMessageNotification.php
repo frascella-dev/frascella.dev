@@ -18,6 +18,7 @@ class ContactMessageNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public function __construct(
+        public readonly int $submissionId,
         public readonly string $senderName,
         public readonly string $senderEmail,
         public readonly string $body,
