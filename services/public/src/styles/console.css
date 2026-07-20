@@ -135,6 +135,10 @@
   height: 0;
   display: none;
 }
+/* xterm also paints its own scrollbar (a VS Code-style scrollable element)
+   over the native one — hiding only the native bar leaves this visible. The
+   wheel still scrolls the scrollback. */
+.ef-console-term .xterm .scrollbar { display: none !important; }
 
 /* shown while a game's chunk is being fetched */
 .ef-game-loading {

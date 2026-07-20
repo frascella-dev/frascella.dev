@@ -52,3 +52,5 @@
 /* No scrollbar — the boot sequence auto-scrolls; the bar just adds noise. */
 .ef-splash .xterm .xterm-viewport { scrollbar-width: none; -ms-overflow-style: none; }
 .ef-splash .xterm .xterm-viewport::-webkit-scrollbar { width: 0; height: 0; display: none; }
+/* xterm paints its own scrollbar over the native one — hide that too. */
+.ef-splash .xterm .scrollbar { display: none !important; }
