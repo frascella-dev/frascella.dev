@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import "./pong.css";
 
 // Fixed logical field — the canvas is scaled to fit its container, so the
 // physics stay identical whatever the window size.

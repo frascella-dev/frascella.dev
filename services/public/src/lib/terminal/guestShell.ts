@@ -3,18 +3,13 @@ import { PALETTE, fg, bold } from "./theme";
 import { Vfs, FsError } from "./vfs";
 import { startNano, type NanoSession } from "./nano";
 import { writeWelcome, writeNeofetch, writeLastLogin } from "./banner";
-
-export type GameKind = "pong";
+import { GAMES, getGame, type GameId } from "../../games/registry";
 
 // What the shell can ask the host app to do.
 export type ShellContext = {
     close: () => void;
-    launch: (game: GameKind) => void;
+    launch: (game: GameId) => void;
 };
-
-const GAMES: { id: GameKind; name: string; desc: string }[] = [
-    { id: "pong", name: "pong", desc: "the classic — you vs. the machine" },
-];
 
 /**
  * An interactive guest shell: a small POSIX-flavoured command set over a
@@ -203,7 +198,7 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
                     println("  " + fg(PALETTE.lime, g.name.padEnd(10)) + fg(PALETTE.dim, g.desc));
                 return;
             }
-            const game = GAMES.find((g) => g.id === sub);
+            const game = getGame(sub);
             if (!game) {
                 err(`play: unknown game "${sub}"`);
                 return println(fg(PALETTE.dim, "Try ") + fg(PALETTE.lime, "play list"));

@@ -1,0 +1,7 @@
+/* Pong — loaded as part of the game's own chunk, not the portfolio bundle. */
+.ef-pong {
+  position: absolute;
+  inset: 0;
+  background: #050605;
+}
+.ef-pong-canvas { display: block; }

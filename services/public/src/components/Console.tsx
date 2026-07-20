@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import Window from "./Window.tsx";
-import Pong from "./Pong.tsx";
 import { useTerminal } from "../lib/terminal/useTerminal.ts";
-import { attachGuestShell, type GameKind } from "../lib/terminal/guestShell.ts";
-
-const GAME_TITLES: Record<GameKind, string> = {
-    pong: "pong — guestsh arcade",
-};
+import { attachGuestShell } from "../lib/terminal/guestShell.ts";
+import { getGame, type GameId } from "../games/registry.ts";
+import { GAME_COMPONENTS } from "../games/index.ts";
 
 /**
  * Freezes the page behind the console: Lenis is paused and native scrolling
@@ -34,7 +31,7 @@ function ConsoleTerminal({
     onLaunch,
 }: {
     onClose: () => void;
-    onLaunch: (game: GameKind) => void;
+    onLaunch: (game: GameId) => void;
 }) {
     const termRef = useRef<Terminal | null>(null);
     const { containerRef } = useTerminal({
@@ -57,7 +54,7 @@ function ConsoleTerminal({
 export default function Console() {
     const [open, setOpen] = useState(false);
     const [minimized, setMinimized] = useState(false);
-    const [games, setGames] = useState<GameKind[]>([]);
+    const [games, setGames] = useState<GameId[]>([]);
 
     const consoleVisible = open && !minimized;
     useScrollLock(consoleVisible || games.length > 0);
@@ -68,9 +65,9 @@ export default function Console() {
     };
 
     // One window per game; re-running `play pong` just keeps the existing one.
-    const launch = (game: GameKind) =>
+    const launch = (game: GameId) =>
         setGames((g) => (g.includes(game) ? g : [...g, game]));
-    const closeGame = (game: GameKind) =>
+    const closeGame = (game: GameId) =>
         setGames((g) => g.filter((x) => x !== game));
 
     return (
@@ -103,22 +100,36 @@ export default function Console() {
                 </Window>
             )}
 
-            {games.map((game, i) => (
-                <Window
-                    key={game}
-                    title={GAME_TITLES[game]}
-                    className="ef-game-window"
-                    onClose={() => closeGame(game)}
-                    initial={{
-                        width: 860,
-                        height: 580,
-                        x: 90 + i * 28,
-                        y: 70 + i * 28,
-                    }}
-                >
-                    {game === "pong" && <Pong />}
-                </Window>
-            ))}
+            {games.map((game, i) => {
+                const meta = getGame(game);
+                const GameComponent = GAME_COMPONENTS[game];
+                if (!meta || !GameComponent) return null;
+                return (
+                    <Window
+                        key={game}
+                        title={`${meta.name} — guestsh arcade`}
+                        className="ef-game-window"
+                        onClose={() => closeGame(game)}
+                        initial={{
+                            width: meta.window.width,
+                            height: meta.window.height,
+                            x: 90 + i * 28,
+                            y: 70 + i * 28,
+                        }}
+                    >
+                        {/* the game chunk is fetched on first launch */}
+                        <Suspense
+                            fallback={
+                                <div className="ef-game-loading">
+                                    loading {meta.name}…
+                                </div>
+                            }
+                        >
+                            <GameComponent />
+                        </Suspense>
+                    </Window>
+                );
+            })}
         </>
     );
 }
