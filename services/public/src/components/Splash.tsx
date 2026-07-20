@@ -2,65 +2,12 @@ import { useRef, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import type { FitAddon } from "@xterm/addon-fit";
 import { useTerminal } from "../lib/terminal/useTerminal.ts";
-import { PALETTE, fg, bold, bgBlock } from "../lib/terminal/theme.ts";
-
-const ASCII_LOGO = [
-    "          ------:                                    ",
-    "          -------------                              ",
-    "          -------------------                        ",
-    "         :-------------------     -:                 ",
-    "        -------    ---------:    ------              ",
-    "        ------        ------:    --------:           ",
-    "       :------       ------:    -----------          ",
-    "       -------       ------:   --------------        ",
-    "      :------       :-----:    :-----:--------       ",
-    "      -------        :----:   -------  :-------      ",
-    "     =------                  -------   =------:     ",
-    "     :----------:-:           ------     :------     ",
-    "     --------------------    -------      ------     ",
-    "     -------------------     ------                  ",
-    "    -------    :-------:    --------:---             ",
-    "     ------          ::     ------------------       ",
-    "     ------                :--------------------     ",
-    "     -------               -----:   :----------:     ",
-    "     :------:             -------         -----:     ",
-    "      :-------            -------                    ",
-    "       -------:          :-----:                     ",
-    "        :--------        ------                      ",
-    "          :---------    :-----:                      ",
-    "           ::------     :-----                       ",
-    "              ----:    -------                       ",
-    "                 -     ------         -:             ",
-    "                       ------        ------          ",
-    "                                    -------          ",
-    "                                    ------:          ",
-];
-
-const SYSINFO: [string, string][] = [
-    ["user", "emanuele@frascella.dev"],
-    ["os", "frascella.dev 2026.04 LTS x86_64"],
-    ["kernel", "6.8.0-portfolio"],
-    ["shell", "zsh 5.9"],
-    ["term", "xterm.js"],
-    ["role", "backend engineer"],
-    ["based", "taranto, italy"],
-    ["stack", "php · node · python · aws"],
-    ["uptime", "5 years, 2 months"],
-    ["theme", "paper / ink / acid-lime"],
-];
-
-const PALETTE_SWATCHES = [
-    "#0A0B0A",
-    "#7A7566",
-    "#E9E6DC",
-    "#C7F651",
-    "#FF8AD8",
-    "#8FD4FF",
-    "#FFB86B",
-    "#EEEAE0",
-];
-
-const LOGO_W = 54;
+import { PALETTE, fg, bold } from "../lib/terminal/theme.ts";
+import {
+    writeWelcome,
+    writeNeofetch,
+    writeLastLogin,
+} from "../lib/terminal/banner.ts";
 
 function promptPrefix(user: string, host: string, path: string): string {
     return (
@@ -71,41 +18,6 @@ function promptPrefix(user: string, host: string, path: string): string {
         bold(fg(PALETTE.orange, path)) +
         fg(PALETTE.dim, "$ ")
     );
-}
-
-function buildInfoLines(): string[] {
-    const lines: string[] = [];
-    lines.push(
-        bold(fg(PALETTE.lime, "emanuele")) +
-            fg(PALETTE.dim, "@") +
-            bold(fg(PALETTE.blue, "frascella.dev")),
-    );
-    lines.push(fg(PALETTE.dim, "─".repeat(34)));
-    for (const [k, v] of SYSINFO) {
-        lines.push(bold(fg(PALETTE.lime, k.padEnd(8))) + " " + v);
-    }
-    lines.push("");
-    lines.push(PALETTE_SWATCHES.map((c) => bgBlock(c, 3)).join(""));
-    return lines;
-}
-
-function writeNeofetch(term: Terminal, cols: number) {
-    const info = buildInfoLines();
-    // Narrow terminals can't hold logo + info side by side — stack them,
-    // mirroring the old mobile layout. Side-by-side rows run ~96 cols wide.
-    if (cols < 100) {
-        for (const line of ASCII_LOGO) term.writeln(fg(PALETTE.lime, line));
-        term.writeln("");
-        for (const line of info) term.writeln(line);
-        return;
-    }
-    const offset = 4; // nudge info down so it reads centered against the logo
-    const rows = Math.max(ASCII_LOGO.length, info.length + offset);
-    for (let i = 0; i < rows; i++) {
-        const logo = (ASCII_LOGO[i] ?? "").padEnd(LOGO_W);
-        const line = info[i - offset] ?? "";
-        term.writeln(fg(PALETTE.lime, logo) + "  " + line);
-    }
 }
 
 export default function Splash({ onDone }: { onDone?: () => void }) {
@@ -160,24 +72,13 @@ export default function Splash({ onDone }: { onDone?: () => void }) {
                 await wait(240);
                 term.writeln("");
 
-                term.writeln(
-                    "Welcome to frascella.dev 2026.04 LTS (GNU/Linux 6.8.0-portfolio x86_64)",
-                );
-                term.writeln(
-                    fg(PALETTE.dim, " * Documentation:  https://github.com/manuto276"),
-                );
-                term.writeln(
-                    fg(PALETTE.dim, " * Support:        https://linkedin.com/in/efrascella256"),
-                );
-                term.writeln("");
+                writeWelcome(term);
                 await wait(240);
 
                 writeNeofetch(term, cols);
                 await wait(900);
 
-                term.writeln("");
-                term.writeln(fg(PALETTE.dim, "Last login: Thu Apr 16 09:42:18 2026 on tty1"));
-                term.writeln("");
+                writeLastLogin(term);
                 if (cancelled) return;
 
                 await type("emanuele", "frascella.dev", "~", "cd portfolio && ls");

@@ -119,7 +119,6 @@ export default function Window({
                 minimized ? "is-min" : ""
             } ${className}`}
             style={style}
-            data-cursor="off"
             role="dialog"
             aria-label={typeof title === "string" ? title : "Window"}
         >
@@ -168,7 +167,11 @@ export default function Window({
                     </button>
                 </div>
             </header>
-            <div className="ef-window-body">{children}</div>
+            {/* dark scheme flips the custom cursor to paper over the terminal,
+                the way it inverts in the footer */}
+            <div className="ef-window-body" data-cursor-scheme="dark">
+                {children}
+            </div>
         </div>
     );
 }

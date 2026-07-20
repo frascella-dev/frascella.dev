@@ -2,6 +2,7 @@ import type { Terminal } from "@xterm/xterm";
 import { PALETTE, fg, bold } from "./theme";
 import { Vfs, FsError } from "./vfs";
 import { startNano, type NanoSession } from "./nano";
+import { writeWelcome, writeNeofetch, writeLastLogin } from "./banner";
 
 export type GameKind = "pong";
 
@@ -350,7 +351,10 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
         }
     });
 
-    // banner
+    // Same boot identity as the splash: welcome, neofetch, last login.
+    writeWelcome(term);
+    writeNeofetch(term, term.cols);
+    writeLastLogin(term);
     println(
         fg(PALETTE.dim, "Type ") +
             fg(PALETTE.lime, "help") +

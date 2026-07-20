@@ -97,7 +97,7 @@ export default function Console() {
                     minimized={minimized}
                     onMinimize={() => setMinimized(true)}
                     onClose={closeConsole}
-                    initial={{ width: 780, height: 460 }}
+                    initial={{ width: 900, height: 560 }}
                 >
                     <ConsoleTerminal onClose={closeConsole} onLaunch={launch} />
                 </Window>
