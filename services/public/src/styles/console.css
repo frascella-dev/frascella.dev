@@ -120,15 +120,29 @@
 .ef-console-term {
   position: absolute;
   inset: 0;
-  padding: 12px 14px 8px;
+  padding: 12px 14px;
 }
 .ef-console-term .xterm { height: 100%; }
 .ef-console-term .xterm .xterm-viewport { background: transparent !important; }
-.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar { width: 8px; }
-.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
+/* No scrollbar — the wheel still scrolls the scrollback, the bar just
+   crowds the window. */
+.ef-console-term .xterm .xterm-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* --- pong --- */
+.ef-pong {
+  position: absolute;
+  inset: 0;
+  background: #050605;
+}
+.ef-pong-canvas { display: block; }
 
 @media (max-width: 640px) {
   .ef-window:not(.is-max) {

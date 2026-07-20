@@ -59,7 +59,7 @@ export function useTerminal({ onReady, options }: UseTerminalOptions) {
                 cursorStyle: "block",
                 fontFamily: TERMINAL_FONT,
                 fontSize: 14,
-                lineHeight: 1.0,
+                lineHeight: 1.15,
                 letterSpacing: 0,
                 theme: TERMINAL_THEME,
                 allowProposedApi: true,
@@ -75,6 +75,17 @@ export function useTerminal({ onReady, options }: UseTerminalOptions) {
             } catch {
                 /* container not laid out yet — the resize observer catches up */
             }
+            // Re-fit once layout has settled: the first fit can run before the
+            // window has its final size, which would leave the last row
+            // spilling past the bottom edge.
+            requestAnimationFrame(() => {
+                if (disposed) return;
+                try {
+                    fit.fit();
+                } catch {
+                    /* ignore transient zero-size */
+                }
+            });
 
             ro = new ResizeObserver(() => {
                 try {

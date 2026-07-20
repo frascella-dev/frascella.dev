@@ -5,6 +5,14 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import {
+    IconMinus,
+    IconSquare,
+    IconMinimize,
+    IconX,
+} from "@tabler/icons-react";
+
+const ICON = { size: 15, stroke: 1.6 } as const;
 
 export type WindowProps = {
     title: ReactNode;
@@ -133,7 +141,7 @@ export default function Window({
                             aria-label="Minimize"
                             onClick={onMinimize}
                         >
-                            <span aria-hidden>–</span>
+                            <IconMinus {...ICON} aria-hidden />
                         </button>
                     )}
                     <button
@@ -143,7 +151,11 @@ export default function Window({
                         aria-label={maximized ? "Restore" : "Maximize"}
                         onClick={() => setMaximized((m) => !m)}
                     >
-                        <span aria-hidden>{maximized ? "❐" : "▢"}</span>
+                        {maximized ? (
+                            <IconMinimize {...ICON} aria-hidden />
+                        ) : (
+                            <IconSquare {...ICON} aria-hidden />
+                        )}
                     </button>
                     <button
                         type="button"
@@ -152,7 +164,7 @@ export default function Window({
                         aria-label="Close"
                         onClick={onClose}
                     >
-                        <span aria-hidden>×</span>
+                        <IconX {...ICON} aria-hidden />
                     </button>
                 </div>
             </header>
