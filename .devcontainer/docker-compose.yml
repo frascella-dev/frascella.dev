@@ -1,76 +1,37 @@
+# Two-service dev environment for the portfolio monorepo.
+# `client` runs the Vite SPA, `server` runs the NestJS API. Both mount the
+# repo at /workspace; each pins its node_modules to a named volume so host
+# and container dependency trees stay separate and fast.
 services:
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            args:
-                WWWUSER: "1000"
-                WWWGROUP: "1000"
-        container_name: portfolio-app
+    client:
+        image: node:20-bookworm
+        container_name: portfolio-client
+        working_dir: /workspace/services/public
         volumes:
-            - ../:/var/www/html:cached
-        working_dir: /var/www/html
+            - ../:/workspace:cached
+            - client-node-modules:/workspace/services/public/node_modules
         ports:
-            - "8000:8000"
             - "5173:5173"
-        networks:
-            - portfolio
-        depends_on:
-            mysql:
-                condition: service_healthy
         environment:
-            DB_HOST: mysql
-            DB_PORT: 3306
-            DB_DATABASE: portfolio
-            DB_USERNAME: laravel
-            DB_PASSWORD: secret
+            VITE_API_URL: http://localhost:3000
         command: sleep infinity
-
-    mysql:
-        image: mysql:8.0
-        container_name: portfolio-mysql
-        restart: unless-stopped
-        environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: portfolio
-            MYSQL_USER: laravel
-            MYSQL_PASSWORD: secret
-        volumes:
-            - mysql-data:/var/lib/mysql
-        ports:
-            - "3306:3306"
         networks:
             - portfolio
-        healthcheck:
-            test:
-                [
-                    "CMD",
-                    "mysqladmin",
-                    "ping",
-                    "-h",
-                    "localhost",
-                    "-uroot",
-                    "-proot",
-                ]
-            interval: 5s
-            timeout: 5s
-            retries: 10
 
-    phpmyadmin:
-        image: phpmyadmin:latest
-        container_name: portfolio-phpmyadmin
-        restart: unless-stopped
-        environment:
-            PMA_HOST: mysql
-            PMA_PORT: 3306
-            PMA_USER: root
-            PMA_PASSWORD: root
-            UPLOAD_LIMIT: 256M
+    server:
+        image: node:20-bookworm
+        container_name: portfolio-server
+        working_dir: /workspace/services/api
+        volumes:
+            - ../:/workspace:cached
+            - server-node-modules:/workspace/services/api/node_modules
         ports:
-            - "8080:80"
-        depends_on:
-            mysql:
-                condition: service_healthy
+            - "3000:3000"
+        environment:
+            PORT: "3000"
+            NODE_ENV: development
+            CORS_ORIGINS: http://localhost:5173
+        command: sleep infinity
         networks:
             - portfolio
 
@@ -79,5 +40,7 @@ networks:
         driver: bridge
 
 volumes:
-    mysql-data:
+    client-node-modules:
+        driver: local
+    server-node-modules:
         driver: local

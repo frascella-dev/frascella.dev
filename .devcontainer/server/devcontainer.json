@@ -1,0 +1,23 @@
+{
+    "name": "Portfolio — Server (NestJS)",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "server",
+    "workspaceFolder": "/workspace/services/api",
+    "remoteUser": "node",
+    "runServices": ["client", "server"],
+    "forwardPorts": [3000, 5173],
+    "postCreateCommand": "npm install",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "editorconfig.editorconfig",
+                "Anthropic.claude-code"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}

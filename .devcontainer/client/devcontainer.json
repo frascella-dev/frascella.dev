@@ -1,0 +1,23 @@
+{
+    "name": "Portfolio — Client (React + Vite)",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "client",
+    "workspaceFolder": "/workspace/services/public",
+    "remoteUser": "node",
+    "runServices": ["client", "server"],
+    "forwardPorts": [5173, 3000],
+    "postCreateCommand": "npm install",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "editorconfig.editorconfig",
+                "Anthropic.claude-code"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    }
+}

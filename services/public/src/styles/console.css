@@ -1,0 +1,167 @@
+/* ============================================================
+   CONSOLE — side launcher tab + draggable terminal window
+   ============================================================ */
+
+/* --- side launcher tab (flush to the right edge) --- */
+.ef-console-tab {
+  position: fixed;
+  right: 0;
+  bottom: 16%;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 9px;
+  border: 1px solid var(--rule-strong);
+  border-right: none;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  user-select: none;
+}
+.ef-console-tab:hover {
+  color: var(--accent-2);
+}
+.ef-console-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-2);
+  /* keep the dot round despite the rotated writing-mode */
+  writing-mode: horizontal-tb;
+}
+.ef-console-tab-label { display: block; }
+
+/* --- window shell --- */
+.ef-window {
+  position: fixed;
+  z-index: 6000;
+  display: flex;
+  flex-direction: column;
+  background: #050605;
+  border: 1px solid var(--rule-strong);
+  box-shadow:
+    0 24px 60px -12px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.ef-window.is-max {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border: none;
+}
+.ef-window.is-min {
+  display: none;
+}
+
+/* --- title bar (site-styled: paper / ink / mono) --- */
+.ef-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 7px 0 12px;
+  height: 30px;
+  flex: 0 0 auto;
+  background: var(--paper);
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
+  user-select: none;
+  touch-action: none;
+  /* hide the native cursor; the custom ring/dot still tracks over the bar */
+  cursor: none;
+}
+.ef-window-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ef-window-controls { display: flex; align-items: center; gap: 3px; }
+.ef-window-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1;
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+/* no hover feedback on the titlebar icons — they stay flat */
+
+/* --- body / terminal --- */
+.ef-window-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  background: #050605;
+}
+.ef-console-term {
+  position: absolute;
+  /* The gap is done with inset, NOT padding: FitAddon measures this element's
+     border-box height and does not subtract padding, so padding here makes it
+     over-count rows and the last lines spill below the (unscrollable) viewport.
+     inset shrinks the element itself, so the fit is correct and the bottom gap
+     is real. */
+  inset: 12px 14px 18px;
+}
+.ef-console-term .xterm { height: 100%; }
+.ef-console-term .xterm .xterm-viewport { background: transparent !important; }
+/* No scrollbar — the wheel still scrolls the scrollback, the bar just
+   crowds the window. */
+.ef-console-term .xterm .xterm-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ef-console-term .xterm .xterm-viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+/* xterm also paints its own scrollbar (a VS Code-style scrollable element)
+   over the native one — hiding only the native bar leaves this visible. The
+   wheel still scrolls the scrollback. */
+.ef-console-term .xterm .scrollbar { display: none !important; }
+
+/* shown while a game's chunk is being fetched */
+.ef-game-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mute);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  background: #050605;
+}
+
+@media (max-width: 640px) {
+  .ef-window:not(.is-max) {
+    left: 12px !important;
+    top: 12px !important;
+    width: calc(100vw - 24px) !important;
+    height: min(70vh, 460px) !important;
+  }
+}
