@@ -30,9 +30,18 @@ Owns `services/api`: endpoints, DTOs/validation, throttling, mail. Keeps the API
 small and stateless, preserves the `/api` prefix and the 422 error contract,
 reads all config from env, and verifies by building + curling the endpoint.
 
+### `typewriter` — the copy
+Owns the *words*, not the layout: headlines, section intros, project
+descriptions, contact copy, and all terminal/console text. Specialised in
+typewriting — kills repetition, cuts to the load-bearing words, tunes rhythm,
+keeps a consistent terse register in Emanuele's voice. Touches text nodes only,
+never structure or facts. Use whenever copy is added or changed, or to sweep the
+site for weak or duplicated phrasing.
+
 ## Division of labour
 
 - Anything with a **visual or interactive** outcome → `frontend`.
+- Anything about the **copy / wording** (repetition, concision, tone) → `typewriter`.
 - Anything **server-side** (email, secrets, validation, rate-limiting, new
   endpoints) → `backend`.
 - Anything **spanning both** or structural → `architect` plans it first, then the

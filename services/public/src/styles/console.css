@@ -68,20 +68,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 8px 0 14px;
-  height: 38px;
+  padding: 0 7px 0 12px;
+  height: 30px;
   flex: 0 0 auto;
   background: var(--paper);
   color: var(--ink);
   border-bottom: 1px solid var(--rule-strong);
   user-select: none;
   touch-action: none;
-  cursor: grab;
+  /* hide the native cursor; the custom ring/dot still tracks over the bar */
+  cursor: none;
 }
-.ef-window-bar:active { cursor: grabbing; }
 .ef-window-title {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-2);
   white-space: nowrap;
@@ -89,26 +89,25 @@
   text-overflow: ellipsis;
 }
 
-.ef-window-controls { display: flex; align-items: center; gap: 4px; }
+.ef-window-controls { display: flex; align-items: center; gap: 3px; }
 .ef-window-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: none;
   background: transparent;
   color: var(--ink-2);
   font-family: var(--mono);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1;
-  cursor: pointer;
+  cursor: none;
   user-select: none;
   -webkit-user-select: none;
 }
-.ef-window-btn:hover { background: var(--paper-3); color: var(--ink); }
-.ef-window-btn.is-close:hover { background: var(--accent); color: var(--paper); }
+/* no hover feedback on the titlebar icons — they stay flat */
 
 /* --- body / terminal --- */
 .ef-window-body {
@@ -119,8 +118,12 @@
 }
 .ef-console-term {
   position: absolute;
-  inset: 0;
-  padding: 12px 14px;
+  /* The gap is done with inset, NOT padding: FitAddon measures this element's
+     border-box height and does not subtract padding, so padding here makes it
+     over-count rows and the last lines spill below the (unscrollable) viewport.
+     inset shrinks the element itself, so the fit is correct and the bottom gap
+     is real. */
+  inset: 12px 14px 18px;
 }
 .ef-console-term .xterm { height: 100%; }
 .ef-console-term .xterm .xterm-viewport { background: transparent !important; }

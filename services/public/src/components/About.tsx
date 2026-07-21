@@ -160,7 +160,7 @@ function Timeline({ items }) {
     return (
         <div className="ef-timeline ef-tl--bleed">
             <div className="ef-tl-head">
-                <span className="ef-label">§ 04 — A thread</span>
+                <span className="ef-label">§ 04 — Timeline</span>
                 <h3 className="ef-h3 ef-tl-title">
                     <span>a short thread,</span>
                     <em>the way I got here.</em>
@@ -583,12 +583,12 @@ export default function About({ timeline = [] }) {
                 <div className="ef-about-lead">
                     <span className="ef-label">idx — 01</span>
                     <p className="ef-about-lead-text">
-                        I build software end-to-end, but my centre of gravity is
-                        the backend —
+                        I work across the whole stack, but my centre of gravity
+                        is the backend —
                         <em>
                             {" "}
-                            systems, APIs, and the applications that sit on top
-                            of them.
+                            the data, the contracts, the logic the rest of it
+                            leans on.
                         </em>
                     </p>
                 </div>
@@ -624,10 +624,10 @@ export default function About({ timeline = [] }) {
                     <div className="ef-about-col">
                         <span className="ef-label">idx — 02</span>
                         <p>
-                            Occasionally I step across to the frontend when the
-                            brief calls for it. I care about things being
-                            well-made — a query that comes back fast, a deploy
-                            that doesn't surprise anyone on Monday.
+                            I'll take the frontend when the brief calls for it.
+                            I care about work that's well-made — a query that
+                            comes back fast, a deploy that surprises no one on
+                            Monday.
                         </p>
                     </div>
                     <div className="ef-about-col">

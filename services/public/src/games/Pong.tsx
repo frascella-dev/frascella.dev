@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Key from "../components/Key";
 import "./pong.css";
 
 // Fixed logical field — the canvas is scaled to fit its container, so the
@@ -32,6 +33,8 @@ type State = {
     started: boolean;
 };
 
+type Phase = "idle" | "playing" | "over";
+
 function serve(s: State, toPlayer: boolean) {
     s.ballX = W / 2;
     s.ballY = H / 2;
@@ -41,9 +44,37 @@ function serve(s: State, toPlayer: boolean) {
     s.vy = speed * Math.sin(angle);
 }
 
+// Keyboard tutorial shown on the start screen and after a game ends.
+function Tutorial({ phase }: { phase: Phase }) {
+    return (
+        <div className="ef-pong-tutorial" aria-hidden>
+            <div className="ef-pong-ctrl">
+                <div className="ef-pong-wasd">
+                    <div className="ef-pong-wasd-row">
+                        <Key label="W" active />
+                    </div>
+                    <div className="ef-pong-wasd-row">
+                        <Key label="A" />
+                        <Key label="S" active />
+                        <Key label="D" />
+                    </div>
+                </div>
+                <span className="ef-pong-hint">move up / down</span>
+            </div>
+            <div className="ef-pong-ctrl">
+                <Key label="space" size="large" />
+                <span className="ef-pong-hint">
+                    {phase === "over" ? "play again" : "start"}
+                </span>
+            </div>
+        </div>
+    );
+}
+
 export default function Pong() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const wrapRef = useRef<HTMLDivElement | null>(null);
+    const [phase, setPhase] = useState<Phase>("idle");
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -68,10 +99,27 @@ export default function Pong() {
 
         const keys = { up: false, down: false };
 
+        // React only needs to know when the coarse phase flips — sync on change.
+        let reported: Phase = "idle";
+        const syncPhase = () => {
+            const p: Phase = state.over
+                ? "over"
+                : state.started
+                  ? "playing"
+                  : "idle";
+            if (p !== reported) {
+                reported = p;
+                setPhase(p);
+            }
+        };
+
         // ── sizing ──────────────────────────────────────────────────────
         let scale = 1;
         let offX = 0;
         let offY = 0;
+        // Leave a black overscan margin so the playfield sits inside the tube
+        // and the squircle corners fall on empty space, never on the paddles.
+        const OVERSCAN = 0.9;
         const resize = () => {
             const rect = wrap.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
@@ -79,7 +127,7 @@ export default function Pong() {
             canvas.height = Math.max(1, Math.floor(rect.height * dpr));
             canvas.style.width = `${rect.width}px`;
             canvas.style.height = `${rect.height}px`;
-            scale = Math.min(rect.width / W, rect.height / H) * dpr;
+            scale = Math.min(rect.width / W, rect.height / H) * dpr * OVERSCAN;
             offX = (canvas.width - W * scale) / 2;
             offY = (canvas.height - H * scale) / 2;
         };
@@ -87,31 +135,19 @@ export default function Pong() {
         const ro = new ResizeObserver(resize);
         ro.observe(wrap);
 
-        // ── input ───────────────────────────────────────────────────────
-        const onMouse = (e: MouseEvent) => {
-            const rect = canvas.getBoundingClientRect();
-            const localScale = Math.min(rect.width / W, rect.height / H) || 1;
-            const fieldTop = (rect.height - H * localScale) / 2;
-            const y = (e.clientY - rect.top - fieldTop) / localScale;
-            state.playerY = Math.max(
-                PADDLE_H / 2,
-                Math.min(H - PADDLE_H / 2, y),
-            );
-            state.started = true;
+        // ── input (keyboard only) ───────────────────────────────────────
+        const restart = () => {
+            state.playerScore = 0;
+            state.cpuScore = 0;
+            state.over = false;
+            serve(state, Math.random() < 0.5);
         };
-        canvas.addEventListener("mousemove", onMouse);
-
         const onKeyDown = (e: KeyboardEvent) => {
             if (["ArrowUp", "ArrowDown", " "].includes(e.key)) e.preventDefault();
             if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") keys.up = true;
             if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") keys.down = true;
             if (e.key === " ") {
-                if (state.over) {
-                    state.playerScore = 0;
-                    state.cpuScore = 0;
-                    state.over = false;
-                    serve(state, Math.random() < 0.5);
-                }
+                if (state.over) restart();
                 state.started = true;
             }
         };
@@ -121,17 +157,6 @@ export default function Pong() {
         };
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
-
-        const onClick = () => {
-            if (state.over) {
-                state.playerScore = 0;
-                state.cpuScore = 0;
-                state.over = false;
-                serve(state, Math.random() < 0.5);
-            }
-            state.started = true;
-        };
-        canvas.addEventListener("click", onClick);
 
         // ── loop ────────────────────────────────────────────────────────
         let raf = 0;
@@ -213,6 +238,7 @@ export default function Pong() {
             }
 
             draw();
+            syncPhase();
             raf = requestAnimationFrame(step);
         };
 
@@ -255,24 +281,14 @@ export default function Pong() {
             ctx.arc(state.ballX, state.ballY, BALL_R, 0, Math.PI * 2);
             ctx.fill();
 
-            // overlays
-            ctx.textAlign = "center";
-            if (!state.started) {
-                ctx.fillStyle = COL_PAPER;
-                ctx.font = "500 22px 'JetBrains Mono', ui-monospace, monospace";
-                ctx.fillText("move the mouse or press ↑ ↓ to start", W / 2, H / 2 + 60);
-                ctx.fillStyle = COL_DIM;
-                ctx.font = "400 16px 'JetBrains Mono', ui-monospace, monospace";
-                ctx.fillText(`first to ${WIN_SCORE} wins`, W / 2, H / 2 + 96);
-            }
+            // win/lose banner — the keyboard tutorial (HTML overlay) carries the
+            // rest of the messaging.
             if (state.over) {
                 const won = state.playerScore > state.cpuScore;
+                ctx.textAlign = "center";
                 ctx.fillStyle = won ? COL_LIME : COL_ORANGE;
                 ctx.font = "700 40px 'JetBrains Mono', ui-monospace, monospace";
-                ctx.fillText(won ? "you win" : "cpu wins", W / 2, H / 2 - 30);
-                ctx.fillStyle = COL_PAPER;
-                ctx.font = "400 18px 'JetBrains Mono', ui-monospace, monospace";
-                ctx.fillText("click or press space to play again", W / 2, H / 2 + 30);
+                ctx.fillText(won ? "you win" : "cpu wins", W / 2, H / 2 - 40);
             }
         };
 
@@ -281,16 +297,19 @@ export default function Pong() {
         return () => {
             cancelAnimationFrame(raf);
             ro.disconnect();
-            canvas.removeEventListener("mousemove", onMouse);
-            canvas.removeEventListener("click", onClick);
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
         };
     }, []);
 
     return (
-        <div className="ef-pong" ref={wrapRef}>
-            <canvas ref={canvasRef} className="ef-pong-canvas" />
+        <div className="ef-pong">
+            <div className="ef-pong-tube" ref={wrapRef}>
+                <canvas ref={canvasRef} className="ef-pong-canvas" />
+                {/* scanlines + vignette + glass glow, clipped to the squircle */}
+                <div className="ef-pong-crt" aria-hidden />
+                {phase !== "playing" && <Tutorial phase={phase} />}
+            </div>
         </div>
     );
 }

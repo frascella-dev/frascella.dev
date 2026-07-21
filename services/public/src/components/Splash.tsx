@@ -67,7 +67,7 @@ export default function Splash({ onDone }: { onDone?: () => void }) {
                 );
                 await wait(140);
                 term.writeln(
-                    fg(PALETTE.dim, "[    0.482110] Systemd services ready. Welcome."),
+                    fg(PALETTE.dim, "[    0.482110] Systemd services ready."),
                 );
                 await wait(240);
                 term.writeln("");

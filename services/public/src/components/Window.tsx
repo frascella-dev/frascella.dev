@@ -12,7 +12,7 @@ import {
     IconX,
 } from "@tabler/icons-react";
 
-const ICON = { size: 15, stroke: 1.6 } as const;
+const ICON = { size: 13, stroke: 1.6 } as const;
 
 export type WindowProps = {
     title: ReactNode;
@@ -22,6 +22,10 @@ export type WindowProps = {
     onMinimize?: () => void;
     /** Controlled: when true the window is kept mounted but hidden. */
     minimized?: boolean;
+    /** Stacking order — higher sits on top. Managed by the window host. */
+    zIndex?: number;
+    /** Raise this window to the top (on open and on any pointer-down). */
+    onFocus?: () => void;
     initial?: { width: number; height: number; x?: number; y?: number };
     className?: string;
     children: ReactNode;
@@ -40,6 +44,8 @@ export default function Window({
     onClose,
     onMinimize,
     minimized = false,
+    zIndex,
+    onFocus,
     initial,
     className = "",
     children,
@@ -103,7 +109,7 @@ export default function Window({
     }, [minimized, onClose]);
 
     const style: React.CSSProperties = maximized
-        ? {}
+        ? { zIndex }
         : {
               left: pos.x,
               top: pos.y,
@@ -111,6 +117,7 @@ export default function Window({
               height,
               minWidth: MIN_W,
               minHeight: MIN_H,
+              zIndex,
           };
 
     return (
@@ -121,6 +128,9 @@ export default function Window({
             style={style}
             role="dialog"
             aria-label={typeof title === "string" ? title : "Window"}
+            // raise to the top when clicked anywhere (bubbles after inner
+            // handlers, so it never blocks dragging or terminal input)
+            onPointerDown={onFocus}
         >
             <header
                 className="ef-window-bar"

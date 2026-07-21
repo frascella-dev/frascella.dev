@@ -51,24 +51,45 @@ function ConsoleTerminal({
     );
 }
 
+const CONSOLE_ID = "console";
+const Z_BASE = 6000;
+
 export default function Console() {
     const [open, setOpen] = useState(false);
     const [minimized, setMinimized] = useState(false);
     const [games, setGames] = useState<GameId[]>([]);
+    // Stacking order of every window id — last entry sits on top.
+    const [order, setOrder] = useState<string[]>([]);
 
     const consoleVisible = open && !minimized;
     useScrollLock(consoleVisible || games.length > 0);
 
+    // Move a window to the top of the stack (focus). New ids land on top too.
+    const focus = (id: string) =>
+        setOrder((o) => [...o.filter((x) => x !== id), id]);
+    const drop = (id: string) => setOrder((o) => o.filter((x) => x !== id));
+    const zOf = (id: string) => Z_BASE + Math.max(0, order.indexOf(id));
+
+    const openConsole = () => {
+        setOpen(true);
+        setMinimized(false);
+        focus(CONSOLE_ID);
+    };
     const closeConsole = () => {
         setOpen(false);
         setMinimized(false);
+        drop(CONSOLE_ID);
     };
 
-    // One window per game; re-running `play pong` just keeps the existing one.
-    const launch = (game: GameId) =>
+    // One window per game; re-running `play pong` just refocuses the existing one.
+    const launch = (game: GameId) => {
         setGames((g) => (g.includes(game) ? g : [...g, game]));
-    const closeGame = (game: GameId) =>
+        focus(game);
+    };
+    const closeGame = (game: GameId) => {
         setGames((g) => g.filter((x) => x !== game));
+        drop(game);
+    };
 
     return (
         <>
@@ -77,10 +98,7 @@ export default function Console() {
                     type="button"
                     className="ef-console-tab"
                     data-cursor="link"
-                    onClick={() => {
-                        setOpen(true);
-                        setMinimized(false);
-                    }}
+                    onClick={openConsole}
                 >
                     <span className="ef-console-tab-dot" aria-hidden />
                     <span className="ef-console-tab-label">open console</span>
@@ -92,6 +110,8 @@ export default function Console() {
                     title="guest@frascella.dev — console"
                     className="ef-console-window"
                     minimized={minimized}
+                    zIndex={zOf(CONSOLE_ID)}
+                    onFocus={() => focus(CONSOLE_ID)}
                     onMinimize={() => setMinimized(true)}
                     onClose={closeConsole}
                     initial={{ width: 900, height: 560 }}
@@ -109,6 +129,8 @@ export default function Console() {
                         key={game}
                         title={`${meta.name} — guestsh arcade`}
                         className="ef-game-window"
+                        zIndex={zOf(game)}
+                        onFocus={() => focus(game)}
                         onClose={() => closeGame(game)}
                         initial={{
                             width: meta.window.width,

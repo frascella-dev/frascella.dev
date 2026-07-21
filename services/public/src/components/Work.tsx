@@ -19,7 +19,7 @@ const BLOCKS = [
             slug: "wip-01",
             tone: "ink",
             title: "Untitled · 01",
-            tagline: "A project parked behind this block. Coming soon.",
+            tagline: "Parked behind this block. Nearly ready.",
             year: "2026",
             metric: { n: "WIP", l: "Status" },
             stack: ["TypeScript", "React"],
@@ -38,7 +38,7 @@ const BLOCKS = [
             slug: "wip-02",
             tone: "paper",
             title: "Untitled · 02",
-            tagline: "Locked for now — case study soon.",
+            tagline: "Locked for now — case study on the way.",
             year: "2026",
             metric: { n: "WIP", l: "Status" },
             stack: ["Go", "Postgres"],
@@ -57,7 +57,7 @@ const BLOCKS = [
             slug: "wip-03",
             tone: "accent",
             title: "Untitled · 03",
-            tagline: "Drafting. Drop a line if you want a preview.",
+            tagline: "Still drafting. Drop a line for an early look.",
             year: "2026",
             metric: { n: "WIP", l: "Status" },
             stack: ["Laravel", "Inertia"],
@@ -364,7 +364,7 @@ export default function Work() {
                 </h2>
                 <div className="ef-work-head-foot">
                     <p className="ef-work-note">
-                        A partial record — click to open the case study.
+                        A partial record — click a block to look inside.
                     </p>
                     <span className="ef-mono ef-work-count">soon</span>
                 </div>

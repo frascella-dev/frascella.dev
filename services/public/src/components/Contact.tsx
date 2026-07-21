@@ -435,7 +435,7 @@ export default function Contact() {
                                 value={data.message}
                                 onChange={update("message")}
                                 onBlur={blur("message")}
-                                placeholder="Tell me what you have in mind. Goals, timeline, anything that helps me understand what would be useful…"
+                                placeholder="Tell me what you have in mind — goals, timeline, constraints, whatever helps…"
                                 data-cursor="text"
                             />
                             <span className="ef-cfield-bar" aria-hidden />

@@ -24,6 +24,8 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
     const history: string[] = [];
     let histIdx = 0;
     let nano: NanoSession | null = null;
+    // While the intro animation plays, keystrokes are ignored.
+    let booting = true;
 
     const write = (s: string) => term.write(s);
     const println = (s = "") => term.write(s + "\r\n");
@@ -265,6 +267,7 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
 
     // ── readline ────────────────────────────────────────────────────────
     const onData = term.onData((data) => {
+        if (booting) return;
         if (nano) return nano.handle(data);
 
         switch (data) {
@@ -346,17 +349,63 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
         }
     });
 
-    // Same boot identity as the splash: welcome, neofetch, last login.
-    writeWelcome(term);
-    writeNeofetch(term, term.cols);
-    writeLastLogin(term);
-    println(
-        fg(PALETTE.dim, "Type ") +
-            fg(PALETTE.lime, "help") +
-            fg(PALETTE.dim, " for commands"),
-    );
-    println();
-    prompt();
+    // ── boot sequence ───────────────────────────────────────────────────
+    // Stream the intro like a real terminal instead of dumping it at once,
+    // then type and run one initial command. Same boot identity as the splash.
+    let cancelled = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const wait = (ms: number) =>
+        new Promise<void>((r) => timeouts.push(setTimeout(r, ms)));
 
-    return () => onData.dispose();
+    // Type a command out character by character behind a fresh prompt.
+    const typeCommand = async (cmd: string) => {
+        write(promptStr());
+        for (const ch of cmd) {
+            if (cancelled) return;
+            write(ch);
+            await wait(46 + Math.random() * 34);
+        }
+        await wait(140);
+        write("\r\n");
+        await wait(160);
+    };
+
+    const boot = async () => {
+        writeWelcome(term);
+        await wait(240);
+        if (cancelled) return;
+        // neofetch runs after the first delay, by which point the terminal has
+        // its final width — so the logo lays out against the right column count.
+        writeNeofetch(term, term.cols);
+        await wait(760);
+        if (cancelled) return;
+        writeLastLogin(term);
+        await wait(220);
+        if (cancelled) return;
+        println(
+            fg(PALETTE.dim, "Type ") +
+                fg(PALETTE.lime, "help") +
+                fg(PALETTE.dim, " for commands"),
+        );
+        println();
+        await wait(360);
+        if (cancelled) return;
+        // an initial command, typed and run, to complete the effect
+        await typeCommand("ls");
+        if (cancelled) return;
+        history.push("ls");
+        histIdx = history.length;
+        execute("ls");
+        await wait(120);
+        if (cancelled) return;
+        booting = false;
+        prompt();
+    };
+    boot();
+
+    return () => {
+        cancelled = true;
+        timeouts.forEach(clearTimeout);
+        onData.dispose();
+    };
 }

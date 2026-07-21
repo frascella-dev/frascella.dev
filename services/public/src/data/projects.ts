@@ -26,7 +26,7 @@ const entries = [
     {
         slug: "vitrine",
         title: "Vitrine",
-        tagline: "A cool system monitor for your desktop",
+        tagline: "A system monitor that lives on your desktop",
         year: 2026,
         role: "Creator",
         tone: "ink",

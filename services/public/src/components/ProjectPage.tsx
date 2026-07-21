@@ -14,7 +14,7 @@ export const PROJECT_DB = {
         stack: ['Node.js', 'TypeScript', 'PostgreSQL', 'Redis', 'AWS ECS', 'Terraform'],
         context: 'The client was migrating from a third-party ledger provider to an in-house system to take back control of reconciliation, reporting and multi-currency treasury operations. Latency SLAs were non-negotiable: reconciliation had to close under fifty milliseconds at the 99th percentile, across twelve currencies and fifteen partner banks.',
         approach: 'A write-once append-only core with derived read-models, audited by a third party. Idempotency keys on every write path, partitioned per-tenant, with an immutable audit trail streamed to S3 and replayable into a cold store. We moved reconciliation from a nightly batch to a streaming consumer that closes within a single business day.',
-        outcome: 'Sub-50ms p99 on reconciliation. Zero discrepancies in the first three months of production traffic, on twelve currencies and fifteen partner banks. Audit passed on first attempt.',
+        outcome: 'Sub-50ms p99 on reconciliation. Zero discrepancies in the first three months of production traffic. Audit passed on first attempt.',
         metrics: [
             { k: 'reconciliation p99', v: '47ms' },
             { k: 'currencies', v: '12' },

@@ -45,7 +45,6 @@ const SYSINFO: [string, string][] = [
     ["term", "xterm.js"],
     ["role", "backend engineer"],
     ["based", "taranto, italy"],
-    ["stack", "php · node · python · aws"],
     ["uptime", "5 years, 2 months"],
     ["theme", "paper / ink / acid-lime"],
 ];

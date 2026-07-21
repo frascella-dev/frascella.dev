@@ -95,16 +95,16 @@ export default function Hero() {
                     <div className="ef-hero-sub-col">
                         <span className="ef-label">idx — 01</span>
                         <p>
-                            Emanuele Frascella. Systems, APIs and the things
-                            that run on them — designed to stay up, stay
-                            readable, and ship on time.
+                            Emanuele Frascella. I build the plumbing behind
+                            the product — made to stay up, read clean, and
+                            ship on time.
                         </p>
                     </div>
                     <div className="ef-hero-sub-col">
                         <span className="ef-label">based — taranto, it</span>
                         <p>
                             I like solving problems that stay solved. When I'm
-                            not shipping production code, I'm probably
+                            not writing production code, I'm probably
                             overengineering something at home for fun.
                         </p>
                     </div>

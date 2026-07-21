@@ -1,7 +1,141 @@
 /* Pong — loaded as part of the game's own chunk, not the portfolio bundle. */
+
+/* Outer "set": a dark bezel the tube floats inside. */
 .ef-pong {
   position: absolute;
   inset: 0;
-  background: #050605;
+  display: grid;
+  place-items: center;
+  padding: clamp(8px, 2.5%, 22px);
+  background: radial-gradient(120% 120% at 50% 40%, #0c0d0c 0%, #050605 72%);
 }
-.ef-pong-canvas { display: block; }
+
+/* The cathode-ray tube: a squircle screen, everything clipped to its shape. */
+.ef-pong-tube {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #050605;
+  /* squircle (superellipse) — curved corners throughout, the classic CRT tube
+     face; moderate control so it's clearly rounded without going full oval */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 50C0 5 5 0 50 0C95 0 100 5 100 50C100 95 95 100 50 100C5 100 0 95 0 50Z' fill='%23fff'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 50C0 5 5 0 50 0C95 0 100 5 100 50C100 95 95 100 50 100C5 100 0 95 0 50Z' fill='%23fff'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+
+.ef-pong-canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* CRT glass: a touch of bloom + luminance so the phosphors glow */
+  filter: blur(0.6px) brightness(1.08) contrast(1.05) saturate(1.14);
+}
+
+/* ── CRT layer: scanlines, RGB aperture grille, vignette, glass glow ─────── */
+.ef-pong-crt {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    /* glass reflection, top-left */
+    radial-gradient(80% 55% at 28% 0%, rgba(233, 230, 220, 0.07) 0%, transparent 60%),
+    /* horizontal scanlines */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.24) 0px,
+      rgba(0, 0, 0, 0.24) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    /* RGB aperture grille — the "pixelated" phosphor triads */
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 0, 0, 0.06) 0px,
+      rgba(255, 0, 0, 0.06) 1px,
+      rgba(0, 255, 0, 0.06) 1px,
+      rgba(0, 255, 0, 0.06) 2px,
+      rgba(0, 0, 255, 0.06) 2px,
+      rgba(0, 0, 255, 0.06) 3px
+    );
+  /* only a faint even phosphor glow — no heavy corner shadow, which would
+     compound at the corners and pinch the lit area back into an oval */
+  box-shadow: inset 0 0 90px rgba(199, 246, 81, 0.03);
+}
+/* slow rolling refresh bar */
+.ef-pong-crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(233, 230, 220, 0.05) 46%,
+    rgba(233, 230, 220, 0.09) 50%,
+    rgba(233, 230, 220, 0.05) 54%,
+    transparent 100%
+  );
+  background-size: 100% 220%;
+  animation: ef-pong-roll 7.5s linear infinite;
+}
+/* barely-there luminance flicker */
+.ef-pong-crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(199, 246, 81, 0.02);
+  animation: ef-pong-flicker 0.12s steps(2) infinite;
+}
+@keyframes ef-pong-roll {
+  0% { background-position: 0 -60%; }
+  100% { background-position: 0 160%; }
+}
+@keyframes ef-pong-flicker {
+  0% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+/* ── keyboard tutorial ────────────────────────────────────────────────── */
+.ef-pong-tutorial {
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  z-index: 2;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(24px, 6%, 60px);
+  pointer-events: none;
+}
+.ef-pong-ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.ef-pong-wasd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ef-pong-wasd-row {
+  display: flex;
+  gap: 3px;
+}
+.ef-pong-hint {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8f8a7b;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-pong-crt::before,
+  .ef-pong-crt::after {
+    animation: none;
+  }
+}
