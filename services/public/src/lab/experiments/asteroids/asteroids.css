@@ -1,0 +1,328 @@
+/* asteroids — scoped overlay chrome. Palette/type follow base.css tokens. */
+.ast-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.ast-wrap canvas {
+    touch-action: none;
+}
+
+.ast-canvas-wrap {
+    position: absolute;
+    inset: 0;
+}
+/* enemy-hit impact shake — toggled imperatively (add/remove) so it can
+   restart on repeat hits without remounting the <Canvas/> underneath */
+.ast-canvas-wrap.ast-shake {
+    animation: ast-shake 0.34s linear;
+}
+@keyframes ast-shake {
+    10% {
+        transform: translate(-3px, 2px);
+    }
+    20% {
+        transform: translate(3px, -2px);
+    }
+    30% {
+        transform: translate(-4px, -1px);
+    }
+    40% {
+        transform: translate(2px, 3px);
+    }
+    50% {
+        transform: translate(-2px, -3px);
+    }
+    60% {
+        transform: translate(3px, 1px);
+    }
+    70% {
+        transform: translate(-1px, 2px);
+    }
+    80% {
+        transform: translate(1px, -1px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* enemy-hit glitch overlay — brief, on-brand "RGB split" using the two
+   accent colors instead of literal red/cyan, plus a scanline tear. Cosmetic
+   only in chill; in arcade it accompanies a life loss. Remounted (via key)
+   on every hit so the animation restarts cleanly. */
+.ast-glitch {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+.ast-glitch::before,
+.ast-glitch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: screen;
+    opacity: 0;
+}
+.ast-glitch::before {
+    background: rgba(255, 107, 26, 0.34);
+    animation: ast-glitch-a 0.34s steps(1, jump-none);
+}
+.ast-glitch::after {
+    background: rgba(199, 246, 81, 0.3);
+    animation: ast-glitch-b 0.34s steps(1, jump-none);
+}
+.ast-glitch-scan {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(17, 17, 16, 0.2) 0px,
+        rgba(17, 17, 16, 0.2) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    animation: ast-glitch-scan 0.34s steps(1, jump-none);
+}
+/* two quick flickers rather than one sustained wash — reads as "glitchy"
+   instead of a full-screen color wash */
+@keyframes ast-glitch-a {
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    8% {
+        opacity: 0.5;
+        transform: translateX(-8px);
+    }
+    18% {
+        opacity: 0;
+    }
+    34% {
+        opacity: 0.35;
+        transform: translateX(-4px);
+    }
+    46% {
+        opacity: 0;
+    }
+}
+@keyframes ast-glitch-b {
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    8% {
+        opacity: 0.5;
+        transform: translateX(8px);
+    }
+    18% {
+        opacity: 0;
+    }
+    34% {
+        opacity: 0.35;
+        transform: translateX(4px);
+    }
+    46% {
+        opacity: 0;
+    }
+}
+@keyframes ast-glitch-scan {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    12% {
+        opacity: 0.55;
+        transform: translateY(2px);
+    }
+    24% {
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.3;
+        transform: translateY(-2px);
+    }
+    52% {
+        opacity: 0;
+    }
+}
+
+.ast-hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    /* above .ast-overlay so the variant switch stays usable from the
+       ready/game-over screens, not just mid-run */
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    gap: 12px;
+    pointer-events: none;
+}
+.ast-hud-item {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10.5px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+    padding: 6px 10px;
+    white-space: nowrap;
+    justify-self: start;
+}
+.ast-hud-lives {
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    justify-self: end;
+}
+
+/* variant switch — small in-scene mono control, always usable */
+.ast-variant {
+    justify-self: center;
+    display: flex;
+    pointer-events: auto;
+}
+.ast-variant-btn {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9px;
+    line-height: 1;
+    padding: 7px 9px;
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    color: var(--ink-mute);
+    white-space: nowrap;
+    transition:
+        background 0.3s var(--ease),
+        color 0.3s var(--ease);
+}
+.ast-variant-btn + .ast-variant-btn {
+    border-left: none;
+}
+.ast-variant-btn:hover {
+    color: var(--ink);
+}
+.ast-variant-btn.is-on {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+/* narrow viewports — the two-button variant switch doesn't fit alongside
+   score/lives on one row, so it drops to its own centered row below */
+@media (max-width: 640px) {
+    .ast-hud {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 8px;
+    }
+    .ast-hud-item:first-child {
+        grid-column: 1;
+    }
+    .ast-hud-lives {
+        grid-column: 2;
+    }
+    .ast-variant {
+        grid-column: 1 / -1;
+        justify-self: center;
+    }
+    .ast-variant-btn {
+        font-size: 8.5px;
+        padding: 6px 7px;
+        letter-spacing: 0.06em;
+    }
+}
+
+.ast-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    background: rgba(238, 234, 224, 0.88);
+}
+.ast-overlay-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: clamp(28px, 5vw, 44px) clamp(32px, 6vw, 56px);
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    text-align: center;
+    max-width: 86%;
+}
+.ast-overlay-label {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(22px, 3.4vw, 32px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+.ast-overlay-score {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 11px;
+    color: var(--ink-mute);
+}
+.ast-btn {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    padding: 11px 26px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    transition:
+        background 0.3s var(--ease),
+        color 0.3s var(--ease);
+}
+.ast-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+}
+.ast-overlay-hint {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10px;
+    color: var(--ink-mute);
+}
+
+/* score popup — kill feedback (both variants), rises + fades once */
+.ast-popup-wrap {
+    pointer-events: none;
+}
+.ast-popup {
+    display: inline-block;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+    text-shadow: 0 1px 0 var(--paper);
+    animation: ast-popup-rise 0.8s var(--ease) forwards;
+}
+@keyframes ast-popup-rise {
+    0% {
+        transform: translateY(0) scale(0.9);
+        opacity: 1;
+    }
+    20% {
+        transform: translateY(-6px) scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-38px) scale(1);
+        opacity: 0;
+    }
+}
