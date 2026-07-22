@@ -1,0 +1,157 @@
+/* ============================================================
+   CONSOLE UNLOCK — the "you caught the ship" card.
+   Same register as the rest of the site: a paper card on an ink scrim,
+   hairlines and mono labels, no rounded-corner dialog chrome. Sits above the
+   console's own windows (z 6000+) since it's what hands them over.
+   ============================================================ */
+.ef-unlock {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 17, 16, 0.62);
+  animation: efUnlockScrim 0.4s var(--ease);
+}
+
+.ef-unlock-card {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 28px clamp(22px, 3vw, 34px) 26px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  box-shadow: 0 40px 80px -30px rgba(17, 17, 16, 0.7);
+  animation: efUnlockIn 0.5s var(--ease);
+}
+/* The site's corner-tick motif, drawn with a single accent hairline pair. */
+.ef-unlock-card::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+  pointer-events: none;
+}
+.ef-unlock-card::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 18px;
+  height: 18px;
+  border-right: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
+  pointer-events: none;
+}
+
+.ef-unlock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.ef-unlock-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+}
+.ef-unlock-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.ef-unlock-title {
+  margin-top: 18px;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(26px, 3.4vw, 36px);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+.ef-unlock-title span,
+.ef-unlock-title em { display: block; }
+.ef-unlock-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+
+.ef-unlock-body {
+  margin-top: 14px;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 44ch;
+}
+
+/* Three hairline rows — the same label/value datum grid as .ef-about-facts. */
+.ef-unlock-meta {
+  margin-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+.ef-unlock-meta > div {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ef-unlock-meta .ef-mono { color: var(--ink); }
+
+.ef-unlock-close {
+  all: unset;
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 13px 22px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+.ef-unlock-close:hover,
+.ef-unlock-close:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.ef-unlock-close:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.ef-unlock-close:hover .ef-label,
+.ef-unlock-close:focus-visible .ef-label { color: var(--accent-ink); opacity: 0.7; }
+.ef-unlock-close-label {
+  font-family: var(--sans);
+  font-size: 15px;
+  letter-spacing: -0.005em;
+}
+.ef-unlock-close-arrow { transition: transform 0.4s var(--ease); }
+.ef-unlock-close:hover .ef-unlock-close-arrow { transform: translateX(4px); }
+
+@keyframes efUnlockScrim {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes efUnlockIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-unlock, .ef-unlock-card { animation: none; }
+}

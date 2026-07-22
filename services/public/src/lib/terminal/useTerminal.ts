@@ -34,8 +34,8 @@ export type UseTerminalOptions = {
 
 /**
  * Mounts an xterm.js terminal into a container and keeps it fitted to size.
- * The single source of terminal setup for the site — the splash animation
- * uses it today; a future interactive shell can reuse the same foundation.
+ * The single source of terminal setup for the site — the guest console uses it
+ * today; anything else that needs a shell can reuse the same foundation.
  */
 export function useTerminal({ onReady, options }: UseTerminalOptions) {
     const containerRef = useRef<HTMLDivElement | null>(null);

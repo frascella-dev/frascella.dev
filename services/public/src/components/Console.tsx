@@ -1,3 +1,5 @@
+import "../styles/console.css";
+
 import { Suspense, useEffect, useRef, useState } from "react";
 import type { Terminal } from "@xterm/xterm";
 import Window from "./Window.tsx";

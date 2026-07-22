@@ -23,7 +23,7 @@
   background-image:
     linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
-  background-size: 8.3333% 100%, 100% 96px;
+  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
   mask-image: radial-gradient(ellipse 80% 60% at 60% 40%, #000 20%, transparent 95%);
 }
 .ef-pp-rect--1 { top: 14vh; right: 8vw;  width: 1px;   height: 22vh; background: var(--ink); opacity: 0.55; }

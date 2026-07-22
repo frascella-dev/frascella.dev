@@ -369,7 +369,9 @@ export default function ProjectPage() {
 
             <section className="ef-pp-metrics">
                 <header>
-                    <span className="ef-label">§ metrics</span>
+                    {/* 04 continues the narrative blocks above (01–03) —
+                        this page numbers its own run, independent of home. */}
+                    <span className="ef-label">§ 04 — Metrics</span>
                     <h2>Numbers it moved.</h2>
                 </header>
                 <div className="ef-pp-metrics-grid">
