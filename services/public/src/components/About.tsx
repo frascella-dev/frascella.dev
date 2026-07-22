@@ -1,479 +1,280 @@
-import { useEffect, useRef, useState } from "react";
-import { IconArrowRight } from "@tabler/icons-react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReveal } from "./Hooks.tsx";
+import Interests from "./Interests.tsx";
 
-function Timeline({ items }) {
-    const wrapRef = useRef(null);
-    const pathRef = useRef(null);
-    const [active, setActive] = useState(null);
-    const [progress, setProgress] = useState(0);
-    const [positions, setPositions] = useState([]);
-    const [travelPt, setTravelPt] = useState(null);
-    const [dims, setDims] = useState({ w: 1400, h: 900 });
-    const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
-    const [mousePx, setMousePx] = useState({ x: 0, y: 0, inside: false });
-    const lastMouseRef = useRef({ x: 0, y: 0, t: 0 });
-    const [vel, setVel] = useState({ vx: 0, vy: 0 });
+// three.js is heavy, so the "big bang" timeline scene is a separate chunk
+// fetched only once the section is near the viewport — same lazy pattern
+// Work.tsx uses for WorkCorridor3D and Contact.tsx uses for SocialBlocks3D.
+// Until then (and always under reduced motion) the plain-text manifest below
+// stands in, so the section is never an empty pinned box.
+const AboutBigBang3D = lazy(() => import("./AboutBigBang3D.tsx"));
 
+// Screens of scroll the pinned stage holds *before* the vortex starts moving
+// and *after* it stops, expressed in viewport heights — same constants,
+// same reasoning, as Work.tsx's corridor (read that file rather than just
+// this comment). Without them the stage pins and starts moving in the same
+// instant, so 2000 — the state the user is meant to actually sit with — is
+// already sliding away before it's been read, and 2026 is gone the moment
+// it arrives. The wrapper grows by exactly this much extra (see its height
+// below), so the dwell comes out of added page height, not out of the
+// travel between entries.
+const LEAD = 0.75;
+const TAIL = 0.75;
+
+function useIsMobile(bp = 1000) {
+    const [mob, setMob] = useState(
+        () => typeof window !== "undefined" && window.innerWidth < bp,
+    );
     useEffect(() => {
-        const compute = () => {
-            const wrap = wrapRef.current;
-            if (!wrap) return;
-            const w = wrap.clientWidth;
-            const h = Math.max(780, Math.min(1280, w * 0.72));
-            setDims({ w, h });
-        };
-        compute();
-        window.addEventListener("resize", compute);
-        return () => window.removeEventListener("resize", compute);
+        const onResize = () => setMob(window.innerWidth < bp);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, [bp]);
+    return mob;
+}
+
+function usePrefersReducedMotion() {
+    const [reduced, setReduced] = useState(
+        () =>
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+    useEffect(() => {
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const on = () => setReduced(mq.matches);
+        mq.addEventListener("change", on);
+        return () => mq.removeEventListener("change", on);
     }, []);
+    return reduced;
+}
 
+/** True once the element is within `rootMargin` of the viewport — latches on. */
+function useNearViewport(
+    ref: React.MutableRefObject<HTMLElement | null>,
+    rootMargin = "600px",
+) {
+    const [near, setNear] = useState(false);
     useEffect(() => {
-        const p = pathRef.current;
-        if (!p) return;
-        requestAnimationFrame(() => {
-            const total = p.getTotalLength();
-            const pts = items.map((entry) => {
-                const t = entry.fraction;
-                const pt = p.getPointAtLength(t * total);
-                const pt2 = p.getPointAtLength(Math.min(total, t * total + 1));
-                const tangent = Math.atan2(pt2.y - pt.y, pt2.x - pt.x);
-                return { x: pt.x, y: pt.y, tangent };
-            });
-            setPositions(pts);
-            const tp = p.getPointAtLength(progress * total);
-            setTravelPt(tp);
-        });
-    }, [dims, progress]);
+        if (near) return;
+        const el = ref.current;
+        if (!el || typeof IntersectionObserver === "undefined") return;
+        const io = new IntersectionObserver(
+            (entries) => {
+                if (entries.some((e) => e.isIntersecting)) {
+                    setNear(true);
+                    io.disconnect();
+                }
+            },
+            { rootMargin },
+        );
+        io.observe(el);
+        return () => io.disconnect();
+    }, [ref, near, rootMargin]);
+    return near;
+}
 
-    useEffect(() => {
-        const onScroll = () => {
-            const el = wrapRef.current;
-            if (!el) return;
-            const r = el.getBoundingClientRect();
-            const vh = window.innerHeight;
-            const total = r.height + vh;
-            const travelled = vh - r.top;
-            const p = travelled / total;
-            setProgress(Math.max(0, Math.min(1, p)));
-        };
-        const onMove = (e) => {
-            const el = wrapRef.current;
-            if (!el) return;
-            const r = el.getBoundingClientRect();
-            const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-            const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
-            setMouse({ x, y });
-
-            const px = e.clientX - r.left;
-            const py = e.clientY - r.top;
-            const inside =
-                px >= 0 && py >= 0 && px <= r.width && py <= r.height;
-            setMousePx({ x: px, y: py, inside });
-
-            const now = performance.now();
-            const last = lastMouseRef.current;
-            const dt = Math.max(1, now - last.t);
-            const vx = (px - last.x) / dt;
-            const vy = (py - last.y) / dt;
-            lastMouseRef.current = { x: px, y: py, t: now };
-            setVel((prev) => ({
-                vx: prev.vx * 0.7 + vx * 0.3,
-                vy: prev.vy * 0.7 + vy * 0.3,
-            }));
-        };
-        window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("mousemove", onMove, { passive: true });
-        onScroll();
-        return () => {
-            window.removeEventListener("scroll", onScroll);
-            window.removeEventListener("mousemove", onMove);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!mousePx.inside || positions.length === 0) {
-            setActive((cur) => cur);
-            return;
-        }
-        const threshold = Math.max(140, dims.h * 0.28);
-        let bestIdx = -1;
-        let bestDist = Infinity;
-        for (let i = 0; i < positions.length; i++) {
-            const p = positions[i];
-            const dx = p.x - mousePx.x;
-            const dy = p.y - mousePx.y;
-            const d = Math.hypot(dx, dy);
-            if (d < bestDist) {
-                bestDist = d;
-                bestIdx = i;
-            }
-        }
-        if (bestDist <= threshold) {
-            setActive(bestIdx);
-        } else {
-            setActive(null);
-        }
-    }, [mousePx, positions, dims.h]);
-
-    const first = items[0]?.year;
-    const last = items[items.length - 1]?.year;
-    const { w, h } = dims;
-
-    const baseWaypoints = [
-        { x: -0.08, y: 0.7 },
-        { x: 0.16, y: 0.22 },
-        { x: 0.3, y: 0.82 },
-        { x: 0.46, y: 0.28 },
-        { x: 0.58, y: 0.72 },
-        { x: 0.74, y: 0.18 },
-        { x: 0.86, y: 0.74 },
-        { x: 1.08, y: 0.32 },
-    ];
-    const warp = 0.02;
-    const wpts = baseWaypoints.map((p, i) => {
-        const phase = (i / baseWaypoints.length) * Math.PI * 2;
-        return {
-            x: (p.x + (mouse.x - 0.5) * warp * Math.sin(phase)) * w,
-            y: (p.y + (mouse.y - 0.5) * warp * Math.cos(phase)) * h,
-        };
-    });
-
-    const pathD = (() => {
-        if (wpts.length < 2) return "";
-        let d = `M ${wpts[0].x} ${wpts[0].y}`;
-        for (let i = 0; i < wpts.length - 1; i++) {
-            const p0 = wpts[i - 1] || wpts[i];
-            const p1 = wpts[i];
-            const p2 = wpts[i + 1];
-            const p3 = wpts[i + 2] || p2;
-            const tension = 0.55;
-            const c1x = p1.x + (p2.x - p0.x) * tension * 0.3;
-            const c1y = p1.y + (p2.y - p0.y) * tension * 0.3;
-            const c2x = p2.x - (p3.x - p1.x) * tension * 0.3;
-            const c2y = p2.y - (p3.y - p1.y) * tension * 0.3;
-            d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
-        }
-        return d;
-    })();
-
+/** The accessible, no-3D read of the same timeline: a plain, crawlable list.
+ *  Shown under reduced motion, before the AboutBigBang3D chunk has loaded,
+ *  and every field here is the real src/data/timeline.ts entry — nothing
+ *  invented for the scene. */
+function BigBangFallback({
+    items,
+    activeIndex,
+    onSelect,
+}: {
+    items: any[];
+    activeIndex: number;
+    onSelect: (i: number) => void;
+}) {
     return (
-        <div className="ef-timeline ef-tl--bleed">
-            <div className="ef-tl-head">
-                <span className="ef-label">§ 04 — Timeline</span>
-                <h3 className="ef-h3 ef-tl-title">
-                    <span>a short thread,</span>
-                    <em>the way I got here.</em>
-                </h3>
-                <p className="ef-tl-lede">
-                    Hover a year to see what happened. Scroll to pull the
-                    thread. {first}{" "}
-                    <IconArrowRight
-                        size={14}
-                        stroke={1.6}
-                        style={{ verticalAlign: "middle" }}
-                    />{" "}
-                    {last}.
-                </p>
-            </div>
-
-            <div
-                className="ef-tl-spline-wrap"
-                ref={wrapRef}
-                onMouseLeave={() => {
-                    setActive(null);
-                    setMousePx((p) => ({ ...p, inside: false }));
-                }}
-                style={{ height: h }}
-            >
-                <div className="ef-tl-decades" aria-hidden>
-                    <span
-                        className="ef-tl-decade ef-tl-decade--1"
-                        style={{
-                            transform: `translate3d(${(mouse.x - 0.5) * -24}px, ${(mouse.y - 0.5) * -10}px, 0)`,
-                        }}
+        <div className="ef-bb-fallback">
+            <ol className="ef-bb-fallback-list">
+                {items.map((it, i) => (
+                    <li
+                        key={it.id}
+                        className={`ef-bb-fallback-item ${
+                            i === activeIndex ? "is-active" : ""
+                        }`}
                     >
-                        2000s
-                    </span>
-                    <span
-                        className="ef-tl-decade ef-tl-decade--2"
-                        style={{
-                            transform: `translate3d(${(mouse.x - 0.5) * 18}px, ${(mouse.y - 0.5) * -14}px, 0)`,
-                        }}
-                    >
-                        2010s
-                    </span>
-                    <span
-                        className="ef-tl-decade ef-tl-decade--3"
-                        style={{
-                            transform: `translate3d(${(mouse.x - 0.5) * -16}px, ${(mouse.y - 0.5) * 12}px, 0)`,
-                        }}
-                    >
-                        2020s
-                    </span>
-                </div>
-
-                <div className="ef-tl-floaters" aria-hidden>
-                    <span
-                        className="ef-tl-floater ef-tl-floater--a"
-                        style={{
-                            transform: `translate3d(${(mouse.x - 0.5) * -20}px, ${(mouse.y - 0.5) * -14}px, 0)`,
-                        }}
-                    />
-                    <span
-                        className="ef-tl-floater ef-tl-floater--c"
-                        style={{
-                            transform: `translate3d(${(mouse.x - 0.5) * 10}px, ${(mouse.y - 0.5) * 18}px, 0)`,
-                        }}
-                    />
-                </div>
-
-                <svg
-                    className="ef-tl-spline"
-                    viewBox={`0 0 ${w} ${h}`}
-                    width={w}
-                    height={h}
-                    preserveAspectRatio="none"
-                    aria-hidden
-                >
-                    <defs>
-                        <linearGradient
-                            id="ef-tl-accent-grad"
-                            x1="0%"
-                            y1="0%"
-                            x2="100%"
-                            y2="0%"
+                        <button
+                            type="button"
+                            onClick={() => onSelect(i)}
+                            data-cursor="view"
                         >
-                            <stop offset="0%" stopColor="var(--ink)" />
-                            <stop offset="80%" stopColor="var(--ink)" />
-                            <stop offset="100%" stopColor="var(--accent)" />
-                        </linearGradient>
-                        <pattern
-                            id="ef-tl-ticks"
-                            x="0"
-                            y="0"
-                            width="28"
-                            height="14"
-                            patternUnits="userSpaceOnUse"
-                        >
-                            <line
-                                x1="0"
-                                y1="7"
-                                x2="4"
-                                y2="7"
-                                stroke="var(--rule)"
-                                strokeWidth="1"
-                            />
-                        </pattern>
-                    </defs>
-
-                    <path
-                        d={pathD}
-                        fill="none"
-                        stroke="var(--rule)"
-                        strokeWidth="1.25"
-                        strokeDasharray="3 8"
-                    />
-
-                    <path
-                        d={pathD}
-                        fill="none"
-                        stroke="var(--ink)"
-                        strokeWidth="10"
-                        opacity="0.04"
-                        style={{
-                            strokeDasharray: 9999,
-                            strokeDashoffset: 9999 * (1 - progress),
-                            transition: "stroke-dashoffset 0.35s linear",
-                        }}
-                    />
-
-                    <path
-                        ref={pathRef}
-                        d={pathD}
-                        fill="none"
-                        stroke="url(#ef-tl-accent-grad)"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        style={{
-                            strokeDasharray: 9999,
-                            strokeDashoffset: 9999 * (1 - progress),
-                            transition: "stroke-dashoffset 0.35s linear",
-                        }}
-                    />
-
-                    {travelPt && progress > 0.01 && progress < 0.99 && (
-                        <g
-                            className="ef-tl-traveler"
-                            transform={`translate(${travelPt.x}, ${travelPt.y})`}
-                        >
-                            <circle
-                                r="14"
-                                fill="var(--accent)"
-                                opacity="0.12"
-                            />
-                            <circle r="7" fill="var(--accent)" opacity="0.28" />
-                            <circle r="3.5" fill="var(--accent)" />
-                        </g>
-                    )}
-                </svg>
-
-                <ol className="ef-tl-nodes">
-                    {positions.map((pos, i) => {
-                        const item = items[i];
-                        if (!item) return null;
-                        const isActive = active === i;
-                        const vside = pos.y > h * 0.55 ? "above" : "below";
-                        return (
-                            <li
-                                key={item.year + item.title}
-                                className={`ef-tl-node ef-tl-node--${item.kind} is-${vside} ${isActive ? "is-active" : ""}`}
-                                style={{ left: pos.x, top: pos.y }}
-                                onFocus={() => setActive(i)}
-                                tabIndex={0}
-                                data-cursor="view"
-                                data-cursor-label={`${item.year} — ${item.title}`}
-                                aria-label={`${item.year}: ${item.title}. ${item.body}`}
-                            >
-                                <span className="ef-tl-dot" aria-hidden>
-                                    <span className="ef-tl-dot-inner" />
-                                    <span className="ef-tl-dot-ring" />
-                                    <span className="ef-tl-dot-pulse" />
+                            <span className="ef-mono ef-bb-fallback-year">
+                                {it.year}
+                            </span>
+                            <span className="ef-bb-fallback-body">
+                                <span className="ef-bb-fallback-title">
+                                    {it.title}
                                 </span>
-                                <span className="ef-tl-connector" aria-hidden />
-                                <span className="ef-mono ef-tl-year">
-                                    {item.year}
+                                <span className="ef-bb-fallback-tag">
+                                    {it.body}
                                 </span>
-                            </li>
-                        );
-                    })}
-                </ol>
-
-                <FollowCard
-                    item={active != null ? items[active] : null}
-                    activeIdx={active}
-                    mousePx={mousePx}
-                    vel={vel}
-                    wrapW={w}
-                    wrapH={h}
-                />
-            </div>
-
-            <ol className="ef-tl-mobile" aria-label="Career timeline">
-                {items.map((item, i) => {
-                    const isLast = i === items.length - 1;
-                    return (
-                        <li
-                            key={item.year + item.title}
-                            className={`ef-tl-m-item ef-tl-m-item--${item.kind} ${isLast ? "is-now" : ""}`}
-                        >
-                            <div className="ef-tl-m-meta">
-                                <span className="ef-tl-m-year">
-                                    {item.year}
-                                </span>
-                                <span className="ef-tl-m-kind">
-                                    {item.kind}
-                                </span>
-                            </div>
-                            <h4 className="ef-tl-m-title">{item.title}</h4>
-                            <p className="ef-tl-m-body">{item.body}</p>
-                        </li>
-                    );
-                })}
+                            </span>
+                            <span className="ef-mono ef-bb-fallback-kind">
+                                {it.kind}
+                            </span>
+                        </button>
+                    </li>
+                ))}
             </ol>
         </div>
     );
 }
 
-function FollowCard({ item, activeIdx, mousePx, vel, wrapW, wrapH }) {
-    const CARD_W = 300;
-    const CARD_H = 280;
-
-    let left = mousePx.x - CARD_W / 2;
-    let top = mousePx.y - CARD_H / 2;
-
-    const m = 16;
-    if (left < m) left = m;
-    if (top < m) top = m;
-    if (left + CARD_W > wrapW - m) left = wrapW - m - CARD_W;
-    if (top + CARD_H > wrapH - m) top = wrapH - m - CARD_H;
-
-    const rot = Math.max(-8, Math.min(8, vel.vx * 50));
-    const visible = item != null;
-
+/** The stage's own ambient backdrop — a faint grid and a couple of hairline
+ *  marks, painted on the sticky stage's paper base, *underneath* the
+ *  transparent WebGL canvas (see AboutBigBang3D: no `<color attach=
+ *  "background">`, `gl={{ alpha: true }}`), so it shows through the 3D scene
+ *  instead of being redrawn inside it. Same arrangement Work.tsx uses for its
+ *  corridor (a local, non-shared ambient component per section — each is
+ *  free to draw its own motif). Decorative and `aria-hidden` throughout. */
+function BigBangField({ mouse }: { mouse: { x: number; y: number } }) {
     return (
-        <div
-            className={`ef-tl-follow ${visible ? "is-visible" : ""}`}
-            style={{
-                transform: `translate3d(${left}px, ${top}px, 0)`,
-            }}
-            aria-hidden={!visible}
-        >
-            {item && (
-                <div
-                    className={`ef-tl-follow-inner ef-tl-follow--${item.kind}`}
-                    style={{
-                        transform: `rotate(${rot}deg)`,
-                    }}
-                >
-                    <div className="ef-tl-card-photo">
-                        {item.photo ? (
-                            <img src={item.photo} alt="" draggable="false" />
-                        ) : (
-                            <PhotoPlaceholder
-                                year={item.year}
-                                kind={item.kind}
-                            />
-                        )}
-                    </div>
-                    <div className="ef-tl-card-body-wrap">
-                        <span className="ef-mono ef-tl-card-meta">
-                            <span>{item.year}</span>
-                            <span className="ef-tl-card-kind">{item.kind}</span>
-                        </span>
-                        <h4 className="ef-tl-card-title">{item.title}</h4>
-                        <p className="ef-tl-card-body">{item.body}</p>
-                    </div>
-                </div>
-            )}
+        <div className="ef-bb-field" aria-hidden>
+            <div className="ef-about-grid-bg" />
+            <div
+                className="ef-bb-field-rect ef-bb-field-rect--1"
+                style={{
+                    transform: `translate3d(${(mouse.x - 0.5) * -12}px, ${(mouse.y - 0.5) * -8}px, 0)`,
+                }}
+            />
+            <div
+                className="ef-bb-field-rect ef-bb-field-rect--2"
+                style={{
+                    transform: `translate3d(${(mouse.x - 0.5) * 8}px, ${(mouse.y - 0.5) * 6}px, 0)`,
+                }}
+            />
+            <div className="ef-bb-field-rule-v" />
+            <div className="ef-bb-field-rule-h" />
         </div>
     );
 }
 
-function PhotoPlaceholder({ year, kind }) {
+/** The pinned "big bang" showcase: a tall wrapper (one screen of scroll per
+ *  entry) holding a position: sticky stage — the exact mechanism Work.tsx's
+ *  corridor uses (see work-corridor.css's header comment). Scroll position
+ *  becomes a continuous `activeFloat`, read off the wrapper's
+ *  getBoundingClientRect(); there is no wheel-jacking or scroll interception,
+ *  so Lenis / keyboard / anchor jumps all keep working untouched. */
+function AboutBigBang({ items }: { items: any[] }) {
+    const wrapRef = useRef<HTMLDivElement | null>(null);
+    const [activeFloat, setActiveFloat] = useState(0);
+    const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+    const isMobile = useIsMobile();
+    const reducedMotion = usePrefersReducedMotion();
+    const nearViewport = useNearViewport(wrapRef);
+    const n = items.length;
+
+    useEffect(() => {
+        const onScroll = () => {
+            const el = wrapRef.current;
+            if (!el) return;
+            const vh = window.innerHeight || 1;
+            const r = el.getBoundingClientRect();
+            const scrolled = -r.top;
+            // LEAD shifts the mapping so the vortex holds still for a beat
+            // at each end — see the LEAD/TAIL comment above and Work.tsx's
+            // identical corridor mapping.
+            const p = (scrolled - LEAD * vh) / vh;
+            setActiveFloat(Math.max(0, Math.min(n - 1, p)));
+        };
+        const onMove = (e: MouseEvent) => {
+            const el = wrapRef.current;
+            if (!el) return;
+            const r = el.getBoundingClientRect();
+            setMouse({
+                x: Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)),
+                y: Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)),
+            });
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        if (!isMobile) {
+            window.addEventListener("mousemove", onMove, { passive: true });
+        }
+        onScroll();
+        return () => {
+            window.removeEventListener("scroll", onScroll);
+            window.removeEventListener("mousemove", onMove);
+        };
+    }, [isMobile, n]);
+
+    const activeIndex = Math.max(0, Math.min(n - 1, Math.round(activeFloat)));
+
+    // Node clicks (and fallback-list clicks) don't hijack the scroll — they
+    // just scroll the page to the exact position where the scene rests
+    // centred on that entry, same as any anchor jump, so Lenis / keyboard /
+    // back-button all keep working. Identical to Work.tsx's goTo.
+    const goTo = (i: number) => {
+        const idx = Math.max(0, Math.min(n - 1, i));
+        const el = wrapRef.current;
+        if (!el) return;
+        const vh = window.innerHeight || 1;
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        const target = top + (LEAD + idx) * vh;
+        const lenis = (window as any).__lenis;
+        if (lenis?.scrollTo) lenis.scrollTo(target, { duration: 1 });
+        else window.scrollTo({ top: target, behavior: "smooth" });
+    };
+
+    const showScene = nearViewport && !reducedMotion;
+    const first = items[0]?.year;
+    const last = items[items.length - 1]?.year;
+
     return (
-        <div className={`ef-tl-photo-ph ef-tl-photo-ph--${kind}`}>
-            <svg viewBox="0 0 120 90" width="100%" height="100%" aria-hidden>
-                <defs>
-                    <pattern
-                        id={`ph-${year}`}
-                        width="6"
-                        height="6"
-                        patternUnits="userSpaceOnUse"
-                    >
-                        <line
-                            x1="0"
-                            y1="6"
-                            x2="6"
-                            y2="0"
-                            stroke="currentColor"
-                            strokeWidth="0.6"
-                            opacity="0.35"
-                        />
-                    </pattern>
-                </defs>
-                <rect width="120" height="90" fill={`url(#ph-${year})`} />
-                <rect
-                    x="8"
-                    y="8"
-                    width="104"
-                    height="74"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="0.8"
-                />
-            </svg>
-            <span className="ef-mono ef-tl-photo-label">photo / {year}</span>
+        <div className="ef-bb-section">
+            <div className="ef-bb-head">
+                {/* 03.2, not 04: the timeline is a subsection of About (§ 03),
+                    not a section of its own — § 04 is the colophon in
+                    Contact.tsx. It was § 03.1 until Interests took that
+                    number directly above it; the decimals run in page order,
+                    which is the only thing the sign is for. */}
+                <span className="ef-label">§ 03.2 — Timeline</span>
+                <h3 className="ef-h3 ef-bb-title">
+                    <span>not all at once —</span>
+                    <em>the way I got here.</em>
+                </h3>
+                <p className="ef-bb-lede">
+                    {first} to {last}. Scroll, and it comes to you in order.
+                </p>
+            </div>
+
+            <div
+                className="ef-bb-wrap"
+                ref={wrapRef}
+                style={{ height: `${(n + LEAD + TAIL) * 100}vh` }}
+            >
+                <div className="ef-bb-stage">
+                    <BigBangField mouse={mouse} />
+                    <div className="ef-bb-layer">
+                        {showScene ? (
+                            <Suspense
+                                fallback={
+                                    <BigBangFallback
+                                        items={items}
+                                        activeIndex={activeIndex}
+                                        onSelect={goTo}
+                                    />
+                                }
+                            >
+                                <AboutBigBang3D
+                                    items={items}
+                                    activeFloat={activeFloat}
+                                    isMobile={isMobile}
+                                    onSelect={goTo}
+                                />
+                            </Suspense>
+                        ) : (
+                            <BigBangFallback
+                                items={items}
+                                activeIndex={activeIndex}
+                                onSelect={goTo}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
@@ -563,113 +364,131 @@ export default function About({ timeline = [] }) {
                 <div className="ef-a-dot" style={pxy(22, 16, -240)} />
             </div>
 
-            <div className="ef-about-head">
-                <span className="ef-label">§ 03 — About</span>
-                <h2 className="ef-about-title">
-                    <span className="ef-line ef-line--1">
-                        <span className="ef-w">building things</span>
-                    </span>
-                    <span className="ef-line ef-line--2">
-                        <em className="ef-w ef-w--em">that run</em>
-                        <span className="ef-w ef-w--thin">quietly,</span>
-                    </span>
-                    <span className="ef-line ef-line--3">
-                        <span className="ef-w ef-w--thin">and reliably.</span>
-                    </span>
-                </h2>
-            </div>
+            {/* Wraps the head + body content only (not the pinned bigbang
+                stage below): .ef-about-bigword is position:absolute and
+                needs a *short* containing block to bleed at the bottom of
+                this content, not at the bottom of the whole section — which,
+                now that the section also holds the ~600vh bigbang wrap,
+                would put it far below the fold instead of where it reads. */}
+            <div className="ef-about-content">
+                <div className="ef-about-head">
+                    <span className="ef-label">§ 03 — About</span>
+                    <h2 className="ef-about-title">
+                        <span className="ef-line ef-line--1">
+                            <span className="ef-w">building things</span>
+                        </span>
+                        <span className="ef-line ef-line--2">
+                            <em className="ef-w ef-w--em">that run</em>
+                            <span className="ef-w ef-w--thin">quietly,</span>
+                        </span>
+                        <span className="ef-line ef-line--3">
+                            <span className="ef-w ef-w--thin">and reliably.</span>
+                        </span>
+                    </h2>
+                </div>
 
-            <div className="ef-about-body-wrap">
-                <div className="ef-about-lead">
-                    <span className="ef-label">idx — 01</span>
-                    <p className="ef-about-lead-text">
-                        I work across the whole stack, but my centre of gravity
-                        is the backend —
-                        <em>
-                            {" "}
-                            the data, the contracts, the logic the rest of it
-                            leans on.
-                        </em>
-                    </p>
+                <div className="ef-about-body-wrap">
+                    <div className="ef-about-lead">
+                        <span className="ef-label">idx — 01</span>
+                        <p className="ef-about-lead-text">
+                            I work across the whole stack, but my centre of
+                            gravity is the backend —
+                            <em>
+                                {" "}
+                                the data, the contracts, the logic the rest
+                                of it leans on.
+                            </em>
+                        </p>
+                    </div>
+
+                    <div
+                        className="ef-about-portrait"
+                        style={{
+                            transform: `translate3d(${(mouse.x - 0.5) * -6}px, ${(rel - 0.5) * -60}px, 0) rotate(-2.5deg)`,
+                        }}
+                    >
+                        <picture>
+                            <source
+                                srcSet={"/images/hero-light.avif"}
+                                type="image/avif"
+                            />
+                            <source
+                                srcSet={"/images/hero-light.webp"}
+                                type="image/webp"
+                            />
+                            <img
+                                src={"/images/hero-light.jpg"}
+                                alt="Portrait of Emanuele Frascella"
+                                draggable="false"
+                            />
+                        </picture>
+                        <div className="ef-about-portrait-tag">
+                            <span>e.f.</span>
+                            <span>taranto · 2026</span>
+                        </div>
+                    </div>
+
+                    <div className="ef-about-cols">
+                        <div className="ef-about-col">
+                            <span className="ef-label">idx — 02</span>
+                            <p>
+                                I'll take the frontend when the brief calls
+                                for it. I care about work that's well-made —
+                                a query that comes back fast, a deploy that
+                                surprises no one on Monday.
+                            </p>
+                        </div>
+                        <div className="ef-about-col">
+                            <span className="ef-label">idx — 03</span>
+                            <p>
+                                Side projects keep me honest — the day job
+                                gets the best of me, but not all of me.
+                            </p>
+                        </div>
+                    </div>
+
+                    <dl className="ef-about-facts">
+                        <div>
+                            <dt>name</dt>
+                            <dd>Emanuele Frascella</dd>
+                        </div>
+                        <div>
+                            <dt>based</dt>
+                            <dd>Taranto, IT</dd>
+                        </div>
+                        <div>
+                            <dt>tz</dt>
+                            <dd>CET / CEST</dd>
+                        </div>
+                        <div>
+                            <dt>exp</dt>
+                            <dd>5+ years</dd>
+                        </div>
+                    </dl>
                 </div>
 
                 <div
-                    className="ef-about-portrait"
+                    className="ef-about-bigword"
+                    aria-hidden
                     style={{
-                        transform: `translate3d(${(mouse.x - 0.5) * -6}px, ${(rel - 0.5) * -60}px, 0) rotate(-2.5deg)`,
+                        transform: `translate3d(${(mouse.x - 0.5) * -10}px, ${(rel - 0.5) * 120}px, 0)`,
                     }}
                 >
-                    <picture>
-                        <source
-                            srcSet={"/images/hero-light.avif"}
-                            type="image/avif"
-                        />
-                        <source
-                            srcSet={"/images/hero-light.webp"}
-                            type="image/webp"
-                        />
-                        <img
-                            src={"/images/hero-light.jpg"}
-                            alt="Portrait of Emanuele Frascella"
-                            draggable="false"
-                        />
-                    </picture>
-                    <div className="ef-about-portrait-tag">
-                        <span>e.f.</span>
-                        <span>taranto · 2026</span>
-                    </div>
+                    about
                 </div>
-
-                <div className="ef-about-cols">
-                    <div className="ef-about-col">
-                        <span className="ef-label">idx — 02</span>
-                        <p>
-                            I'll take the frontend when the brief calls for it.
-                            I care about work that's well-made — a query that
-                            comes back fast, a deploy that surprises no one on
-                            Monday.
-                        </p>
-                    </div>
-                    <div className="ef-about-col">
-                        <span className="ef-label">idx — 03</span>
-                        <p>
-                            Side projects keep me honest — the day job gets the
-                            best of me, but not all of me.
-                        </p>
-                    </div>
-                </div>
-
-                <dl className="ef-about-facts">
-                    <div>
-                        <dt>name</dt>
-                        <dd>Emanuele Frascella</dd>
-                    </div>
-                    <div>
-                        <dt>based</dt>
-                        <dd>Taranto, IT</dd>
-                    </div>
-                    <div>
-                        <dt>tz</dt>
-                        <dd>CET / CEST</dd>
-                    </div>
-                    <div>
-                        <dt>exp</dt>
-                        <dd>5+ years</dd>
-                    </div>
-                </dl>
             </div>
 
-            <Timeline items={timeline} />
+            {/* § 03.1, between the about copy and the § 03.2 timeline. It
+                belongs here and nowhere else: the body above ends on "side
+                projects keep me honest — the day job gets the best of me, but
+                not all of me", and this is the *not all of me* — the same
+                voice, one step further. Putting it after the timeline would
+                strand it behind ~600vh of pinned scroll and turn the page's
+                last beat before the footer into a toy; putting it before the
+                about copy would introduce a person by their hobby. */}
+            <Interests />
 
-            <div
-                className="ef-about-bigword"
-                aria-hidden
-                style={{
-                    transform: `translate3d(${(mouse.x - 0.5) * -10}px, ${(rel - 0.5) * 120}px, 0)`,
-                }}
-            >
-                about
-            </div>
+            <AboutBigBang items={timeline} />
         </section>
     );
 }

@@ -15,8 +15,8 @@ export const PALETTE = {
     green: "#28c840",
 } as const;
 
-// xterm theme — dark, matches the splash background so the CRT overlay
-// (scanlines + vignette) sits cleanly on top.
+// xterm theme — dark, so the CRT overlay (scanlines + vignette) drawn by the
+// console window sits cleanly on top.
 export const TERMINAL_THEME: ITheme = {
     background: PALETTE.bg,
     foreground: PALETTE.fg,

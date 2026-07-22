@@ -351,7 +351,7 @@ export function attachGuestShell(term: Terminal, ctx: ShellContext): () => void 
 
     // ── boot sequence ───────────────────────────────────────────────────
     // Stream the intro like a real terminal instead of dumping it at once,
-    // then type and run one initial command. Same boot identity as the splash.
+    // then type and run one initial command.
     let cancelled = false;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const wait = (ms: number) =>

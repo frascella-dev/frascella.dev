@@ -4,8 +4,23 @@
 .ef-about {
   position: relative;
   /* background: var(--paper); */
-  padding: clamp(80px, 12vh, 160px) clamp(16px, 5vw, 80px) 120px;
-  overflow: hidden;
+  /* Shared with .ef-bb-wrap (about-bigbang.css), which cancels this exact
+     padding to bleed the pinned "big bang" stage full-width — keeping both
+     in one variable means they can never drift out of sync (see
+     work-corridor.css's --work-pad-x for the same technique). */
+  --about-pad-x: clamp(16px, 5vw, 80px);
+  padding: clamp(80px, 12vh, 160px) var(--about-pad-x) 120px;
+  /* `clip`, not `hidden` — deliberately, on both axes (an ancestor's
+     overflow-x alone would make the browser auto-promote overflow-y to
+     `auto`, and plain `hidden` still counts as a scroll container for
+     `position: sticky` purposes). Either would confine .ef-bb-stage's sticky
+     stage to this section's own box instead of the real viewport, and it
+     would stop pinning — it'd scroll away with the page instead. `clip`
+     still clips the decorative bleed (the big-word backdrop, the parallax
+     rects) exactly like `hidden` did, it just isn't a scroll container. Same
+     reasoning as base.css's html/body `overflow-x: clip` — see that file's
+     comment for the full story. */
+  overflow: clip;
   isolation: isolate;
   border-bottom: 1px solid var(--rule);
 }
@@ -16,7 +31,7 @@
   background-image:
     linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
-  background-size: 8.3333% 100%, 100% 96px;
+  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
   mask-image: radial-gradient(ellipse 100% 70% at 50% 50%, #000 30%, transparent 95%);
 }
 .ef-a-rect--1 { top: 8vh;  right: 8vw;  width: 1px;   height: 32vh; background: var(--ink); opacity: 0.5; }
@@ -74,6 +89,13 @@
   z-index: -1;
 }
 .ef-about-title .ef-w--thin { font-weight: 200; color: var(--ink-mute); }
+
+/* Containing block for .ef-about-bigword only — see the comment on it in
+   About.tsx for why it can't just be .ef-about itself any more. */
+.ef-about-content {
+  position: relative;
+  z-index: 2;
+}
 
 /* --- Body --- */
 .ef-about-body-wrap {
@@ -292,7 +314,7 @@
 }
 
 @media (max-width: 560px) {
-  .ef-about { padding: 60px 14px 80px; }
+  .ef-about { --about-pad-x: 14px; padding: 60px var(--about-pad-x) 80px; }
   .ef-about-title .ef-line--3 { padding-left: 0; }
 }
 

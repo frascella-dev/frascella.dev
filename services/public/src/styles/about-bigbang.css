@@ -1,0 +1,326 @@
+/* ============================================================
+   ABOUT — "big bang" timeline showcase.
+   Same scroll-pinned mechanism as work-corridor.css: a tall wrapper (one
+   screen of scroll per entry) holds a position: sticky stage that fills the
+   viewport. The head above it (label/title/lede) is normal in-flow content —
+   it scrolls away like any heading, no pin, no fade. The instant the
+   wrapper's top reaches the viewport top the stage locks, scene already
+   fully formed; it stays locked for exactly one screen per timeline entry
+   (see About.tsx's scroll-progress math) before releasing into the footer.
+   ============================================================ */
+
+.ef-bb-section {
+  position: relative;
+  margin-top: clamp(90px, 14vh, 180px);
+}
+
+.ef-bb-head {
+  display: grid;
+  gap: 14px;
+  max-width: 900px;
+  margin: 0 auto clamp(40px, 6vh, 72px);
+  padding: 0 clamp(16px, 5vw, 80px);
+  padding-top: 40px;
+  border-top: 1px solid var(--rule);
+}
+.ef-bb-title {
+  display: block;
+  margin: 4px 0 0;
+}
+.ef-bb-title span,
+.ef-bb-title em {
+  display: block;
+}
+.ef-bb-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+.ef-bb-lede {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink-2);
+  max-width: 560px;
+}
+
+.ef-bb-wrap {
+  position: relative;
+  /* Cancels .ef-about's own horizontal padding so the pinned stage bleeds to
+     the true viewport edges — same technique, and same reasoning, as
+     work-corridor.css's .ef-work-corridor-wrap (a margin that cancels a
+     *measured* padding value, not the 100vw/-50vw trick, which leaves a
+     scrollbar-gutter-sized gap). See about.css's --about-pad-x. */
+  margin-inline: calc(-1 * var(--about-pad-x));
+}
+
+.ef-bb-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* ---- ambient backdrop: painted on the stage's paper base, *underneath*
+   the transparent WebGL canvas (see AboutBigBang3D — no <color attach=
+   "background">, gl={{ alpha: true }}), so it shows through the 3D scene
+   instead of being redrawn inside it. Same arrangement as Work's corridor
+   (work.css's local AmbientField / .ef-work-field) — a faint grid plus a
+   couple of small hairline marks, nothing more. ---- */
+.ef-bb-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.ef-bb-field-rect {
+  position: absolute;
+  will-change: transform;
+}
+.ef-bb-field-rect--1 {
+  top: 14%;
+  left: 8%;
+  width: 1px;
+  height: 22vh;
+  background: var(--ink);
+  opacity: 0.25;
+}
+.ef-bb-field-rect--2 {
+  bottom: 18%;
+  right: 10%;
+  width: 84px;
+  height: 84px;
+  border: 1px solid var(--ink);
+  opacity: 0.16;
+}
+.ef-bb-field-rule-v {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: var(--ink);
+  opacity: 0.05;
+}
+.ef-bb-field-rule-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.05;
+}
+
+.ef-bb-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.ef-bb-scene {
+  position: absolute;
+  inset: 0;
+  /* A mouse drag across the canvas doesn't orbit anything (there's no
+     OrbitControls), but without this the browser's own default drag
+     gesture would select the Html node labels' text instead. */
+  user-select: none;
+}
+.ef-bb-canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+}
+.ef-bb-canvas canvas { display: block; }
+
+/* ---- node year labels rendered via drei <Html>, positioned in 3D ---- */
+.ef-bb-node-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: center;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+  will-change: opacity, transform;
+}
+.ef-bb-node-label::before {
+  content: "";
+  width: 1px;
+  height: 9px;
+  background: currentColor;
+  opacity: 0.5;
+  margin-bottom: 1px;
+}
+.ef-bb-node-year {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: inherit;
+  text-shadow:
+    0 0 3px var(--paper),
+    0 0 6px var(--paper),
+    0 0 10px var(--paper);
+}
+
+/* ---- epoch datum: small, persistent, snapped to the active entry's own
+   year (never a separately-interpolated number — see AboutBigBang3D, there
+   is exactly one "current year" now). Sits well clear of the fixed nav
+   (.ef-nav's content bottoms out around 46–64px) and of the "Say hello"
+   pill, which is top-right — this is top-left. ---- */
+.ef-bb-epoch {
+  position: absolute;
+  top: clamp(84px, 13vh, 128px);
+  left: clamp(16px, 5vw, 40px);
+  z-index: 4;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  pointer-events: none;
+}
+.ef-bb-epoch-year {
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-shadow:
+    0 0 4px var(--paper),
+    0 0 8px var(--paper),
+    0 0 14px var(--paper);
+}
+
+/* ---- story reveal: replaces the old detail card. Anchored bottom-left —
+   clear of the vortex's centre (now screen-centre, see AboutBigBang3D's
+   camera) and, being left-anchored with a capped width, clear of the
+   right-edge OPEN CONSOLE tab without needing to know its exact geometry.
+   Every word is always in the DOM (see StoryReveal) — only opacity/transform
+   animate — so this box's rendered height is the *full* text's height at
+   all times; min-height only covers the small natural variance between
+   entries so switching entries doesn't visibly resize it. Zero hover
+   required: it's driven purely by scroll position, so it already reads in
+   full the moment a touch reader stops scrolling. ---- */
+.ef-bb-story {
+  position: absolute;
+  left: clamp(16px, 5vw, 40px);
+  bottom: clamp(20px, 5vh, 56px);
+  z-index: 4;
+  width: min(420px, 62vw);
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.ef-bb-story-kind {
+  color: var(--ink-mute);
+  transition: opacity 0.3s var(--ease);
+}
+.ef-bb-story-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.ef-bb-story-body {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-shadow:
+    0 0 6px var(--paper),
+    0 0 10px var(--paper);
+}
+.ef-bb-story-word {
+  display: inline-block;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+/* ---- fallback manifest (no-3D / reduced-motion / pre-load) ---- */
+.ef-bb-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(16px, 5vw, 80px) clamp(70px, 12vh, 120px);
+  overflow-y: auto;
+}
+.ef-bb-fallback-list {
+  list-style: none;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border-top: 1px solid var(--rule-strong);
+}
+.ef-bb-fallback-item { border-bottom: 1px solid var(--rule-strong); }
+.ef-bb-fallback-item button {
+  all: unset;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 24px;
+  width: 100%;
+  padding: 22px 4px;
+  cursor: pointer;
+  color: var(--ink);
+  border-left: 2px solid transparent;
+  padding-left: 16px;
+  transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.ef-bb-fallback-item button:hover,
+.ef-bb-fallback-item.is-active button {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+.ef-bb-fallback-year { color: var(--ink-mute); white-space: nowrap; }
+.ef-bb-fallback-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ef-bb-fallback-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(20px, 2.6vw, 28px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.ef-bb-fallback-tag {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+.ef-bb-fallback-kind {
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+
+@media (max-width: 1000px) {
+  .ef-bb-epoch { top: clamp(72px, 11vh, 96px); left: 14px; }
+  .ef-bb-epoch-year { font-size: 18px; }
+
+  .ef-bb-story {
+    left: 14px;
+    right: 14px;
+    bottom: 16px;
+    width: auto;
+    min-height: 116px;
+  }
+  .ef-bb-story-title { font-size: 20px; }
+  .ef-bb-story-body { font-size: 13.5px; }
+
+  .ef-bb-fallback-item button {
+    grid-template-columns: auto 1fr;
+    padding: 18px 4px;
+    padding-left: 14px;
+  }
+  .ef-bb-fallback-kind { grid-column: 2 / 3; }
+  .ef-bb-fallback-title { font-size: clamp(19px, 6vw, 26px); }
+}
+
+@media (max-width: 560px) {
+  .ef-bb-fallback { padding: 0 16px 90px; }
+}

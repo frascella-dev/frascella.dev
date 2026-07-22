@@ -1,0 +1,423 @@
+/* ============================================================
+   SHOWCASE — dev-lab experiment, scoped to this folder only.
+   Extends base.css tokens (paper/ink/accent, mono, ease). No new
+   language: hairline borders, mono labels, editorial type.
+   ============================================================ */
+
+.showcase-root {
+    position: absolute;
+    inset: 0;
+}
+.showcase-root canvas {
+    touch-action: none;
+}
+
+/* ---- HUD chrome, drawn over the canvas ---- */
+.showcase-hud {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.showcase-hud-top {
+    top: 14px;
+    left: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+.showcase-variant-label {
+    color: var(--ink);
+}
+.showcase-variant-count {
+    color: var(--ink-mute);
+}
+
+.showcase-switch {
+    top: 14px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+    pointer-events: auto;
+}
+.showcase-switch button {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 10px;
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    color: var(--ink-mute);
+    padding: 7px 11px;
+    line-height: 1;
+    transition:
+        background 0.25s var(--ease),
+        color 0.25s var(--ease),
+        border-color 0.25s var(--ease);
+}
+.showcase-switch button:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+}
+.showcase-switch button[data-active="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+}
+
+.showcase-nav {
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    pointer-events: auto;
+}
+.showcase-nav button {
+    font-family: var(--mono);
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    color: var(--ink);
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    transition:
+        background 0.2s var(--ease),
+        color 0.2s var(--ease);
+}
+.showcase-nav button:hover {
+    background: var(--ink);
+    color: var(--paper);
+}
+.showcase-nav-count {
+    color: var(--ink-mute);
+    min-width: 64px;
+    text-align: center;
+}
+
+.showcase-hint {
+    bottom: 14px;
+    right: 16px;
+    color: var(--ink-mute);
+    text-align: right;
+    max-width: 30ch;
+}
+
+/* ---- 3D card (drei <Html>) ---- */
+.showcase-card {
+    width: 208px;
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(238, 234, 224, 0.92);
+    border: 1px solid var(--rule-strong);
+    opacity: 0.55;
+    user-select: none;
+    pointer-events: auto;
+    transition:
+        opacity 0.35s var(--ease),
+        border-color 0.35s var(--ease),
+        background 0.35s var(--ease);
+}
+.showcase-card[data-active="true"] {
+    opacity: 1;
+    border-color: var(--ink);
+    background: var(--paper);
+}
+.showcase-card[data-kind="wip"] {
+    border-style: dashed;
+}
+.showcase-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    color: var(--ink-mute);
+}
+.showcase-card[data-active="true"] .showcase-card-head {
+    color: var(--ink);
+}
+.showcase-card-title {
+    font-family: var(--display);
+    font-size: 20px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+.showcase-card[data-kind="wip"] .showcase-card-title {
+    color: var(--ink-mute);
+}
+.showcase-card-tag {
+    font-family: var(--sans);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--ink-2);
+}
+.showcase-card-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    list-style: none;
+}
+.showcase-card-stack li {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9.5px;
+    color: var(--ink-mute);
+}
+.showcase-card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--rule);
+    padding-top: 8px;
+}
+.showcase-card-metric strong {
+    display: block;
+    font-family: var(--display);
+    font-size: 18px;
+    color: var(--accent);
+    line-height: 1;
+}
+.showcase-card[data-kind="wip"] .showcase-card-metric strong {
+    color: var(--ink-mute);
+}
+.showcase-card-metric em {
+    font-family: var(--mono);
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+}
+
+/* ---- constellation node label + docked detail panel ---- */
+.showcase-node-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    white-space: nowrap;
+    pointer-events: none;
+    background: rgba(238, 234, 224, 0.75);
+    padding: 1px 5px;
+    transform: translate(16px, -18px);
+}
+.showcase-node-label[data-active="true"] {
+    color: var(--ink);
+    background: var(--paper);
+}
+
+.showcase-detail {
+    left: 16px;
+    bottom: 14px;
+    max-width: 280px;
+    padding-left: 14px;
+    border-left: 2px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+        opacity 0.3s var(--ease),
+        transform 0.3s var(--ease);
+}
+.showcase-detail[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+}
+.showcase-detail-title {
+    font-family: var(--display);
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.05;
+}
+.showcase-detail-tag {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.4;
+}
+.showcase-detail-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    list-style: none;
+}
+.showcase-detail-stack li {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9.5px;
+    color: var(--ink-mute);
+}
+
+/* ---- exploded layers (variant 05) ---- */
+.showcase-exp-line {
+    color: var(--ink-mute);
+    white-space: nowrap;
+}
+.showcase-exp-title {
+    font-family: var(--display);
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    white-space: nowrap;
+}
+.showcase-exp-tag {
+    /* Html-portalled content has no real containing block to wrap
+       against (unlike normal document flow) — an explicit width is
+       required or the box collapses to its longest word's min-content
+       and every word falls onto its own line. See .showcase-card, which
+       hit the same thing first and fixed it with a fixed width. */
+    width: 240px;
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--ink-2);
+    text-align: center;
+}
+.showcase-exp-foot {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.showcase-exp-stack {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 10px;
+    list-style: none;
+}
+.showcase-exp-stack li {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9.5px;
+    color: var(--ink-mute);
+    border: 1px solid var(--rule);
+    padding: 2px 7px;
+}
+.showcase-exp-metric strong {
+    display: block;
+    text-align: center;
+    font-family: var(--display);
+    font-size: 20px;
+    color: var(--accent);
+    line-height: 1;
+}
+.showcase-exp-metric em {
+    display: block;
+    text-align: center;
+    font-family: var(--mono);
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-mute);
+}
+
+/* ---- kinetic type (variant 06) ---- */
+.showcase-type {
+    display: flex;
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+}
+.showcase-type-word {
+    position: relative;
+    display: block;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    color: var(--ink-mute);
+    text-shadow: 3px 3px 0 rgba(255, 107, 26, 0);
+    transform: scale(0.72);
+    transition:
+        color 0.35s var(--ease),
+        text-shadow 0.35s var(--ease),
+        transform 0.35s var(--ease);
+}
+.showcase-type[data-active="true"] .showcase-type-word {
+    color: var(--ink);
+    text-shadow: 5px 5px 0 rgba(255, 107, 26, 0.85);
+    animation: showcase-kinetic-drift 4.5s var(--ease) infinite;
+}
+.showcase-type[data-kind="wip"] .showcase-type-word {
+    font-style: italic;
+}
+
+@keyframes showcase-kinetic-drift {
+    0%,
+    100% {
+        transform: scale(1) rotate(-0.6deg) translateY(0);
+    }
+    50% {
+        transform: scale(1) rotate(0.6deg) translateY(-3px);
+    }
+}
+
+@media (max-width: 720px) {
+    .showcase-hint {
+        display: none;
+    }
+    .showcase-card {
+        width: 168px;
+        padding: 12px 13px 13px;
+    }
+    .showcase-card-title {
+        font-size: 17px;
+    }
+
+    /* HUD chrome is cramped at phone widths: drop the count, let the
+       variant label wrap to its own row, and push the switch below it
+       instead of fighting it for the same 14px-from-top strip. */
+    .showcase-hud-top {
+        right: 16px;
+        flex-wrap: wrap;
+    }
+    .showcase-variant-count {
+        display: none;
+    }
+    .showcase-switch {
+        top: 42px;
+    }
+    .showcase-switch button {
+        padding: 5px 9px;
+        font-size: 9px;
+    }
+    .showcase-nav {
+        bottom: 10px;
+    }
+    .showcase-detail {
+        max-width: calc(100% - 32px);
+    }
+    /* Variant 06 shows the docked panel *and* the prev/next nav at once
+       (03 is the only other docked-panel variant, and it has no nav) —
+       lift the panel clear of the centered nav strip so they don't
+       collide at phone widths. */
+    .showcase-detail[data-with-nav="true"] {
+        bottom: 54px;
+    }
+    .showcase-exp-title {
+        font-size: 28px;
+    }
+    .showcase-exp-tag {
+        font-size: 12px;
+        max-width: 26ch;
+    }
+    .showcase-type-word {
+        font-size: 21px;
+    }
+}

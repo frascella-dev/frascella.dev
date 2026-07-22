@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { IconArrowRight, IconCornerDownRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 import { GithubBlock, LinkedinBlock } from "./Blocks.tsx";
 import { Toast, type ToastState } from "./Toast.tsx";
 import { api, fieldErrors } from "../lib/api.ts";
+
+// three.js is heavy, so the 3D blocks are a separate chunk fetched only once
+// the contact section is close to the viewport. Until then (and on mobile, or
+// with reduced motion) the flat blocks below stand in — no layout shift.
+const SocialBlocks3D = lazy(() => import("./SocialBlocks3D.tsx"));
 
 type FieldKey = "name" | "email" | "message";
 
@@ -142,6 +147,46 @@ function Marquee({ words, speed = 40 }: { words: string[]; speed?: number }) {
     );
 }
 
+/** True once the element is within `rootMargin` of the viewport — latches on. */
+function useNearViewport(
+    ref: React.MutableRefObject<HTMLElement | null>,
+    rootMargin = "400px",
+) {
+    const [near, setNear] = useState(false);
+    useEffect(() => {
+        if (near) return;
+        const el = ref.current;
+        if (!el || typeof IntersectionObserver === "undefined") return;
+        const io = new IntersectionObserver(
+            (entries) => {
+                if (entries.some((e) => e.isIntersecting)) {
+                    setNear(true);
+                    io.disconnect();
+                }
+            },
+            { rootMargin },
+        );
+        io.observe(el);
+        return () => io.disconnect();
+    }, [ref, near, rootMargin]);
+    return near;
+}
+
+function usePrefersReducedMotion() {
+    const [reduced, setReduced] = useState(
+        () =>
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+    useEffect(() => {
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const on = () => setReduced(mq.matches);
+        mq.addEventListener("change", on);
+        return () => mq.removeEventListener("change", on);
+    }, []);
+    return reduced;
+}
+
 function useIsMobile(bp = 1000) {
     const [mob, setMob] = useState(
         () => typeof window !== "undefined" && window.innerWidth < bp,
@@ -160,6 +205,12 @@ export default function Contact() {
     const [rel, setRel] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
     const isMobile = useIsMobile();
+    const nearViewport = useNearViewport(sectionRef);
+    const reducedMotion = usePrefersReducedMotion();
+    // Mobile gets the 3D blocks too — the chunk only loads once you've scrolled
+    // to the footer, so it never costs anything up front. Reduced motion still
+    // falls back to the flat blocks.
+    const use3D = nearViewport && !reducedMotion;
 
     const setRefs = (node: HTMLElement | null) => {
         sectionRef.current = node;
@@ -495,15 +546,23 @@ export default function Contact() {
                     </div>
                 </form>
 
-                <aside className="ef-contact-aside">
-                    {SOCIALS.map((s) => (
-                        <SocialBlock
-                            key={s.label}
-                            cfg={s}
-                            mouse={mouse}
-                            rel={rel}
-                        />
-                    ))}
+                <aside
+                    className={`ef-contact-aside ${use3D ? "is-3d" : ""}`}
+                >
+                    {use3D ? (
+                        <Suspense fallback={null}>
+                            <SocialBlocks3D />
+                        </Suspense>
+                    ) : (
+                        SOCIALS.map((s) => (
+                            <SocialBlock
+                                key={s.label}
+                                cfg={s}
+                                mouse={mouse}
+                                rel={rel}
+                            />
+                        ))
+                    )}
                 </aside>
             </div>
 

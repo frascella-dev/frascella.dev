@@ -12,7 +12,7 @@ Every piece of user-facing text in `services/public`:
 - Headlines, section intros, taglines
 - Project / work descriptions (`src/data/`)
 - The about and contact copy
-- Terminal & console text — the splash boot lines, the neofetch sysinfo, `help`/`play` command output, error strings in `src/lib/terminal/`
+- Terminal & console text — the guest-shell boot lines, the neofetch sysinfo, `help`/`play` command output, error strings in `src/lib/terminal/`
 - Microcopy: buttons, labels, placeholders, empty states, aria-labels
 
 ## The craft bar — typewriting technique

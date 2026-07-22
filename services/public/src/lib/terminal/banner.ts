@@ -2,8 +2,7 @@ import type { Terminal } from "@xterm/xterm";
 import { PALETTE, fg, bold, bgBlock } from "./theme";
 
 // The shared boot identity — welcome block, neofetch (logo + sysinfo) and the
-// last-login line. Used by both the splash boot sequence and the guest console
-// so the two read as the same machine.
+// last-login line, so every terminal on the site reads as the same machine.
 
 const ASCII_LOGO = [
     "          ------:                                    ",

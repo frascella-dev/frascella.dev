@@ -1,0 +1,355 @@
+/* pong — scoped overlay chrome. Deliberately the same construction as
+   asteroids.css (same HUD grid, same overlay panel, same glitch) so the
+   two experiments read as one machine; only the prefix differs. */
+.png-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.png-wrap canvas {
+    touch-action: none;
+}
+
+.png-canvas-wrap {
+    position: absolute;
+    inset: 0;
+}
+/* concede impact shake — toggled imperatively (add/remove) so it can
+   restart on repeat points without remounting the <Canvas/> underneath */
+.png-canvas-wrap.png-shake {
+    animation: png-shake 0.34s linear;
+}
+@keyframes png-shake {
+    10% {
+        transform: translate(-3px, 2px);
+    }
+    20% {
+        transform: translate(3px, -2px);
+    }
+    30% {
+        transform: translate(-4px, -1px);
+    }
+    40% {
+        transform: translate(2px, 3px);
+    }
+    50% {
+        transform: translate(-2px, -3px);
+    }
+    60% {
+        transform: translate(3px, 1px);
+    }
+    70% {
+        transform: translate(-1px, 2px);
+    }
+    80% {
+        transform: translate(1px, -1px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* concede glitch overlay — on-brand "RGB split" using the two accents
+   instead of literal red/cyan, plus a scanline tear. Remounted (via key)
+   on every point conceded so the animation restarts cleanly. */
+.png-glitch {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+}
+.png-glitch::before,
+.png-glitch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: screen;
+    opacity: 0;
+}
+.png-glitch::before {
+    background: rgba(255, 107, 26, 0.34);
+    animation: png-glitch-a 0.34s steps(1, jump-none);
+}
+.png-glitch::after {
+    background: rgba(199, 246, 81, 0.3);
+    animation: png-glitch-b 0.34s steps(1, jump-none);
+}
+.png-glitch-scan {
+    position: absolute;
+    inset: 0;
+    /* transparent at rest — the element stays mounted between points, so
+       without this the tear would linger over the field after the flicker */
+    opacity: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(17, 17, 16, 0.2) 0px,
+        rgba(17, 17, 16, 0.2) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    animation: png-glitch-scan 0.34s steps(1, jump-none);
+}
+/* two quick flickers rather than one sustained wash — reads as "glitchy"
+   instead of a full-screen color wash */
+@keyframes png-glitch-a {
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    8% {
+        opacity: 0.5;
+        transform: translateX(-8px);
+    }
+    18% {
+        opacity: 0;
+    }
+    34% {
+        opacity: 0.35;
+        transform: translateX(-4px);
+    }
+    46% {
+        opacity: 0;
+    }
+}
+@keyframes png-glitch-b {
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    8% {
+        opacity: 0.5;
+        transform: translateX(8px);
+    }
+    18% {
+        opacity: 0;
+    }
+    34% {
+        opacity: 0.35;
+        transform: translateX(4px);
+    }
+    46% {
+        opacity: 0;
+    }
+}
+@keyframes png-glitch-scan {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    12% {
+        opacity: 0.55;
+        transform: translateY(2px);
+    }
+    24% {
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.3;
+        transform: translateY(-2px);
+    }
+    52% {
+        opacity: 0;
+    }
+}
+
+.png-hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    /* above .png-overlay so the variant switch stays usable from the
+       ready/game-over screens, not just mid-match */
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    gap: 12px;
+    pointer-events: none;
+}
+.png-hud-item {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10.5px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+    padding: 6px 10px;
+    white-space: nowrap;
+    justify-self: start;
+}
+/* the near score carries the accent, the away one stays quiet — one
+   accented HUD item per row, as in asteroids */
+.png-hud-you {
+    color: var(--accent);
+}
+.png-hud-away {
+    color: var(--ink-mute);
+    justify-self: end;
+}
+
+/* variant switch — small in-scene mono control, always usable */
+.png-variant {
+    justify-self: center;
+    display: flex;
+    pointer-events: auto;
+}
+.png-variant-btn {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9px;
+    line-height: 1;
+    padding: 7px 9px;
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    color: var(--ink-mute);
+    white-space: nowrap;
+    transition:
+        background 0.3s var(--ease),
+        color 0.3s var(--ease);
+}
+.png-variant-btn + .png-variant-btn {
+    border-left: none;
+}
+.png-variant-btn:hover {
+    color: var(--ink);
+}
+.png-variant-btn.is-on {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+/* narrow viewports — the two-button variant switch doesn't fit alongside
+   the scores on one row, so it drops to its own centered row below */
+@media (max-width: 640px) {
+    .png-hud {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 8px;
+    }
+    /* rows are pinned explicitly: auto-placement would push the away score
+       below the full-width variant row instead of beside the near one */
+    .png-hud-item:first-child {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .png-hud-away {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    .png-variant {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-self: center;
+    }
+    .png-variant-btn {
+        font-size: 8.5px;
+        padding: 6px 7px;
+        letter-spacing: 0.06em;
+    }
+}
+
+.png-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    background: rgba(238, 234, 224, 0.88);
+}
+.png-overlay-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: clamp(28px, 5vw, 44px) clamp(32px, 6vw, 56px);
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    text-align: center;
+    max-width: 86%;
+}
+.png-overlay-label {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(22px, 3.4vw, 32px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+.png-overlay-score {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 11px;
+    color: var(--ink-mute);
+}
+.png-btn {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 11px;
+    padding: 11px 26px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    transition:
+        background 0.3s var(--ease),
+        color 0.3s var(--ease);
+}
+.png-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+}
+.png-overlay-hint {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10px;
+    color: var(--ink-mute);
+}
+
+/* point popup — rises + fades once, colored by whoever scored */
+.png-popup-wrap {
+    pointer-events: none;
+}
+.png-popup {
+    display: inline-block;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+    font-size: 22px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-shadow: 0 1px 0 var(--paper);
+    animation: png-popup-rise 0.8s var(--ease) forwards;
+}
+@keyframes png-popup-rise {
+    0% {
+        transform: translateY(0) scale(0.9);
+        opacity: 1;
+    }
+    20% {
+        transform: translateY(-6px) scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-38px) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Only the decorative chrome is muted — the match itself is the point of
+   the experiment, so the sim keeps running. */
+@media (prefers-reduced-motion: reduce) {
+    .png-canvas-wrap.png-shake,
+    .png-glitch::before,
+    .png-glitch::after,
+    .png-glitch-scan,
+    .png-popup {
+        animation: none;
+    }
+    .png-glitch {
+        display: none;
+    }
+}

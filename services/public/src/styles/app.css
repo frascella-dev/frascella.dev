@@ -2,13 +2,18 @@
 @import './nav.css';
 @import './hero.css';
 @import './work.css';
+@import './work-corridor.css';
 @import './blocks.css';
 @import './toast.css';
 @import './about.css';
-@import './timeline.css';
+@import './about-bigbang.css';
+@import './interests.css';
 @import './contact.css';
 @import './cursor-tweaks.css';
-@import './splash.css';
-@import './console.css';
+@import './console-unlock.css';
+/* console.css is deliberately NOT imported here — it's imported by
+   Console.tsx instead, so it travels in that lazy desktop-only chunk. Nothing
+   outside Console/Window uses .ef-console-* or .ef-window*, and no later
+   sheet overrides them, so pulling it out of the global cascade is safe. */
 @import './project-page.css';
 @import './responsive.css';
