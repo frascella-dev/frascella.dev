@@ -38,10 +38,31 @@ keeps a consistent terse register in Emanuele's voice. Touches text nodes only,
 never structure or facts. Use whenever copy is added or changed, or to sweep the
 site for weak or duplicated phrasing.
 
+### `choreographer` — motion & the scroll narrative
+Owns the *time axis*: how a section enters, how long it holds before it moves,
+how one beat hands over to the next, pinned/sticky stages and the scroll→state
+mapping, reveal order and easing, and the `prefers-reduced-motion` path as a
+designed alternative rather than a fallback. Pairs with `typewriter` — dwell is
+a function of how much there is to read, so timing is set against the copy, not
+guessed. Verifies by scrolling in the browser and screenshotting the beats,
+especially the entrance and exit of every pinned range.
+
+### `seo` — search visibility & machine-readability
+Owns metadata, per-route titles/descriptions, Open Graph and Twitter cards,
+JSON-LD, `robots.txt`/`sitemap.xml`, heading and `alt` semantics, and the SEO
+half of Core Web Vitals. Specialised in the constraint that actually bites here:
+this is a **client-rendered SPA with no SSR**, so the served HTML is near-empty
+and anything a non-rendering bot must see has to be static or build-time. Where
+that can't be satisfied client-side it presents the options and their costs —
+it does not introduce SSR or prerendering on its own authority.
+
 ## Division of labour
 
 - Anything with a **visual or interactive** outcome → `frontend`.
 - Anything about the **copy / wording** (repetition, concision, tone) → `typewriter`.
+- Anything about **pacing, scroll flow, or animation timing** → `choreographer`
+  (with `typewriter` when the beat drags because the words are long).
+- Anything about **being found or parsed by machines** → `seo`.
 - Anything **server-side** (email, secrets, validation, rate-limiting, new
   endpoints) → `backend`.
 - Anything **spanning both** or structural → `architect` plans it first, then the

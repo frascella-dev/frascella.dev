@@ -30,37 +30,6 @@
   mix-blend-mode: normal;
 }
 .ef-cursor-view.ef-cursor-dot { opacity: 0; }
-/* crosshair — the interests play panel (§ 03.1). The ring squares off into
-   a reticle with a gap at the centre so the dot still reads as the aim
-   point; scoped to [data-cursor="crosshair"], so nothing else changes. */
-.ef-cursor-crosshair.ef-cursor-ring {
-  width: 30px; height: 30px;
-  border-radius: 0;
-  border-color: var(--accent);
-  background: transparent;
-}
-.ef-cursor-crosshair.ef-cursor-ring::before,
-.ef-cursor-crosshair.ef-cursor-ring::after {
-  content: "";
-  position: absolute;
-  left: 50%; top: 50%;
-  background: linear-gradient(var(--reticle-angle, 90deg),
-    var(--accent) 0 32%, transparent 32% 68%, var(--accent) 68% 100%);
-}
-.ef-cursor-crosshair.ef-cursor-ring::before {
-  width: 52px; height: 1px;
-  transform: translate(-50%, -50%);
-}
-.ef-cursor-crosshair.ef-cursor-ring::after {
-  --reticle-angle: 180deg;
-  width: 1px; height: 52px;
-  transform: translate(-50%, -50%);
-}
-.ef-cursor-crosshair.ef-cursor-dot {
-  width: 4px; height: 4px;
-  border-radius: 0;
-  background: var(--accent);
-}
 .ef-cursor-label {
   font-family: var(--mono);
   text-transform: uppercase;

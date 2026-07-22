@@ -130,11 +130,87 @@
   opacity: 0.75;
 }
 
+/* --- The finale: the arrival plate at the end of the aisle ---
+   Plain DOM sitting over the transparent canvas, centred in the pinned
+   stage, so the 3D threshold resolves *around* the words rather than
+   carrying them (see WorkFinale in Work.tsx for why). Every opacity and
+   offset here is set inline from the scroll-derived `finale` progress —
+   this file only owns the resting look. */
+.ef-work-finale {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  /* Never eats a click meant for a corridor card or the page's cursor. */
+  pointer-events: none;
+  padding: 0 clamp(16px, 6vw, 80px);
+}
+.ef-work-finale-inner {
+  /* Narrower than the 3D doorframe it lands inside (~40% of the stage width
+     on a 16:9 desktop), so the sentence reads as being *in* the threshold
+     rather than spilling through it. */
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.ef-work-finale-eyebrow { will-change: opacity, transform; }
+.ef-work-finale-rule {
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.4;
+  transform-origin: center;
+  will-change: transform;
+}
+.ef-work-finale-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.02em;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(24px, 3.4vw, 42px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+.ef-work-finale-line span { will-change: opacity, transform; }
+/* The one accent in the beat — the same underline device the section title
+   uses on "apis", spent here on the two words the ending turns on. */
+.ef-work-finale-line em {
+  font-style: italic;
+  font-weight: 300;
+  position: relative;
+  z-index: 0;
+}
+.ef-work-finale-line em::after {
+  content: "";
+  position: absolute;
+  left: -0.04em; right: -0.04em; bottom: 0.1em;
+  height: 0.16em;
+  background: var(--accent);
+  z-index: -1;
+}
+.ef-work-finale-foot {
+  color: var(--ink-mute);
+  letter-spacing: 0.14em;
+  will-change: opacity, transform;
+}
+
 /* --- Fallback manifest (no-3D / reduced-motion / pre-load) --- */
 .ef-work-fallback {
   position: absolute;
   inset: 0;
   display: flex;
+  /* Column, not row: the manifest and its closing block are two stacked
+     children of this box. `safe center` so that if the list plus the ending
+     ever outgrows the pinned stage it starts from the top and scrolls,
+     rather than centring and cutting its own first entry off. */
+  flex-direction: column;
+  justify-content: safe center;
   align-items: center;
   padding: 0 clamp(16px, 5vw, 80px) clamp(70px, 12vh, 120px);
   overflow-y: auto;
@@ -209,6 +285,43 @@
   border-radius: 999px;
 }
 
+/* The reduced-motion / no-3D ending: the same words, as the last line of the
+   record rather than a place you walk to. */
+.ef-work-fallback-end {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Left inset matches .ef-work-fallback-item button's, so the ending sits
+     on the same optical margin as the entries above it. */
+  padding: 26px 4px 0 16px;
+}
+.ef-work-fallback-end-line {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(20px, 2.6vw, 30px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.ef-work-fallback-end-line em {
+  font-style: italic;
+  font-weight: 300;
+  position: relative;
+  z-index: 0;
+}
+.ef-work-fallback-end-line em::after {
+  content: "";
+  position: absolute;
+  left: -0.04em; right: -0.04em; bottom: 0.1em;
+  height: 0.16em;
+  background: var(--accent);
+  z-index: -1;
+}
+.ef-work-fallback-end-count { color: var(--ink-mute); letter-spacing: 0.14em; }
+
 @media (max-width: 1000px) {
   .ef-work-corridor-card {
     width: min(72vw, 252px);
@@ -221,8 +334,12 @@
   .ef-work-fallback-item button { grid-template-columns: auto 1fr; padding: 18px 4px; padding-left: 14px; }
   .ef-work-fallback-year { grid-column: 2 / 3; }
   .ef-work-fallback-title { font-size: clamp(20px, 6vw, 28px); }
+  /* A phone-height stage has to hold four entries *and* the ending without
+     turning the pinned stage into an inner scroller. */
+  .ef-work-fallback-end { padding-top: 18px; gap: 7px; }
+  .ef-work-fallback-end-line { font-size: 20px; }
 }
 
 @media (max-width: 560px) {
-  .ef-work-fallback { padding: 0 16px 90px; }
+  .ef-work-fallback { padding: 0 16px 64px; }
 }

@@ -52,14 +52,33 @@ function buildItems() {
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-// Screens of scroll the pinned stage holds *before* the corridor starts
-// moving and *after* it stops, expressed in viewport heights. They buy the
-// first and last project a moment on screen instead of one flashing past on
-// arrival and the other on departure. The wrapper is grown by exactly the
-// same amount (see the corridor wrapper's height), so the extra dwell comes
-// out of added page height, not out of the travel between projects.
+// --- The pinned stage's beat sheet, in screens of scroll ------------------
+//
+// LEAD   still on the first project, before the corridor starts moving.
+// (n-1)  one screen of travel per gap between projects.
+// HOLD   still on the LAST project — the beat that used to be TAIL. The
+//        corridor no longer releases from here, so this is what stops the
+//        last card being read while the camera is already walking away.
+// FINALE the walk past the last frame to the threshold at the end of the
+//        aisle, and the copy resolving on it. Longer than a project gap
+//        because it covers empty aisle, an arrival, and four lines of text
+//        that have to be legible before anything else happens.
+// TAIL   still on the arrival, before the stage releases into the archive
+//        strip and § 03. Both ends of the pin are stillness; so is the
+//        seam between the last project and the finale.
+//
+// The wrapper is grown by exactly this much, so every beat is bought with
+// added page height rather than taken out of the travel between projects.
 const LEAD = 0.75;
-const TAIL = 0.75;
+const HOLD = 0.75;
+const FINALE = 1.15;
+const TAIL = 0.65;
+
+/** Sub-range of a 0..1 progress value, clamped — the stagger primitive for
+ *  the finale's reveal. Scroll-linked, so scrubbing backwards unplays it
+ *  exactly as it played. */
+const seg = (v: number, a: number, b: number) =>
+    Math.max(0, Math.min(1, (v - a) / (b - a)));
 
 function useIsMobile(bp = 1000) {
     const [mob, setMob] = useState(
@@ -125,6 +144,7 @@ function WorkCorridorFallback({
     activeIndex: number;
     onSelect: (i: number) => void;
 }) {
+    const shipped = items.filter((it) => it.kind !== "wip").length;
     return (
         <div className="ef-work-fallback">
             <ol className="ef-work-fallback-list">
@@ -172,6 +192,76 @@ function WorkCorridorFallback({
                     </li>
                 ))}
             </ol>
+            {/* The finale, stated rather than arrived at. Under reduced
+                motion there is no walk to the end of the aisle, so the
+                ending has to be the last line of the record instead of a
+                place you reach — same words, same order, no movement. */}
+            <div className="ef-work-fallback-end">
+                <span className="ef-label">end of the aisle</span>
+                <p className="ef-work-fallback-end-line">
+                    this is as far as it goes — <em>for now.</em>
+                </p>
+                <span className="ef-mono ef-work-fallback-end-count">
+                    {pad2(shipped)} shipped · {pad2(items.length - shipped)} in
+                    progress
+                </span>
+            </div>
+        </div>
+    );
+}
+
+/**
+ * The arrival plate: the words at the end of the corridor.
+ *
+ * Deliberately plain DOM over the transparent canvas rather than a drei
+ * <Html> inside it — the scene owns space, the page owns type. That keeps the
+ * finale copy at real CSS size (crisp, responsive, no 1/distance scaling),
+ * makes it identical on the desktop hallway and the mobile rail, and means
+ * the one thing the visitor has to *read* at the end never depends on where
+ * the camera happens to be. The 3D threshold resolves around it.
+ *
+ * Every value here is a sub-range of the scroll-derived `finale`, so the
+ * reveal scrubs both ways and can't be left half-played by a fast scroll, an
+ * anchor jump or a reversal. The order is the reading order: where you are,
+ * a rule under it, the sentence, then the count. Nothing else in the frame
+ * moves while this happens.
+ */
+function WorkFinale({ finale, items }: { finale: number; items: any[] }) {
+    const shipped = items.filter((it) => it.kind !== "wip").length;
+    const rise = (t: number, px: number) => ({
+        opacity: t,
+        transform: `translate3d(0, ${(1 - t) * px}px, 0)`,
+    });
+    return (
+        <div className="ef-work-finale">
+            <div className="ef-work-finale-inner">
+                <span
+                    className="ef-label ef-work-finale-eyebrow"
+                    style={rise(seg(finale, 0.3, 0.52), 8)}
+                >
+                    end of the aisle
+                </span>
+                <span
+                    className="ef-work-finale-rule"
+                    aria-hidden
+                    style={{ transform: `scaleX(${seg(finale, 0.42, 0.68)})` }}
+                />
+                <p className="ef-work-finale-line">
+                    <span style={rise(seg(finale, 0.52, 0.76), 14)}>
+                        this is as far
+                    </span>
+                    <span style={rise(seg(finale, 0.6, 0.84), 14)}>
+                        as it goes — <em>for now.</em>
+                    </span>
+                </p>
+                <span
+                    className="ef-mono ef-work-finale-foot"
+                    style={rise(seg(finale, 0.74, 0.96), 8)}
+                >
+                    {pad2(shipped)} shipped · {pad2(items.length - shipped)} in
+                    progress
+                </span>
+            </div>
         </div>
     );
 }
@@ -206,10 +296,12 @@ function AmbientField({ mouse }: { mouse: { x: number; y: number } }) {
 
 export default function Work() {
     const [revealRef, shown] = useReveal();
+    const [stripRef, stripShown] = useReveal<HTMLDivElement>({ threshold: 0.6 });
     const sectionRef = useRef<HTMLElement | null>(null);
     const wrapRef = useRef<HTMLDivElement | null>(null);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
     const [activeFloat, setActiveFloat] = useState(0);
+    const [finale, setFinale] = useState(0);
     const isMobile = useIsMobile();
     const reducedMotion = usePrefersReducedMotion();
     const nearViewport = useNearViewport(wrapRef);
@@ -241,6 +333,12 @@ export default function Work() {
             // moment it arrives.
             const p = (scrolled - LEAD * vh) / vh;
             setActiveFloat(Math.max(0, Math.min(n - 1, p)));
+            // The finale picks up where the projects leave off, after HOLD
+            // screens of stillness on the last one. Both are read off the
+            // same rect in the same tick, so they can never disagree.
+            setFinale(
+                Math.max(0, Math.min(1, (p - (n - 1) - HOLD) / FINALE)),
+            );
         };
         const onMove = (e: MouseEvent) => {
             const sec = sectionRef.current;
@@ -286,6 +384,20 @@ export default function Work() {
 
     const showCorridor = nearViewport && !reducedMotion;
 
+    // Under reduced motion nothing is scroll-driven, so the finale's screens
+    // of scroll would be dead height over a static list. The wrapper keeps
+    // exactly the budget it had before the finale existed, and the ending is
+    // carried as the closing block of the manifest instead.
+    const screens = reducedMotion
+        ? n + LEAD + TAIL
+        : n + LEAD + HOLD + FINALE + TAIL;
+
+    // As the room opens out, the "work." wordmark under the canvas comes up
+    // from a whisper to something you notice — the last beat reframes the
+    // walk as having been inside the word all along. Two hundredths of
+    // opacity; the restraint is the point.
+    const bigwordOpacity = 0.05 + seg(finale, 0.35, 0.85) * 0.055;
+
     return (
         <section
             className={`ef-work ${shown ? "is-in" : ""}`}
@@ -324,7 +436,7 @@ export default function Work() {
             <div
                 className="ef-work-corridor-wrap"
                 ref={wrapRef}
-                style={{ height: `${(n + LEAD + TAIL) * 100}vh` }}
+                style={{ height: `${screens * 100}vh` }}
             >
                 <div className="ef-work-stage">
                     <AmbientField mouse={mouse} />
@@ -333,6 +445,7 @@ export default function Work() {
                         aria-hidden
                         style={{
                             transform: `translate3d(${(mouse.x - 0.5) * -10}px, ${(stageRel - 0.5) * 120}px, 0)`,
+                            opacity: bigwordOpacity,
                         }}
                     >
                         work.
@@ -351,6 +464,7 @@ export default function Work() {
                                 <WorkCorridor3D
                                     items={items}
                                     activeFloat={activeFloat}
+                                    finale={finale}
                                     isMobile={isMobile}
                                     onSelect={goTo}
                                 />
@@ -363,10 +477,20 @@ export default function Work() {
                             />
                         )}
                     </div>
+                    {showCorridor && (
+                        <WorkFinale finale={finale} items={items} />
+                    )}
                 </div>
             </div>
 
-            <div className="ef-work-strip">
+            {/* The handover. The stage releases on a still frame that has
+                just said "this is as far as it goes"; the archive strip is
+                the answer to it, so it arrives on its own beat rather than
+                being dragged up from under the sticky stage. */}
+            <div
+                className={`ef-work-strip ${stripShown ? "is-in" : ""}`}
+                ref={stripRef}
+            >
                 <span className="ef-label">Archive</span>
                 <a
                     className="ef-work-strip-link"

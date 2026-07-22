@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReveal } from "./Hooks.tsx";
-import Interests from "./Interests.tsx";
 
 // three.js is heavy, so the "big bang" timeline scene is a separate chunk
 // fetched only once the section is near the viewport — same lazy pattern
@@ -225,12 +224,11 @@ function AboutBigBang({ items }: { items: any[] }) {
     return (
         <div className="ef-bb-section">
             <div className="ef-bb-head">
-                {/* 03.2, not 04: the timeline is a subsection of About (§ 03),
-                    not a section of its own — § 04 is the colophon in
-                    Contact.tsx. It was § 03.1 until Interests took that
-                    number directly above it; the decimals run in page order,
-                    which is the only thing the sign is for. */}
-                <span className="ef-label">§ 03.2 — Timeline</span>
+                {/* 03.1, not 04: the timeline is a subsection of About
+                    (§ 03), not a section of its own — § 04 is the colophon in
+                    Contact.tsx. The decimal keeps the § pointing at a real
+                    number, which is the only thing the sign is for. */}
+                <span className="ef-label">§ 03.1 — Timeline</span>
                 <h3 className="ef-h3 ef-bb-title">
                     <span>not all at once —</span>
                     <em>the way I got here.</em>
@@ -477,16 +475,6 @@ export default function About({ timeline = [] }) {
                     about
                 </div>
             </div>
-
-            {/* § 03.1, between the about copy and the § 03.2 timeline. It
-                belongs here and nowhere else: the body above ends on "side
-                projects keep me honest — the day job gets the best of me, but
-                not all of me", and this is the *not all of me* — the same
-                voice, one step further. Putting it after the timeline would
-                strand it behind ~600vh of pinned scroll and turn the page's
-                last beat before the footer into a toy; putting it before the
-                about copy would introduce a person by their hobby. */}
-            <Interests />
 
             <AboutBigBang items={timeline} />
         </section>

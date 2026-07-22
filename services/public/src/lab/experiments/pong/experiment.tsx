@@ -5,7 +5,7 @@ import LabStage from "../../LabStage.tsx";
 import "./pong.css";
 
 // ------------------------------------------------------------------
-// pong — 3d. The console's pong (src/games/Pong.tsx) replayed in the
+// pong — 3d. The portfolio's old console pong, replayed in the
 // asteroids rendering register: paper field, thin ink wireframe, the
 // same orange/lime accents, shard bursts, score popups and the on-hit
 // glitch. Nothing here is filled-block CRT — that look belongs to the
@@ -30,7 +30,8 @@ const ACCENT_2 = "#C7F651";
 
 type Variant = "cpu" | "2p";
 
-/* ---- rules, mirrored from src/games/Pong.tsx ------------------- */
+/* ---- rules (originally mirrored from the console pong, now the
+   only copy — the console and its games were removed) ------------ */
 const W = 1000;
 const H = 620;
 const PADDLE_W = 14;

@@ -23,6 +23,30 @@ const INK = "#111110";
 const damp = THREE.MathUtils.damp;
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
+// --- The finale -----------------------------------------------------------
+//
+// The corridor used to simply stop on the last project and release. It now
+// keeps walking: past the last frame the aisle is empty for a beat, a
+// threshold resolves out of the fog ahead, and the camera comes to rest
+// inside it while the room beyond opens out. `finale` (0..1) is scroll-
+// derived in Work.tsx — this file only ever reads it, never times it.
+//
+// How far past the last frame the camera travels, in project spacings
+// (desktop) / rail slots (mobile). The threshold sits exactly at the resting
+// point, so at finale = 1 it lands on the same plane the active card sits on
+// — the reading distance the whole corridor has been using.
+export const FINALE_RUN = 2.4;
+export const FINALE_RUN_M = 1.05;
+
+/** Zero derivative at both ends: the walk leaves the last project and
+ *  arrives at the threshold without a visible start or stop, which is what
+ *  makes the two still beats either side of it read as stillness rather than
+ *  as a stall. */
+const smoothstep = (t: number) => {
+  const x = Math.max(0, Math.min(1, t));
+  return x * x * (3 - 2 * x);
+};
+
 function CorridorCard({
     item,
     idx,
@@ -101,7 +125,11 @@ function CorridorRail({ n, spacingX }: { n: number; spacingX: number }) {
         const floorY = -1.3;
         const ceilY = 1.15;
         const trackX0 = 0;
-        const trackX1 = (n - 1) * spacingX;
+        // The flat track now runs one finale slot past the last project, to
+        // the threshold — the rail's own version of the desktop corridor
+        // continuing past the last frame. The bend (and, past the threshold,
+        // the splay) starts there instead of on the last project.
+        const trackX1 = (n - 1 + FINALE_RUN_M) * spacingX;
         // How far outward (X) and how deep (Z) the bend runs. bendDepth is
         // picked so the deepest point's distance from the camera clears the
         // mobile fog's far plane (~15) with room to spare — see the <fog>
@@ -110,25 +138,36 @@ function CorridorRail({ n, spacingX }: { n: number; spacingX: number }) {
         const bendDepth = 9;
         const segs = 7;
         const bend = (t: number) => -bendDepth * t * t; // ease-in: flat near the track, steep further out
-        const path: [number, number][] = [];
+        // Past the threshold the two hairlines also pull apart in Y as they
+        // bend away — the lateral rail's read of desktop's "the corridor
+        // opens out into a room". Only on the outgoing end: the incoming end
+        // is where the visitor came from and stays a plain rail.
+        const splay = (t: number) => t * t;
+        // [x, z, floorY, ceilY]
+        const path: [number, number, number, number][] = [];
         for (let s = segs; s >= 1; s--) {
             const t = s / segs;
-            path.push([trackX0 - t * bendRunX, z + bend(t)]);
+            path.push([trackX0 - t * bendRunX, z + bend(t), floorY, ceilY]);
         }
-        path.push([trackX0, z]);
-        path.push([trackX1, z]);
+        path.push([trackX0, z, floorY, ceilY]);
+        path.push([trackX1, z, floorY, ceilY]);
         for (let s = 1; s <= segs; s++) {
             const t = s / segs;
-            path.push([trackX1 + t * bendRunX, z + bend(t)]);
+            const o = splay(t);
+            path.push([
+                trackX1 + t * bendRunX,
+                z + bend(t),
+                floorY - o * 0.85,
+                ceilY + o * 1.15,
+            ]);
         }
         const verts: number[] = [];
-        [floorY, ceilY].forEach((y) => {
-            for (let i = 0; i < path.length - 1; i++) {
-                const [x0, z0] = path[i];
-                const [x1, z1] = path[i + 1];
-                verts.push(x0, y, z0, x1, y, z1);
-            }
-        });
+        for (let i = 0; i < path.length - 1; i++) {
+            const [x0, z0, f0, c0] = path[i];
+            const [x1, z1, f1, c1] = path[i + 1];
+            verts.push(x0, f0, z0, x1, f1, z1);
+            verts.push(x0, c0, z0, x1, c1, z1);
+        }
         for (let i = 0; i < n; i++) {
             const x = i * spacingX;
             verts.push(x, floorY, z, x, ceilY, z);
@@ -144,7 +183,8 @@ function CorridorRail({ n, spacingX }: { n: number; spacingX: number }) {
     );
 }
 
-/** Hairline floor/ceiling rails + a doorframe upright at each project depth. */
+/** Hairline floor/ceiling rails + a doorframe upright at each project depth,
+ *  flaring open past the finale threshold. */
 function CorridorGrid({
     n,
     spacing,
@@ -162,19 +202,60 @@ function CorridorGrid({
         // as endless in both directions instead of stopping dead on the
         // outer projects.
         const RUN_IN = 5 * spacing; // behind the camera at project 0
-        const RUN_OUT = 7 * spacing; // beyond the last project, into the fog
         const z0 = 2.2 + RUN_IN;
-        const zEnd = -(n - 1) * spacing - 2.2 - RUN_OUT;
+        // Where the finale comes to rest (see FINALE_RUN). Past this the
+        // corridor stops being a corridor: the rails splay outward and the
+        // ceiling lifts, so arriving at the threshold reads as walking out of
+        // a hallway into a room rather than as the hallway ending.
+        const zT = -(n - 1 + FINALE_RUN) * spacing;
+        // The run-out is measured from the *threshold*, not from the last
+        // project, because that's where the camera finishes: it has to still
+        // outrun the fog's far plane once the camera has walked all the way
+        // in, or the hard cut the fog exists to hide reappears exactly at the
+        // one moment the visitor is standing still looking at it.
+        const zEnd = zT - 40;
         const floorY = -1.05;
         const ceilY = 1.6;
+        // Ease-in, so the room doesn't start widening until you're through
+        // the threshold — from inside the corridor the opening reads as a
+        // far wall, and only resolves into "there is more space beyond" once
+        // you're close enough for the perspective to give it away.
+        const OPEN = 9 * spacing;
+        const open = (z: number) => {
+            const t = Math.max(0, Math.min(1, (zT - z) / OPEN));
+            return t * t;
+        };
+        const wAt = (z: number) => halfW * (1 + 2.4 * open(z));
+        const cAt = (z: number) => ceilY + 2 * open(z);
+        const fAt = (z: number) => floorY - 0.8 * open(z);
+
+        // Rungs every half-spacing inside the corridor; twice as far apart
+        // once through the threshold. A bigger room takes a bigger grid — and
+        // it keeps the far end from packing into a dense band of near-
+        // horizontal lines directly behind the finale copy, which is the one
+        // thing in the section that has to be read.
+        const zs: number[] = [];
+        for (let z = z0; z >= zEnd; ) {
+            zs.push(z);
+            z -= z > zT ? spacing / 2 : spacing;
+        }
         const verts: number[] = [];
-        [-halfW, halfW].forEach((x) => {
-            verts.push(x, floorY, z0, x, floorY, zEnd);
-            verts.push(x, ceilY, z0, x, ceilY, zEnd);
-        });
-        for (let z = z0; z >= zEnd; z -= spacing / 2) {
-            verts.push(-halfW, floorY, z, halfW, floorY, z);
-            verts.push(-halfW, ceilY, z, halfW, ceilY, z);
+        // Longitudinal rails, sampled rather than drawn as two long lines so
+        // they can follow the flare.
+        for (let i = 0; i < zs.length - 1; i++) {
+            const a = zs[i];
+            const b = zs[i + 1];
+            const wa = wAt(a);
+            const wb = wAt(b);
+            verts.push(-wa, fAt(a), a, -wb, fAt(b), b);
+            verts.push(wa, fAt(a), a, wb, fAt(b), b);
+            verts.push(-wa, cAt(a), a, -wb, cAt(b), b);
+            verts.push(wa, cAt(a), a, wb, cAt(b), b);
+        }
+        for (const z of zs) {
+            const w = wAt(z);
+            verts.push(-w, fAt(z), z, w, fAt(z), z);
+            verts.push(-w, cAt(z), z, w, cAt(z), z);
         }
         for (let i = 0; i < n; i++) {
             const z = -i * spacing;
@@ -187,6 +268,79 @@ function CorridorGrid({
     return (
         <lineSegments geometry={geo} frustumCulled={false}>
             <lineBasicMaterial color={INK} transparent opacity={0.14} />
+        </lineSegments>
+    );
+}
+
+/**
+ * The finale threshold: a doorframe at the far end of the aisle, drawn once
+ * and never moved.
+ *
+ * It is deliberately *not* revealed — it sits in the geometry from the first
+ * frame, dissolved into the paper by the scene fog, and simply resolves as
+ * the camera closes on it. That's the whole trick: nothing arrives, the
+ * visitor does. Two nested rectangles rather than one, so it reads as a frame
+ * with a reveal (an architrave) instead of a rectangle on a wall — the same
+ * hairline-and-inset language the page's rules and tiles use.
+ *
+ * Drawn a touch stronger than the 0.14 rails so that at the moment of arrival
+ * it is the one line-weight in the frame that has any authority.
+ */
+function Threshold({
+    n,
+    spacing,
+    halfW,
+    spacingX,
+    isMobile,
+}: {
+    n: number;
+    spacing: number;
+    halfW: number;
+    spacingX: number;
+    isMobile: boolean;
+}) {
+    const geo = useMemo(() => {
+        const v: number[] = [];
+        if (isMobile) {
+            // Same doorframe, read flat: the rail has no depth to look down,
+            // so the portal is a rectangle standing on the track at the
+            // threshold slot, spanning the rail's own floor/ceiling. The
+            // finale copy lands inside it exactly as it does on desktop —
+            // deliberately not a single centre upright, which would draw a
+            // line straight through the sentence.
+            const x = (n - 1 + FINALE_RUN_M) * spacingX;
+            const z = -0.95;
+            const f = -1.3;
+            const c = 1.15;
+            const w = spacingX * 0.42;
+            const rect = (hw: number, y0: number, y1: number) => {
+                v.push(x - hw, y0, z, x + hw, y0, z);
+                v.push(x - hw, y1, z, x + hw, y1, z);
+                v.push(x - hw, y0, z, x - hw, y1, z);
+                v.push(x + hw, y0, z, x + hw, y1, z);
+            };
+            rect(w, f, c);
+            rect(w - spacingX * 0.022, f + 0.09, c - 0.09);
+        } else {
+            const zT = -(n - 1 + FINALE_RUN) * spacing;
+            const f = -1.05;
+            const c = 1.6;
+            const rect = (w: number, y0: number, y1: number) => {
+                v.push(-w, y0, zT, w, y0, zT);
+                v.push(-w, y1, zT, w, y1, zT);
+                v.push(-w, y0, zT, -w, y1, zT);
+                v.push(w, y0, zT, w, y1, zT);
+            };
+            rect(halfW, f, c);
+            rect(halfW - 0.14, f + 0.1, c - 0.1);
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
+        return g;
+    }, [n, spacing, halfW, spacingX, isMobile]);
+    return (
+        <lineSegments geometry={geo} frustumCulled={false}>
+            <lineBasicMaterial color={INK} transparent opacity={0.34} />
         </lineSegments>
     );
 }
@@ -209,11 +363,13 @@ function CameraRig({ intensity = 1 }: { intensity?: number }) {
 function CorridorScene({
     items,
     activeFloat,
+    finale,
     isMobile,
     onSelect,
 }: {
     items: any[];
     activeFloat: number;
+    finale: number;
     isMobile: boolean;
     onSelect: (i: number) => void;
 }) {
@@ -278,14 +434,31 @@ function CorridorScene({
         return slotPx / pxPerUnit;
     }, [camera, size, isMobile]);
 
+    // One continuous position along the aisle: projects 0..n-1, then the
+    // finale's walk out to the threshold. Everything downstream (group
+    // translation, per-card distance, fade, culling) reads `walk`, so the
+    // last card correctly passes the camera and falls away during the finale
+    // instead of staying pinned at full opacity on a plane the camera has
+    // already left.
+    const run = isMobile ? FINALE_RUN_M : FINALE_RUN;
+    const walk = activeFloat + smoothstep(finale) * run;
+
+    // On desktop the frames leave on their own: the camera walks past them
+    // and nearFade takes them out. The lateral rail has no "past" — a card
+    // slid one slot left is still sitting there at the edge of the screen —
+    // so the finale has to let them go explicitly. They're gone by the time
+    // the copy starts arriving, leaving the rail, the threshold and the
+    // words, which is the same frame desktop ends on.
+    const exitFade = isMobile
+        ? 1 - smoothstep((finale - 0.05) / 0.3)
+        : 1;
+
     useFrame((_, dt) => {
         if (!groupRef.current) return;
         if (isMobile) {
-            const targetX = -activeFloat * spacingX;
-            groupRef.current.position.x = damp(groupRef.current.position.x, targetX, 8, dt);
+            groupRef.current.position.x = damp(groupRef.current.position.x, -walk * spacingX, 8, dt);
         } else {
-            const targetZ = activeFloat * spacing;
-            groupRef.current.position.z = damp(groupRef.current.position.z, targetZ, 8, dt);
+            groupRef.current.position.z = damp(groupRef.current.position.z, walk * spacing, 8, dt);
         }
     });
 
@@ -311,9 +484,16 @@ function CorridorScene({
             ) : (
                 <CorridorGrid n={n} spacing={spacing} halfW={halfW} />
             )}
+            <Threshold
+                n={n}
+                spacing={spacing}
+                halfW={halfW}
+                spacingX={spacingX}
+                isMobile={isMobile}
+            />
             {items.map((it, i) => {
                 if (isMobile) {
-                    const d = i - activeFloat;
+                    const d = i - walk;
                     const rank = Math.abs(d);
                     if (rank > mobileWindowRadius) return null;
                     // A shallow, one-directional recede (always away from the
@@ -325,7 +505,7 @@ function CorridorScene({
                     return (
                         <group key={it.slug} position={[i * spacingX, -0.08, -recede]}>
                             <Html center distanceFactor={8.8} style={{ pointerEvents: "auto" }}>
-                                <CorridorCard item={it} idx={i} isActive={i === activeIndex} rank={rank} nearFade={1} isMobile={isMobile} onSelect={onSelect} />
+                                <CorridorCard item={it} idx={i} isActive={i === activeIndex} rank={rank} nearFade={exitFade} isMobile={isMobile} onSelect={onSelect} />
                             </Html>
                         </group>
                     );
@@ -335,7 +515,7 @@ function CorridorScene({
                 // camera and the active card. Html scales as 1/distance, so
                 // those balloon (at d = -2 the card renders ~4x size and spills
                 // off-screen). Cull them early and fade them out on approach.
-                const d = i - activeFloat;
+                const d = i - walk;
                 if (d < -NEAR_CULL || d > windowRadius + 0.5) return null;
                 const nearFade = d < 0 ? Math.max(0, 1 + d / NEAR_CULL) : 1;
                 const rank = Math.max(0, d);
@@ -355,11 +535,13 @@ function CorridorScene({
 export default function WorkCorridor3D({
     items,
     activeFloat,
+    finale,
     isMobile,
     onSelect,
 }: {
     items: any[];
     activeFloat: number;
+    finale: number;
     isMobile: boolean;
     onSelect: (i: number) => void;
 }) {
@@ -387,7 +569,7 @@ export default function WorkCorridor3D({
                 straight run — see CorridorRail's bendDepth comment. */}
             <fog attach="fog" args={[PAPER, isMobile ? 9 : 11, isMobile ? 15 : 30]} />
             <CameraRig intensity={isMobile ? 0.3 : 1} />
-            <CorridorScene items={items} activeFloat={activeFloat} isMobile={isMobile} onSelect={onSelect} />
+            <CorridorScene items={items} activeFloat={activeFloat} finale={finale} isMobile={isMobile} onSelect={onSelect} />
         </Canvas>
     );
 }

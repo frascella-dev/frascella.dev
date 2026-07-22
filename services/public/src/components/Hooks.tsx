@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 
-import {
-    CONSOLE_UNLOCK_EVENT,
-    isConsoleUnlocked,
-} from "../lib/consoleUnlock.ts";
-
 // Intersection-based reveal
 export function useReveal<T extends HTMLElement = HTMLElement>(
     options: IntersectionObserverInit = {},
@@ -102,64 +97,6 @@ export function useScrollY(): number {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
     return y;
-}
-
-/**
- * True only on a real desktop: a wide viewport AND a precise primary pointer.
- *
- * Gates the console and everything downstream of it (the xterm terminal, the
- * shell, the games). Width alone isn't enough — a landscape tablet clears
- * 1024px but has no keyboard, and a terminal you can't type into is worse
- * than no terminal. `pointer: fine` is the honest test for "there is a mouse
- * and, in practice, a keyboard"; laptops with touchscreens still report fine
- * for their primary pointer, so they're correctly included.
- *
- * Re-evaluated on change, so rotating a tablet or resizing a window takes
- * effect immediately rather than being frozen at first paint.
- */
-const DESKTOP_QUERY = "(min-width: 1024px) and (pointer: fine)";
-
-export function useIsDesktop(): boolean {
-    const [isDesktop, setIsDesktop] = useState(
-        () =>
-            typeof window !== "undefined" &&
-            window.matchMedia(DESKTOP_QUERY).matches,
-    );
-    useEffect(() => {
-        const mq = window.matchMedia(DESKTOP_QUERY);
-        const on = () => setIsDesktop(mq.matches);
-        mq.addEventListener("change", on);
-        on();
-        return () => mq.removeEventListener("change", on);
-    }, []);
-    return isDesktop;
-}
-
-/**
- * True once the console easter egg has been unlocked (see lib/consoleUnlock).
- *
- * Reads localStorage once, then follows the in-page unlock event, so catching
- * the ship reveals the console immediately instead of on the next reload. The
- * cross-tab `storage` event is honoured too — cheap, and it keeps a second tab
- * of the site honest.
- */
-export function useConsoleUnlocked(): boolean {
-    const [unlocked, setUnlocked] = useState(isConsoleUnlocked);
-    useEffect(() => {
-        if (unlocked) return;
-        // The in-page event latches unconditionally: the catch happened here,
-        // so it counts even if localStorage refused the write.
-        const onUnlock = () => setUnlocked(true);
-        const onStorage = () => setUnlocked(isConsoleUnlocked());
-        window.addEventListener(CONSOLE_UNLOCK_EVENT, onUnlock);
-        window.addEventListener("storage", onStorage);
-        onStorage();
-        return () => {
-            window.removeEventListener(CONSOLE_UNLOCK_EVENT, onUnlock);
-            window.removeEventListener("storage", onStorage);
-        };
-    }, [unlocked]);
-    return unlocked;
 }
 
 // Clock (for live time)
