@@ -17,4 +17,7 @@ export type ExperimentMeta = {
     blurb: string;
     /** Optional short tags shown as mono labels. */
     tags?: string[];
+    /** Which part of the site this experiment feeds — groups the lab index.
+     *  Omitted → treated as "misc". */
+    category?: "work" | "timeline" | "games" | "misc";
 };

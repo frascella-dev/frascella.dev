@@ -374,7 +374,7 @@ export default function Contact() {
             className={`ef-contact ${shown ? "is-in" : ""}`}
             id="contact"
             ref={setRefs}
-            data-screen-label="05 Contact"
+            data-screen-label="04 Contact"
             data-cursor-scheme="dark"
         >
             <div className="ef-colophon">

@@ -4,7 +4,7 @@ import { Html, Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import LabStage from "../../LabStage.tsx";
 import { timeline } from "../../../data/timeline.ts";
-import "./bigbang.css";
+import "./timeline.css";
 
 // A "big bang" reading of the About timeline, in two variants:
 //

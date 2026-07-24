@@ -23,6 +23,36 @@ const experiments = Object.entries(metaModules)
     .map(([path, mod]) => ({ meta: mod.default, folder: folderOf(path) }))
     .sort((a, b) => a.meta.slug.localeCompare(b.meta.slug));
 
+// The index is grouped by what each experiment feeds (ExperimentMeta.category).
+// Each category is a tab; order is fixed; an empty category is dropped; anything
+// without a category falls into "misc". IDX numbers restart per category.
+const CATEGORY_ORDER: { key: NonNullable<ExperimentMeta["category"]>; label: string }[] = [
+    { key: "work", label: "work" },
+    { key: "timeline", label: "timeline" },
+    { key: "games", label: "games" },
+    { key: "misc", label: "misc" },
+];
+
+const groupedExperiments = CATEGORY_ORDER.map(({ key, label }) => ({
+    key,
+    label,
+    items: experiments
+        .filter((e) => (e.meta.category ?? "misc") === key)
+        .map((e, i) => ({ ...e, n: i + 1 })),
+})).filter((g) => g.items.length > 0);
+
+// The active tab lives in the URL (?cat=…) so a reload or a browser-back lands
+// on the same category. `lastCat` remembers it across in-app navigation too —
+// the "← lab" link builds a fresh /lab URL that wouldn't otherwise carry the
+// query, so it reads this instead.
+const VALID_CATS = new Set<string>(groupedExperiments.map((g) => g.key));
+let lastCat: string | null = null;
+
+function readCatFromUrl(): string | null {
+    const cat = new URLSearchParams(location.search).get("cat");
+    return cat && VALID_CATS.has(cat) ? cat : null;
+}
+
 function lazyFor(slug: string) {
     const entry = Object.entries(componentModules).find(
         ([path]) => folderOf(path) === slug,
@@ -40,7 +70,9 @@ function useLabRoute() {
         return () => window.removeEventListener("popstate", on);
     }, []);
     const go = (to: string | null) => {
-        history.pushState({}, "", to ? `/lab/${to}` : "/lab");
+        // Returning to the index restores the last tab via its query param.
+        const url = to ? `/lab/${to}` : lastCat ? `/lab?cat=${lastCat}` : "/lab";
+        history.pushState({}, "", url);
         setSlug(to);
         window.scrollTo(0, 0);
     };
@@ -48,6 +80,24 @@ function useLabRoute() {
 }
 
 function Index({ go }: { go: (slug: string) => void }) {
+    const [activeCat, setActiveCat] = useState(
+        () => readCatFromUrl() ?? lastCat ?? groupedExperiments[0]?.key ?? "misc",
+    );
+    const current =
+        groupedExperiments.find((g) => g.key === activeCat) ??
+        groupedExperiments[0];
+
+    // Reflect the shown tab in the URL (?cat=…) and remember it, so a reload,
+    // a browser-back, or the in-app "← lab" link all restore this tab.
+    const selectCat = (key: string) => {
+        setActiveCat(key);
+        lastCat = key;
+        history.replaceState({}, "", `/lab?cat=${key}`);
+    };
+    useEffect(() => {
+        if (current && readCatFromUrl() !== current.key) selectCat(current.key);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     return (
         <div className="lab-index">
             <header className="lab-index-head">
@@ -62,13 +112,39 @@ function Index({ go }: { go: (slug: string) => void }) {
                 <span className="ef-label lab-devflag">dev only</span>
             </header>
 
-            {experiments.length === 0 ? (
+            {groupedExperiments.length === 0 || !current ? (
                 <p className="lab-empty ef-label">no experiments yet</p>
             ) : (
-                <ul className="lab-grid">
-                    {experiments.map((e, i) => (
-                        <li key={e.meta.slug}>
+                <div className="lab-browser">
+                    <nav
+                        className="lab-tabs"
+                        role="tablist"
+                        aria-label="experiment categories"
+                    >
+                        {groupedExperiments.map((group) => (
+                            <button
+                                key={group.key}
+                                type="button"
+                                role="tab"
+                                aria-selected={group.key === current.key}
+                                className={`ef-label lab-tab ${
+                                    group.key === current.key ? "is-active" : ""
+                                }`}
+                                data-cursor="link"
+                                onClick={() => selectCat(group.key)}
+                            >
+                                <span>{group.label}</span>
+                                <span className="ef-mono lab-tab-count">
+                                    {String(group.items.length).padStart(2, "0")}
+                                </span>
+                            </button>
+                        ))}
+                    </nav>
+
+                    <div className="lab-cols" key={current.key}>
+                        {current.items.map((e) => (
                             <a
+                                key={e.meta.slug}
                                 href={`/lab/${e.meta.slug}`}
                                 className="lab-card"
                                 data-cursor="link"
@@ -78,7 +154,7 @@ function Index({ go }: { go: (slug: string) => void }) {
                                 }}
                             >
                                 <span className="ef-label">
-                                    IDX — {String(i + 1).padStart(2, "0")}
+                                    IDX — {String(e.n).padStart(2, "0")}
                                 </span>
                                 <span className="lab-card-title ef-h3">
                                     {e.meta.title}
@@ -94,9 +170,9 @@ function Index({ go }: { go: (slug: string) => void }) {
                                     </span>
                                 )}
                             </a>
-                        </li>
-                    ))}
-                </ul>
+                        ))}
+                    </div>
+                </div>
             )}
         </div>
     );

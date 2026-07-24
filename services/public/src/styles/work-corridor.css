@@ -194,10 +194,50 @@
   background: var(--accent);
   z-index: -1;
 }
-.ef-work-finale-foot {
-  color: var(--ink-mute);
-  letter-spacing: 0.14em;
+/* The GitHub exit: the finale's one real affordance, a plain hairline text
+   link — not a button, not the door/threshold this used to be — landing
+   last, after the sentence. Same visual language the old .ef-work-strip-link
+   used (work.css), which this replaces as the section's only "go to GitHub"
+   affordance; see .ef-work-strip there for the strip that no longer repeats
+   it. */
+.ef-work-finale-link {
+  position: relative;
+  pointer-events: auto;
+  text-decoration: none;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: clamp(15px, 1.8vw, 22px);
+  letter-spacing: -0.015em;
   will-change: opacity, transform;
+}
+.ef-work-finale-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+.ef-work-finale-link:hover::after,
+.ef-work-finale-link:focus-visible::after { transform: scaleX(1); }
+.ef-work-finale-link:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: 6px;
+}
+.ef-work-finale-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s var(--ease);
+}
+.ef-work-finale-link:hover .ef-work-finale-link-arrow,
+.ef-work-finale-link:focus-visible .ef-work-finale-link-arrow {
+  transform: translate(4px, -4px);
 }
 
 /* --- Fallback manifest (no-3D / reduced-motion / pre-load) --- */
@@ -320,7 +360,39 @@
   background: var(--accent);
   z-index: -1;
 }
-.ef-work-fallback-end-count { color: var(--ink-mute); letter-spacing: 0.14em; }
+/* Reduced-motion / no-3D parity for the finale link: the same exit, stated
+   rather than walked to — same URL, same wording, same hairline-underline
+   language as .ef-work-finale-link, just present from the start instead of
+   scroll-revealed (nothing here is scroll-driven under reduced motion). */
+.ef-work-fallback-end-link {
+  position: relative;
+  margin-top: 4px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: clamp(15px, 2vw, 19px);
+  letter-spacing: -0.015em;
+}
+.ef-work-fallback-end-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease);
+}
+.ef-work-fallback-end-link:hover::after,
+.ef-work-fallback-end-link:focus-visible::after { transform: scaleX(1); }
+.ef-work-fallback-end-link:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: 6px;
+}
 
 @media (max-width: 1000px) {
   .ef-work-corridor-card {

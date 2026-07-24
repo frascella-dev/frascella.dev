@@ -78,16 +78,16 @@ export default function Hero() {
             <div className="ef-hero-stage">
                 <h1 className="ef-hero-title">
                     <span className="ef-line ef-line--1">
-                        <span className="ef-w">backend</span>
+                        <span className="ef-w">software</span>
                         <em className="ef-w ef-w--em">engineer</em>
                     </span>
                     <span className="ef-line ef-line--2">
-                        <span className="ef-w">&amp;</span>
-                        <span className="ef-w ef-w--thin">occasional</span>
+                        <span className="ef-w ef-w--thin">across</span>
+                        <span className="ef-w">systems</span>
                     </span>
                     <span className="ef-line ef-line--3">
-                        <span className="ef-w ef-w--thin">frontend</span>
-                        <span className="ef-w">author.</span>
+                        <span className="ef-w ef-w--thin">&amp;</span>
+                        <span className="ef-w">interfaces.</span>
                     </span>
                 </h1>
 
@@ -95,9 +95,9 @@ export default function Hero() {
                     <div className="ef-hero-sub-col">
                         <span className="ef-label">idx — 01</span>
                         <p>
-                            Emanuele Frascella. I build the plumbing behind
-                            the product — made to stay up, read clean, and
-                            ship on time.
+                            Emanuele Frascella. I build software meant to
+                            hold up — stable under load, considered in
+                            the details.
                         </p>
                     </div>
                     <div className="ef-hero-sub-col">
@@ -116,7 +116,7 @@ export default function Hero() {
                     <span className="ef-label">lat — 40.47° n</span>
                     <span className="ef-label">lon — 17.24° e</span>
                 </div>
-                <a href="#work" className="ef-hero-scroll" data-cursor="link">
+                <a href="#about" className="ef-hero-scroll" data-cursor="link">
                     <span className="ef-hero-scroll-track">
                         <span className="ef-hero-scroll-dot" />
                     </span>

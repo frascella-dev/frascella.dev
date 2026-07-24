@@ -2,15 +2,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, Line } from "@react-three/drei";
 import * as THREE from "three";
-import LabStage from "../../LabStage.tsx";
-import { projects } from "../../../data/projects.ts";
-import "./showcase.css";
+import LabStage from "../LabStage.tsx";
+import { projects } from "../../data/projects.ts";
+import "./showcase-common.css";
 
-// Three takes on the Work grid, reimagined in space. Same real project data as
-// Work.tsx (src/data/projects.ts) plus the same "coming soon" placeholders that
-// section already shows, so the lab reads honestly rather than inventing ships.
-// Line-based, unlit (meshBasicMaterial / lineBasicMaterial only) — no lights
-// needed, matches the example's flat wireframe language.
+// Shared engine for the six showcase-* experiments. Each is its own card in the
+// lab index (its own folder + meta.ts + a one-line experiment.tsx) but they all
+// render through <ShowcaseStage variant="…" /> here, so the scenes live in one
+// place. Same real project data as Work.tsx (src/data/projects.ts) plus the
+// same "coming soon" placeholders that section already shows, so the lab reads
+// honestly rather than inventing ships. Line-based, unlit (meshBasicMaterial /
+// lineBasicMaterial only) — no lights needed, matching the site's wireframe
+// language.
 
 const WIP_ITEMS = [
     {
@@ -46,15 +49,6 @@ function buildItems() {
     return [...projects.map((p) => ({ ...p, kind: "shipped" })), ...WIP_ITEMS];
 }
 
-const VARIANTS = [
-    { id: 1, label: "carousel" },
-    { id: 2, label: "depth stack" },
-    { id: 3, label: "constellation" },
-    { id: 4, label: "corridor" },
-    { id: 5, label: "exploded" },
-    { id: 6, label: "kinetic type" },
-];
-
 const damp = THREE.MathUtils.damp;
 
 function CardBody({ item, idx }) {
@@ -85,7 +79,7 @@ function CardBody({ item, idx }) {
 
 /* ---------------------------------------------------------------------- */
 /* Rig — a small, constant pointer parallax on the camera, shared by all
-   three variants so the stage always feels alive & spatial.              */
+   variants so the stage always feels alive & spatial.                    */
 /* ---------------------------------------------------------------------- */
 function CameraRig() {
     const { camera, pointer } = useThree();
@@ -101,11 +95,11 @@ function CameraRig() {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 01 — CAROUSEL: a ring of cards you rotate through. Cards stay
-   billboarded to the camera (no per-card rotation) — with only four real
-   slots a true rotisserie shows card backs at 90°/180°; keeping them
-   forward-facing while their position swings around the ring reads just
-   as "carousel" and stays legible at every step.                        */
+/* CAROUSEL: a ring of cards you rotate through. Cards stay billboarded to
+   the camera (no per-card rotation) — with only a handful of real slots a
+   true rotisserie shows card backs at 90°/180°; keeping them forward-facing
+   while their position swings around the ring reads just as "carousel" and
+   stays legible at every step.                                           */
 /* ---------------------------------------------------------------------- */
 // Spokes render above the ring (a halo, not underfoot) so they stay clear of
 // the cards' own DOM — Html panels always paint over the WebGL canvas, so any
@@ -193,8 +187,8 @@ function CarouselScene({ items, active, setActive }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 02 — DEPTH STACK: a receding coverflow, connected by a thin
-   staircase line, with mouse-driven parallax on the whole stack.         */
+/* DEPTH STACK: a receding coverflow, connected by a thin staircase line,
+   with mouse-driven parallax on the whole stack.                         */
 /* ---------------------------------------------------------------------- */
 function StackConnectors({ items, active, n, getRefs }) {
     const railRef = useRef(null);
@@ -285,9 +279,9 @@ function StackScene({ items, active, setActive }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 03 — CONSTELLATION: a node graph around a hub; hover/select
-   pulls a node forward, a docked panel (rendered by the parent) shows
-   its detail so text stays legible regardless of depth.                 */
+/* CONSTELLATION: a node graph around a hub; hover/select pulls a node
+   forward, a docked panel (rendered by the stage) shows its detail so
+   text stays legible regardless of depth.                               */
 /* ---------------------------------------------------------------------- */
 function ConstellationNode({ item, idx, position, active, onHover, onBlur, onSelect }) {
     const ref = useRef(null);
@@ -393,12 +387,12 @@ function ConstellationScene({ items, active, hover, setHover, setActive }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 04 — CORRIDOR: an exhibition hallway. Frames are fixed in world
-   space, alternating left/right down a receding aisle, framed by a
-   hairline floor/ceiling grid with a doorframe upright at each project.
-   Advancing "active" slides the whole hallway toward the camera — the
-   same optical result as dollying forward, without touching the shared
-   CameraRig (which every variant relies on for its parallax + lookAt).  */
+/* CORRIDOR: an exhibition hallway. Frames are fixed in world space,
+   alternating left/right down a receding aisle, framed by a hairline
+   floor/ceiling grid with a doorframe upright at each project. Advancing
+   "active" slides the whole hallway toward the camera — the same optical
+   result as dollying forward, without touching the shared CameraRig
+   (which every variant relies on for its parallax + lookAt).            */
 /* ---------------------------------------------------------------------- */
 function CorridorGrid({ n, spacing, halfW }) {
     const geo = useMemo(() => {
@@ -489,11 +483,11 @@ function CorridorScene({ items, active, setActive }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 05 — EXPLODED LAYERS: the focused project's own fields burst
-   into parallel planes receding in Z (a mechanical exploded-view read on
-   a single "part"), tied back to a stepped leader line + a fixed core
-   mark at the origin they emerge from. Swapping the active project keys
-   a fresh instance, so it collapses back to the core and re-explodes.   */
+/* EXPLODED LAYERS: the focused project's own fields burst into parallel
+   planes receding in Z (a mechanical exploded-view read on a single
+   "part"), tied back to a stepped leader line + a fixed core mark at the
+   origin they emerge from. Swapping the active project keys a fresh
+   instance, so it collapses back to the core and re-explodes.           */
 /* ---------------------------------------------------------------------- */
 const EXPLODE_LAYOUT = [
     { key: "head", y: 1.62, z: 1.35 },
@@ -642,12 +636,12 @@ function ExplodedScene({ items, active, setActive }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Variant 06 — KINETIC TYPE: titles as the interface — a line of giant
-   words you scrub through by bringing one to center. A hairline baseline
-   with a tick per title gives it geometry; a docked panel (as in 03)
-   carries the tagline/stack since the type itself only ever shows a
-   title. Kept as plain (non-rotated) DOM text — no CSS-3D rotation, so
-   no risk of the mirrored-backface bug the flat cards would hit.        */
+/* KINETIC TYPE: titles as the interface — a line of giant words you scrub
+   through by bringing one to center. A hairline baseline with a tick per
+   title gives it geometry; a docked panel (as in constellation) carries
+   the tagline/stack since the type itself only ever shows a title. Kept
+   as plain (non-rotated) DOM text — no CSS-3D rotation, so no risk of the
+   mirrored-backface bug the flat cards would hit.                        */
 /* ---------------------------------------------------------------------- */
 function KineticScene({ items, active, setActive }) {
     const offsets = useMemo(() => {
@@ -701,19 +695,68 @@ function KineticScene({ items, active, setActive }) {
     );
 }
 
-export default function Showcase() {
+/* ---------------------------------------------------------------------- */
+/* Per-variant config + the shared stage. Each showcase-* experiment is a
+   one-line wrapper: <ShowcaseStage variant="carousel" /> etc.           */
+/* ---------------------------------------------------------------------- */
+export const SHOWCASE_VARIANTS = {
+    carousel: {
+        idx: "01",
+        label: "carousel",
+        Scene: CarouselScene,
+        nav: true,
+        detail: false,
+    },
+    stack: {
+        idx: "02",
+        label: "depth stack",
+        Scene: StackScene,
+        nav: true,
+        detail: false,
+    },
+    constellation: {
+        idx: "03",
+        label: "constellation",
+        Scene: ConstellationScene,
+        nav: false,
+        detail: true,
+        detailTitle: true,
+        hint: "hover / click a node",
+        hover: true,
+    },
+    corridor: {
+        idx: "04",
+        label: "corridor",
+        Scene: CorridorScene,
+        nav: true,
+        detail: false,
+    },
+    exploded: {
+        idx: "05",
+        label: "exploded",
+        Scene: ExplodedScene,
+        nav: true,
+        detail: false,
+    },
+    kinetic: {
+        idx: "06",
+        label: "kinetic type",
+        Scene: KineticScene,
+        nav: true,
+        detail: true,
+        detailWithNav: true,
+    },
+};
+
+export function ShowcaseStage({ variant }) {
+    const cfg = SHOWCASE_VARIANTS[variant];
     const items = useMemo(buildItems, []);
     const n = items.length;
-    const [variant, setVariant] = useState(1);
     const [active, setActive] = useState(0);
     const [hover, setHover] = useState(null);
 
     useEffect(() => {
         const onKey = (e) => {
-            if (["1", "2", "3", "4", "5", "6"].includes(e.key)) {
-                setVariant(Number(e.key));
-                return;
-            }
             if (e.key === "ArrowRight") setActive((a) => (a + 1) % n);
             else if (e.key === "ArrowLeft") setActive((a) => (a - 1 + n) % n);
         };
@@ -721,39 +764,23 @@ export default function Showcase() {
         return () => window.removeEventListener("keydown", onKey);
     }, [n]);
 
-    const variantMeta = VARIANTS.find((v) => v.id === variant);
     const detailItem = items[hover ?? active];
+    const labStageHint = cfg.hint ?? (cfg.nav ? "←/→ select · click a card" : undefined);
 
     return (
         <LabStage
-            idx="02"
-            title="project showcase — 3d"
+            idx={cfg.idx}
+            title={`showcase — ${cfg.label}`}
             tag="showcase"
-            hint="1–6 variant · ←/→ select · click a card"
+            hint={labStageHint}
         >
             <div className="showcase-root">
                 <div className="showcase-hud showcase-hud-top">
-                    <span className="ef-label showcase-variant-label">
-                        variant — {String(variant).padStart(2, "0")} / {variantMeta.label}
-                    </span>
+                    <span className="ef-label showcase-variant-label">{cfg.label}</span>
                     <span className="ef-label showcase-variant-count">{n} projects</span>
                 </div>
 
-                <div className="showcase-hud showcase-switch">
-                    {VARIANTS.map((v) => (
-                        <button
-                            key={v.id}
-                            type="button"
-                            data-active={v.id === variant}
-                            onClick={() => setVariant(v.id)}
-                            data-cursor="view"
-                        >
-                            {String(v.id).padStart(2, "0")}
-                        </button>
-                    ))}
-                </div>
-
-                {variant !== 3 && (
+                {cfg.nav && (
                     <div className="showcase-hud showcase-nav">
                         <button
                             type="button"
@@ -777,11 +804,11 @@ export default function Showcase() {
                     </div>
                 )}
 
-                {(variant === 3 || variant === 6) && (
+                {cfg.detail && (
                     <div
                         className="showcase-hud showcase-detail"
                         data-visible={detailItem ? "true" : "false"}
-                        data-with-nav={variant === 6}
+                        data-with-nav={cfg.detailWithNav ? "true" : undefined}
                     >
                         {detailItem && (
                             <>
@@ -789,7 +816,9 @@ export default function Showcase() {
                                     № {String((hover ?? active) + 1).padStart(2, "0")} —{" "}
                                     {detailItem.kind === "wip" ? "WIP" : detailItem.year}
                                 </span>
-                                {variant === 3 && <span className="showcase-detail-title">{detailItem.title}</span>}
+                                {cfg.detailTitle && (
+                                    <span className="showcase-detail-title">{detailItem.title}</span>
+                                )}
                                 <p className="showcase-detail-tag">{detailItem.tagline}</p>
                                 <ul className="showcase-detail-stack" aria-hidden>
                                     {(detailItem.stack || []).slice(0, 5).map((s) => (
@@ -801,16 +830,16 @@ export default function Showcase() {
                     </div>
                 )}
 
-                {variant === 3 && (
-                    <span className="showcase-hud showcase-hint ef-label">hover / click a node</span>
-                )}
-
                 <Canvas camera={{ position: [0, 0.75, 7.4], fov: 40 }} gl={{ antialias: true }}>
                     <color attach="background" args={["#EEEAE0"]} />
                     <CameraRig />
-                    {variant === 1 && <CarouselScene items={items} active={active} setActive={setActive} />}
-                    {variant === 2 && <StackScene items={items} active={active} setActive={setActive} />}
-                    {variant === 3 && (
+                    {variant === "carousel" && (
+                        <CarouselScene items={items} active={active} setActive={setActive} />
+                    )}
+                    {variant === "stack" && (
+                        <StackScene items={items} active={active} setActive={setActive} />
+                    )}
+                    {variant === "constellation" && (
                         <ConstellationScene
                             items={items}
                             active={active}
@@ -819,9 +848,15 @@ export default function Showcase() {
                             setActive={setActive}
                         />
                     )}
-                    {variant === 4 && <CorridorScene items={items} active={active} setActive={setActive} />}
-                    {variant === 5 && <ExplodedScene items={items} active={active} setActive={setActive} />}
-                    {variant === 6 && <KineticScene items={items} active={active} setActive={setActive} />}
+                    {variant === "corridor" && (
+                        <CorridorScene items={items} active={active} setActive={setActive} />
+                    )}
+                    {variant === "exploded" && (
+                        <ExplodedScene items={items} active={active} setActive={setActive} />
+                    )}
+                    {variant === "kinetic" && (
+                        <KineticScene items={items} active={active} setActive={setActive} />
+                    )}
                 </Canvas>
             </div>
         </LabStage>

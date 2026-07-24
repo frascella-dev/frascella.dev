@@ -78,8 +78,8 @@ export default function App() {
                 ) : (
                     <>
                         <Hero />
-                        <Work />
                         <About timeline={timeline} />
+                        <Work />
                         <Contact />
                     </>
                 )}

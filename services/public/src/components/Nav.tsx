@@ -40,7 +40,7 @@ export default function Nav() {
 
     useEffect(() => {
         if (onDetail) return;
-        const ids = ['top', 'work', 'about', 'contact'];
+        const ids = ['top', 'about', 'work', 'contact'];
         const io = new IntersectionObserver(
             (entries) => {
                 entries.forEach((e) => {
@@ -95,8 +95,8 @@ export default function Nav() {
 
     const items = [
         { id: 'top', n: '01', t: 'Index' },
-        { id: 'work', n: '02', t: 'Work' },
-        { id: 'about', n: '03', t: 'About' },
+        { id: 'about', n: '02', t: 'About' },
+        { id: 'work', n: '03', t: 'Work' },
         { id: 'contact', n: '04', t: 'Contact' },
     ];
 

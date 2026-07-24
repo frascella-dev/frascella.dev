@@ -64,7 +64,7 @@ const pad2 = (n: number) => String(n).padStart(2, "0");
 //        because it covers empty aisle, an arrival, and four lines of text
 //        that have to be legible before anything else happens.
 // TAIL   still on the arrival, before the stage releases into the archive
-//        strip and § 03. Both ends of the pin are stillness; so is the
+//        strip and § 04. Both ends of the pin are stillness; so is the
 //        seam between the last project and the finale.
 //
 // The wrapper is grown by exactly this much, so every beat is bought with
@@ -144,7 +144,6 @@ function WorkCorridorFallback({
     activeIndex: number;
     onSelect: (i: number) => void;
 }) {
-    const shipped = items.filter((it) => it.kind !== "wip").length;
     return (
         <div className="ef-work-fallback">
             <ol className="ef-work-fallback-list">
@@ -201,10 +200,18 @@ function WorkCorridorFallback({
                 <p className="ef-work-fallback-end-line">
                     this is as far as it goes — <em>for now.</em>
                 </p>
-                <span className="ef-mono ef-work-fallback-end-count">
-                    {pad2(shipped)} shipped · {pad2(items.length - shipped)} in
-                    progress
-                </span>
+                <a
+                    className="ef-work-fallback-end-link"
+                    href="https://github.com/manuto276"
+                    target="_blank"
+                    rel="noreferrer"
+                    data-cursor="link"
+                >
+                    <span>more projects on github.com/manuto276</span>
+                    <span aria-hidden>
+                        <IconArrowUpRight size={16} stroke={1.6} />
+                    </span>
+                </a>
             </div>
         </div>
     );
@@ -223,15 +230,20 @@ function WorkCorridorFallback({
  * Every value here is a sub-range of the scroll-derived `finale`, so the
  * reveal scrubs both ways and can't be left half-played by a fast scroll, an
  * anchor jump or a reversal. The order is the reading order: where you are,
- * a rule under it, the sentence, then the count. Nothing else in the frame
+ * a rule under it, the sentence, then the exit. Nothing else in the frame
  * moves while this happens.
  */
-function WorkFinale({ finale, items }: { finale: number; items: any[] }) {
-    const shipped = items.filter((it) => it.kind !== "wip").length;
+function WorkFinale({ finale }: { finale: number }) {
     const rise = (t: number, px: number) => ({
         opacity: t,
         transform: `translate3d(0, ${(1 - t) * px}px, 0)`,
     });
+    // The GitHub exit lands last, once the sentence has already arrived —
+    // its own sub-range of `finale`, same primitive as everything above it,
+    // so it scrubs (and un-scrubs) exactly like the rest of the plate. Sole
+    // "go to GitHub" affordance in the section (see .ef-work-strip in
+    // work.css, which no longer repeats it).
+    const link = seg(finale, 0.74, 0.96);
     return (
         <div className="ef-work-finale">
             <div className="ef-work-finale-inner">
@@ -254,13 +266,22 @@ function WorkFinale({ finale, items }: { finale: number; items: any[] }) {
                         as it goes — <em>for now.</em>
                     </span>
                 </p>
-                <span
-                    className="ef-mono ef-work-finale-foot"
-                    style={rise(seg(finale, 0.74, 0.96), 8)}
+                <a
+                    className="ef-work-finale-link"
+                    href="https://github.com/manuto276"
+                    target="_blank"
+                    rel="noreferrer"
+                    data-cursor="link"
+                    style={{
+                        ...rise(link, 8),
+                        pointerEvents: link > 0.4 ? "auto" : "none",
+                    }}
                 >
-                    {pad2(shipped)} shipped · {pad2(items.length - shipped)} in
-                    progress
-                </span>
+                    <span>more projects on github.com/manuto276</span>
+                    <span className="ef-work-finale-link-arrow" aria-hidden>
+                        <IconArrowUpRight size={18} stroke={1.6} />
+                    </span>
+                </a>
             </div>
         </div>
     );
@@ -403,12 +424,12 @@ export default function Work() {
             className={`ef-work ${shown ? "is-in" : ""}`}
             id="work"
             ref={setRefs}
-            data-screen-label="02 Work"
+            data-screen-label="03 Work"
         >
             <div className="ef-work-head">
                 <AmbientField mouse={mouse} />
 
-                <span className="ef-label">§ 02 — Selected work</span>
+                <span className="ef-label">§ 03 — Selected work</span>
                 <h2 className="ef-work-title">
                     <span className="ef-line ef-line--1">
                         <span className="ef-w">systems,</span>
@@ -478,32 +499,21 @@ export default function Work() {
                         )}
                     </div>
                     {showCorridor && (
-                        <WorkFinale finale={finale} items={items} />
+                        <WorkFinale finale={finale} />
                     )}
                 </div>
             </div>
 
-            {/* The handover. The stage releases on a still frame that has
-                just said "this is as far as it goes"; the archive strip is
-                the answer to it, so it arrives on its own beat rather than
-                being dragged up from under the sticky stage. */}
+            {/* The handover. The GitHub exit is already spent — the finale
+                plate's link (or, without 3D, the fallback's closing link)
+                is the one obvious way out, so this strip doesn't repeat
+                it. It closes the record instead: a colophon, not a second
+                CTA. */}
             <div
                 className={`ef-work-strip ${stripShown ? "is-in" : ""}`}
                 ref={stripRef}
             >
                 <span className="ef-label">Archive</span>
-                <a
-                    className="ef-work-strip-link"
-                    href="https://github.com/manuto276"
-                    target="_blank"
-                    rel="noreferrer"
-                    data-cursor="link"
-                >
-                    <span>more projects on github.com/manuto276</span>
-                    <span className="ef-work-strip-arrow" aria-hidden>
-                        <IconArrowUpRight size={20} stroke={1.6} />
-                    </span>
-                </a>
                 <span className="ef-mono">EST. 2021 — ∞</span>
             </div>
         </section>

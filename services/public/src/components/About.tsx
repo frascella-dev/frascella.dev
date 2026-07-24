@@ -224,11 +224,11 @@ function AboutBigBang({ items }: { items: any[] }) {
     return (
         <div className="ef-bb-section">
             <div className="ef-bb-head">
-                {/* 03.1, not 04: the timeline is a subsection of About
-                    (§ 03), not a section of its own — § 04 is the colophon in
+                {/* 02.1, not 03: the timeline is a subsection of About
+                    (§ 02), not a section of its own — § 04 is the colophon in
                     Contact.tsx. The decimal keeps the § pointing at a real
                     number, which is the only thing the sign is for. */}
-                <span className="ef-label">§ 03.1 — Timeline</span>
+                <span className="ef-label">§ 02.1 — Timeline</span>
                 <h3 className="ef-h3 ef-bb-title">
                     <span>not all at once —</span>
                     <em>the way I got here.</em>
@@ -322,7 +322,7 @@ export default function About({ timeline = [] }) {
             className={`ef-about ${shown ? "is-in" : ""}`}
             id="about"
             ref={setRefs}
-            data-screen-label="03 About"
+            data-screen-label="02 About"
         >
             <div className="ef-about-field" aria-hidden>
                 <div className="ef-about-grid-bg" />
@@ -370,7 +370,7 @@ export default function About({ timeline = [] }) {
                 would put it far below the fold instead of where it reads. */}
             <div className="ef-about-content">
                 <div className="ef-about-head">
-                    <span className="ef-label">§ 03 — About</span>
+                    <span className="ef-label">§ 02 — About</span>
                     <h2 className="ef-about-title">
                         <span className="ef-line ef-line--1">
                             <span className="ef-w">building things</span>
@@ -380,7 +380,7 @@ export default function About({ timeline = [] }) {
                             <span className="ef-w ef-w--thin">quietly,</span>
                         </span>
                         <span className="ef-line ef-line--3">
-                            <span className="ef-w ef-w--thin">and reliably.</span>
+                            <span className="ef-w ef-w--thin">and well.</span>
                         </span>
                     </h2>
                 </div>
@@ -389,12 +389,12 @@ export default function About({ timeline = [] }) {
                     <div className="ef-about-lead">
                         <span className="ef-label">idx — 01</span>
                         <p className="ef-about-lead-text">
-                            I work across the whole stack, but my centre of
-                            gravity is the backend —
+                            I work across the whole stack — the data and
+                            contracts underneath, the surface people
+                            actually touch —
                             <em>
                                 {" "}
-                                the data, the contracts, the logic the rest
-                                of it leans on.
+                                same standard, either layer.
                             </em>
                         </p>
                     </div>
@@ -430,10 +430,10 @@ export default function About({ timeline = [] }) {
                         <div className="ef-about-col">
                             <span className="ef-label">idx — 02</span>
                             <p>
-                                I'll take the frontend when the brief calls
-                                for it. I care about work that's well-made —
-                                a query that comes back fast, a deploy that
-                                surprises no one on Monday.
+                                I care about work that's well-made — a
+                                query that comes back fast, an interface
+                                that doesn't make you think twice, a deploy
+                                that surprises no one on Monday.
                             </p>
                         </div>
                         <div className="ef-about-col">

@@ -43,30 +43,78 @@
     white-space: nowrap;
 }
 
-.lab-grid {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
+/* tabbed browser: one category at a time */
+.lab-browser {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+.lab-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-bottom: 1px solid var(--rule);
+}
+.lab-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    color: var(--ink-mute);
+    cursor: pointer;
+    position: relative;
+    top: 1px; /* drop the active tab onto the rule so they read as connected */
+    transition: color 0.3s var(--ease), background 0.3s var(--ease),
+        border-color 0.3s var(--ease);
+}
+.lab-tab:hover {
+    color: var(--ink-2);
+}
+.lab-tab.is-active {
+    color: var(--ink);
+    background: var(--paper);
+    border-color: var(--rule);
+    border-bottom-color: var(--paper);
+}
+.lab-tab-count {
+    color: var(--ink-mute);
+}
+
+/* masonry columns — cards flow at their natural height, no rigid rows */
+.lab-cols {
+    columns: 320px 4;
+    column-gap: 16px;
+    animation: lab-cols-in 0.35s var(--ease);
+}
+@keyframes lab-cols-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 .lab-card {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 32px 28px 36px;
+    padding: 28px 26px 30px;
     background: var(--paper);
     text-decoration: none;
     color: var(--ink);
-    min-height: 240px;
-    transition: background 0.4s var(--ease);
+    border: 1px solid var(--rule);
+    break-inside: avoid;
+    margin-bottom: 16px;
+    transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
 }
 .lab-card:hover {
     background: var(--paper-2);
-}
-.lab-card-title {
-    margin-top: auto;
+    border-color: var(--rule-strong);
 }
 .lab-card-blurb {
     font-family: var(--sans);

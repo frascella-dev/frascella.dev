@@ -6,4 +6,5 @@ export default {
     blurb:
         "The console's pong, restyled into the asteroids register — wireframe paddles, a tumbling ball with an orange tracer, shard bursts on every rally. CPU or two-player.",
     tags: ["r3f", "game"],
+    category: "games",
 } satisfies ExperimentMeta;

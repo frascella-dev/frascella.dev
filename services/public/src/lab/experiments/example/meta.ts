@@ -5,4 +5,5 @@ export default {
     title: "hello wireframe",
     blurb: "Reference pattern — react-three-fiber inside LabStage, portfolio palette (paper bg, ink wireframe).",
     tags: ["r3f", "reference"],
+    category: "misc",
 } satisfies ExperimentMeta;
