@@ -2,15 +2,16 @@
 
 Personal portfolio of **Emanuele Frascella**, backend engineer (Taranto, Italy).
 
-Two independent services:
+Independent services:
 
 | Path              | Stack              | Role                                                                 |
 | ----------------- | ------------------ | ------------------------------------------------------------------- |
-| `services/public` | React + Vite (SPA) | The public portfolio site — design-led, client-side only.           |
+| `services/site`   | Astro + React islands | The public portfolio site — design-led, client-rendered, no SSR.  |
+| `services/lab`    | React + Vite (SPA) | Standalone three.js experimentation lab (dev playground).           |
 | `services/api`    | NestJS (Node)      | Thin, stateless API. Server-side effects only (today: contact email). |
 
-No database, no admin, no SSR. The SPA talks to the API over CORS through a
-single endpoint (`POST /api/contact`).
+No database, no admin, no SSR. The portfolio talks to the API over CORS through
+a single endpoint (`POST /api/contact`).
 
 ## Quick start
 
@@ -21,7 +22,10 @@ Run each service in its own terminal:
 cd services/api    && cp .env.example .env && npm install && npm run dev
 
 # Public site — http://localhost:5173
-cd services/public && cp .env.example .env && npm install && npm run dev
+cd services/site && cp .env.example .env && npm install && npm run dev
+
+# three.js lab — http://localhost:5174 (optional, standalone)
+cd services/lab    && npm install && npm run dev
 ```
 
 The API logs contact messages to the console instead of sending them until
@@ -31,13 +35,14 @@ The API logs contact messages to the console instead of sending them until
 
 ```bash
 cd services/api    && npm run build
-cd services/public && npm run build
+cd services/site && npm run build
 ```
 
 ## Layout
 
 ```
-services/public   React + Vite SPA
+services/site     Astro + React islands (portfolio)
+services/lab      React + Vite SPA (three.js lab)
 services/api      NestJS API
 .devcontainer     client/ + server/ dev containers
 .claude           agents (architect/frontend/backend) + /ship command

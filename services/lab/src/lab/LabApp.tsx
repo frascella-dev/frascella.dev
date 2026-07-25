@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import type { ComponentType } from "react";
 import type { ExperimentMeta } from "./experiments/types.ts";
-import CustomCursor from "../components/CustomCursor.tsx";
 import "./lab.css";
 
 // Experiments are auto-discovered — drop a folder under experiments/<slug>/ with
@@ -224,12 +223,6 @@ function LabRoutes() {
 }
 
 export default function LabApp() {
-    // The lab renders as its own root, so it needs the custom cursor too — the
-    // native one is hidden globally in base.css.
-    return (
-        <>
-            <CustomCursor />
-            <LabRoutes />
-        </>
-    );
+    // A plain three.js testing harness — native cursor, no chrome.
+    return <LabRoutes />;
 }

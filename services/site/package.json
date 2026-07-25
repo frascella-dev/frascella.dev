@@ -1,0 +1,33 @@
+{
+    "name": "@portfolio/site",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Emanuele Frascella — public portfolio (Astro + React islands)",
+    "scripts": {
+        "dev": "astro dev --port 5173 --host",
+        "build": "astro build",
+        "preview": "astro preview --port 5173",
+        "astro": "astro",
+        "typecheck": "astro check"
+    },
+    "dependencies": {
+        "@astrojs/react": "^4.2.0",
+        "@react-three/drei": "^9.122.0",
+        "@react-three/fiber": "^8.18.0",
+        "@tabler/icons-react": "^3.41.1",
+        "astro": "^5.13.0",
+        "axios": "^1.7.9",
+        "lenis": "^1.1.18",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "three": "^0.169.0"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.4",
+        "@types/react": "^18.3.12",
+        "@types/react-dom": "^18.3.1",
+        "@types/three": "^0.169.0",
+        "typescript": "^5.6.3"
+    }
+}

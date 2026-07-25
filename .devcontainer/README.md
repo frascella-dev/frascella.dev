@@ -3,9 +3,9 @@
 Two independent dev containers, one per service, sharing a single
 `docker-compose.yml`.
 
-- **`client/`** → the `client` compose service. React + Vite SPA
-  (`services/public`), Vite dev server on **5173**. Workspace folder is
-  `services/public`.
+- **`client/`** → the `client` compose service. Astro + React islands
+  (`services/site`), dev server on **5173**. Workspace folder is
+  `services/site`.
 - **`server/`** → the `server` compose service. NestJS API (`services/api`),
   listening on **3000**. Workspace folder is `services/api`.
 

@@ -6,10 +6,10 @@ services:
     client:
         image: node:20-bookworm
         container_name: portfolio-client
-        working_dir: /workspace/services/public
+        working_dir: /workspace/services/site
         volumes:
             - ../:/workspace:cached
-            - client-node-modules:/workspace/services/public/node_modules
+            - client-node-modules:/workspace/services/site/node_modules
         ports:
             - "5173:5173"
         environment:
