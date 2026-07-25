@@ -5,7 +5,7 @@ vendor-neutral companion to `CLAUDE.md` — read that first for the project map.
 
 ## The repo in one breath
 
-A two-service monorepo: `services/public` (React + Vite portfolio SPA) and
+A two-service monorepo: `services/site` (React + Vite portfolio SPA) and
 `services/api` (NestJS, sends the contact email). No database, no admin, no
 Laravel. The client/server seam is a single CORS request to `/api/contact`
 with a `422 { message, errors }` validation contract.
@@ -18,7 +18,7 @@ server, and produce an ordered implementation plan citing `file:line`. Does not
 edit files; hands work to `frontend`/`backend`. Use before non-trivial features.
 
 ### `frontend` — the portfolio SPA
-Owns `services/public`: React components, CSS, animation, layout, responsive and
+Owns `services/site`: React components, CSS, animation, layout, responsive and
 touch behaviour, the contact-form UI. **This agent can run the app and see its
 own output** — it drives a browser (Playwright) to screenshot the page at desktop
 and mobile sizes, read the result, interact with it, and iterate until the craft

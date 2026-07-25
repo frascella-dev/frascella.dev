@@ -2,8 +2,10 @@ import axios from "axios";
 
 // The portfolio is a standalone SPA that talks to the NestJS API over CORS.
 // The base URL is injected at build time; it defaults to the local API port
-// so `npm run dev` works with no extra configuration.
-const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+// so `npm run dev` works with no extra configuration. Under Astro the var
+// is `PUBLIC_API_URL`; the old `VITE_API_URL` is still honored as a fallback.
+const env = import.meta.env as Record<string, string | undefined>;
+const baseURL = env["PUBLIC_API_URL"] ?? env["VITE_API_URL"] ?? "http://localhost:3000";
 
 export const api = axios.create({
     baseURL,
