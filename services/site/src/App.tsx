@@ -10,7 +10,6 @@ import Work from "./components/Work.tsx";
 import About from "./components/About.tsx";
 import Contact from "./components/Contact.tsx";
 import ProjectPage from "./components/ProjectPage.tsx";
-import { timeline } from "./data/timeline.ts";
 
 export default function App() {
     const routeSlug = useRoute();
@@ -78,7 +77,7 @@ export default function App() {
                 ) : (
                     <>
                         <Hero />
-                        <About timeline={timeline} />
+                        <About />
                         <Work />
                         <Contact />
                     </>

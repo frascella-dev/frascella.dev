@@ -4,22 +4,11 @@
 .ef-about {
   position: relative;
   /* background: var(--paper); */
-  /* Shared with .ef-bb-wrap (about-bigbang.css), which cancels this exact
-     padding to bleed the pinned "big bang" stage full-width — keeping both
-     in one variable means they can never drift out of sync (see
-     work-corridor.css's --work-pad-x for the same technique). */
   --about-pad-x: clamp(16px, 5vw, 80px);
   padding: clamp(80px, 12vh, 160px) var(--about-pad-x) 120px;
-  /* `clip`, not `hidden` — deliberately, on both axes (an ancestor's
-     overflow-x alone would make the browser auto-promote overflow-y to
-     `auto`, and plain `hidden` still counts as a scroll container for
-     `position: sticky` purposes). Either would confine .ef-bb-stage's sticky
-     stage to this section's own box instead of the real viewport, and it
-     would stop pinning — it'd scroll away with the page instead. `clip`
-     still clips the decorative bleed (the big-word backdrop, the parallax
-     rects) exactly like `hidden` did, it just isn't a scroll container. Same
-     reasoning as base.css's html/body `overflow-x: clip` — see that file's
-     comment for the full story. */
+  /* `clip`, not `hidden` — it still clips the decorative bleed (the big-word
+     backdrop, the parallax rects) but isn't a scroll container. Same reasoning
+     as base.css's html/body `overflow-x: clip` — see that file's comment. */
   overflow: clip;
   isolation: isolate;
   border-bottom: 1px solid var(--rule);
