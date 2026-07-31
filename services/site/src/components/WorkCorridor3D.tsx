@@ -62,7 +62,7 @@ function CorridorCard({
     rank: number;
     nearFade: number;
     isMobile: boolean;
-    onSelect: (i: number) => void;
+    onSelect: (i: number, el?: HTMLElement | null) => void;
 }) {
     // Fade by distance from the active card rather than a flat "on/off" —
     // lets more of the hallway render (see CorridorScene's windowRadius)
@@ -86,8 +86,8 @@ function CorridorCard({
             } ${item.kind === "wip" ? "is-wip" : ""}`}
             style={{ opacity }}
             data-cursor="view"
-            data-cursor-label="View"
-            onClick={() => onSelect(idx)}
+            data-cursor-label={isActive ? "Open" : "View"}
+            onClick={(e) => onSelect(idx, e.currentTarget)}
         >
             <div className="ef-work-corridor-card-head ef-mono">
                 <span>№ {pad2(idx + 1)}</span>
@@ -371,7 +371,7 @@ function CorridorScene({
     activeFloat: number;
     finale: number;
     isMobile: boolean;
-    onSelect: (i: number) => void;
+    onSelect: (i: number, el?: HTMLElement | null) => void;
 }) {
     const n = items.length;
     const spacing = isMobile ? 2.6 : 3.2;
@@ -543,7 +543,7 @@ export default function WorkCorridor3D({
     activeFloat: number;
     finale: number;
     isMobile: boolean;
-    onSelect: (i: number) => void;
+    onSelect: (i: number, el?: HTMLElement | null) => void;
 }) {
     return (
         <Canvas

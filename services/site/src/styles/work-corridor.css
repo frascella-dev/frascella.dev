@@ -25,7 +25,10 @@
   top: 0;
   height: 100vh;
   overflow: hidden;
-  background: var(--paper);
+  /* No paper fill: the transparent R3F canvas and this transparent stage now
+     let the site-wide grid (base.css .ef-site-grid) show behind the corridor,
+     the same continuous backdrop as every other section. Body paper still
+     sits behind that grid, so the corridor still reads as sitting on paper. */
 }
 
 /* --- Corridor layer: the 3D canvas / fallback list + nav --- */

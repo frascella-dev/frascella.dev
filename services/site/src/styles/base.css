@@ -98,6 +98,33 @@ body::after {
   opacity: 0.5;
 }
 
+/* ============================================================
+   SITE GRID — one ambient grid behind the whole page (it used to be
+   painted per-section). Fixed to the viewport and sat at z-index -1 so
+   every transparent section reveals the same continuous grid; the dark
+   Contact section deliberately covers it. The inner layer is over-sized
+   past the viewport on both axes so the GSAP scroll parallax (see App.tsx:
+   it scrubs `.ef-site-grid-inner`'s yPercent against page scroll) can drift
+   it without ever exposing a hard edge.
+   ============================================================ */
+.ef-site-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ef-site-grid-inner {
+  position: absolute;
+  top: -25vh; bottom: -25vh; left: 0; right: 0;
+  background-image:
+    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
+  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
+  mask-image: radial-gradient(ellipse 92% 78% at 50% 45%, #000 42%, transparent 100%);
+  will-change: transform;
+}
+
 /* Scroll progress bar */
 .ef-scroll-bar {
   position: fixed;

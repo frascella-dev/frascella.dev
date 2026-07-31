@@ -4,36 +4,18 @@
 .ef-about {
   position: relative;
   /* background: var(--paper); */
-  /* Shared with .ef-bb-wrap (about-bigbang.css), which cancels this exact
-     padding to bleed the pinned "big bang" stage full-width — keeping both
-     in one variable means they can never drift out of sync (see
-     work-corridor.css's --work-pad-x for the same technique). */
   --about-pad-x: clamp(16px, 5vw, 80px);
   padding: clamp(80px, 12vh, 160px) var(--about-pad-x) 120px;
-  /* `clip`, not `hidden` — deliberately, on both axes (an ancestor's
-     overflow-x alone would make the browser auto-promote overflow-y to
-     `auto`, and plain `hidden` still counts as a scroll container for
-     `position: sticky` purposes). Either would confine .ef-bb-stage's sticky
-     stage to this section's own box instead of the real viewport, and it
-     would stop pinning — it'd scroll away with the page instead. `clip`
-     still clips the decorative bleed (the big-word backdrop, the parallax
-     rects) exactly like `hidden` did, it just isn't a scroll container. Same
-     reasoning as base.css's html/body `overflow-x: clip` — see that file's
-     comment for the full story. */
-  overflow: clip;
+  /* Visible on purpose: the giant ".ef-about-bigword" ("about") sits at the
+     section's bottom edge and must bleed past it rather than being shaved off
+     by the section end. Horizontal bleed is still contained globally by the
+     `overflow-x: clip` on html/body (see base.css). */
+  overflow: visible;
   isolation: isolate;
   border-bottom: 1px solid var(--rule);
 }
 
 .ef-about-field { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-.ef-about-grid-bg {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
-  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
-  mask-image: radial-gradient(ellipse 100% 70% at 50% 50%, #000 30%, transparent 95%);
-}
 .ef-a-rect--1 { top: 8vh;  right: 8vw;  width: 1px;   height: 32vh; background: var(--ink); opacity: 0.5; }
 .ef-a-rect--2 { top: 42vh; left: 6vw;   width: 140px; height: 90px; border: 1px solid var(--ink); opacity: 0.55; }
 .ef-a-rect--3 { top: 66vh; right: 14vw; width: 36vw;  height: 1px;  background: var(--ink); opacity: 0.3; }
@@ -71,7 +53,18 @@
   display: flex;
   flex-direction: column;
 }
-.ef-about-title .ef-line { display: flex; align-items: baseline; gap: clamp(12px, 2.4vw, 48px); flex-wrap: wrap; }
+/* Masks the GSAP word-rise entrance (see About.tsx) — see the matching
+   comment in hero.css for why the extra padding/negative margin is there. */
+.ef-about-title .ef-line {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 2.4vw, 48px);
+  flex-wrap: wrap;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.ef-about-title .ef-w { display: inline-block; }
 .ef-about-title .ef-line--1 { justify-content: flex-start; }
 .ef-about-title .ef-line--2 { justify-content: flex-end; padding-right: clamp(20px, 6vw, 120px); }
 .ef-about-title .ef-line--3 { justify-content: flex-start; padding-left: clamp(40px, 12vw, 220px); }
@@ -130,11 +123,14 @@
   color: var(--ink-mute);
 }
 
+/* Grid placement lives on the reveal wrapper (see About.tsx) rather than on
+   .ef-about-portrait itself, since that inner element's own transform is
+   rewritten every scroll/mousemove tick by the parallax effect — the GSAP
+   entrance animates the wrapper's opacity/y instead, so the two never touch
+   the same style property. */
+.ef-about-portrait-reveal { grid-area: portrait; align-self: start; justify-self: end; }
 .ef-about-portrait {
-  grid-area: portrait;
   position: relative;
-  align-self: start;
-  justify-self: end;
   width: min(32vw, 380px);
   aspect-ratio: 3 / 4;
   background: var(--paper-2);

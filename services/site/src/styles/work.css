@@ -56,7 +56,18 @@
   display: flex;
   flex-direction: column;
 }
-.ef-work-title .ef-line { display: flex; align-items: baseline; gap: clamp(12px, 2.4vw, 48px); flex-wrap: wrap; }
+/* Masks the GSAP word-rise entrance (see Work.tsx) — see the matching
+   comment in hero.css for why the extra padding/negative margin is there. */
+.ef-work-title .ef-line {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 2.4vw, 48px);
+  flex-wrap: wrap;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.ef-work-title .ef-w { display: inline-block; }
 .ef-work-title .ef-line--1 { justify-content: flex-start; }
 .ef-work-title .ef-line--2 { justify-content: flex-end; padding-right: clamp(20px, 6vw, 120px); }
 .ef-work-title .ef-line--3 { justify-content: flex-start; padding-left: clamp(40px, 12vw, 220px); }
@@ -111,7 +122,11 @@
 .ef-work-bigword {
   position: absolute;
   left: -2vw; right: -2vw;
-  bottom: -12vw;
+  /* Sits inside the viewport-height, overflow:hidden corridor stage, so it
+     must clear the stage's bottom edge rather than bleed past it (which the
+     clip would shave). 4vw offsets the +/-60px vertical parallax drift the
+     inline transform adds, keeping the whole word on-screen at every scroll. */
+  bottom: 4vw;
   font-family: var(--display);
   font-weight: 700;
   font-size: 30vw;
@@ -127,7 +142,7 @@
 }
 
 @media (max-width: 720px) {
-  .ef-work-bigword { font-size: 40vw; bottom: -24vw; }
+  .ef-work-bigword { font-size: 40vw; bottom: 6vw; }
 }
 
 /* --- Footer strip --- */
@@ -150,14 +165,10 @@
   /* The seam out of the corridor. The pinned stage releases on the finale's
      still frame; the strip is what closes the section out after it, so it
      lands on its own beat instead of simply being uncovered as the sticky
-     stage slides off. */
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
-}
-.ef-work-strip.is-in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .ef-work-strip { opacity: 1; transform: none; transition: none; }
+     stage slides off. Reveal is GSAP/ScrollTrigger-driven now (see Work.tsx)
+     rather than a CSS class toggle — the hidden state is set from JS too, so
+     if script fails to run for any reason this stays visible instead of
+     stuck at opacity: 0. */
 }
 .ef-work-strip .ef-mono {
   font-size: 11px;

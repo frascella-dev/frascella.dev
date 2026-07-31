@@ -1,7 +1,8 @@
 import "./styles/app.css";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Lenis from "lenis";
+import { gsap, ScrollTrigger } from "./lib/gsap.ts";
 
 import CustomCursor from "./components/CustomCursor.tsx";
 import Nav, { useRoute } from "./components/Nav.tsx";
@@ -10,11 +11,11 @@ import Work from "./components/Work.tsx";
 import About from "./components/About.tsx";
 import Contact from "./components/Contact.tsx";
 import ProjectPage from "./components/ProjectPage.tsx";
-import { timeline } from "./data/timeline.ts";
 
 export default function App() {
     const routeSlug = useRoute();
     const onDetail = !!routeSlug;
+    const gridRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const lenis = new Lenis({
@@ -25,11 +26,15 @@ export default function App() {
             touchMultiplier: 1.4,
         });
         (window as any).__lenis = lenis;
-        const raf = (time: number) => {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        };
-        requestAnimationFrame(raf);
+
+        // Bridge Lenis -> ScrollTrigger: every Lenis scroll frame drives a
+        // ScrollTrigger.update(), and Lenis is stepped from GSAP's own ticker
+        // (one clock, no double-RAF drift). lagSmoothing off so a heavy 3D
+        // frame can't make ScrollTrigger "catch up" and desync from Lenis.
+        lenis.on("scroll", ScrollTrigger.update);
+        const onTick = (time: number) => lenis.raf(time * 1000); // ticker = seconds
+        gsap.ticker.add(onTick);
+        gsap.ticker.lagSmoothing(0);
 
         const onClick = (e: MouseEvent) => {
             const a = (e.target as HTMLElement).closest('a[href^="#"]');
@@ -54,9 +59,27 @@ export default function App() {
         window.addEventListener("scroll", onScroll, { passive: true });
         onScroll();
 
+        // Site-wide ambient grid parallax: the fixed grid drifts a little
+        // slower/further than the page as you scroll, scrubbed 1:1 against
+        // total document scroll. `ease: none` keeps it linear so the drift
+        // tracks the wheel exactly rather than easing behind it.
+        const gridTween = gsap.to(gridRef.current, {
+            yPercent: 9,
+            ease: "none",
+            scrollTrigger: {
+                trigger: document.body,
+                start: "top top",
+                end: "bottom bottom",
+                scrub: true,
+            },
+        });
+
         return () => {
             document.removeEventListener("click", onClick);
             window.removeEventListener("scroll", onScroll);
+            gsap.ticker.remove(onTick);
+            gridTween.scrollTrigger?.kill();
+            gridTween.kill();
             lenis.destroy();
             if ((window as any).__lenis === lenis) {
                 delete (window as any).__lenis;
@@ -66,6 +89,10 @@ export default function App() {
 
     return (
         <>
+            <div className="ef-site-grid" aria-hidden>
+                <div className="ef-site-grid-inner" ref={gridRef} />
+            </div>
+
             <div className="ef-scroll-bar" aria-hidden>
                 <div className="ef-scroll-bar-fill" id="ef-scroll-fill" />
             </div>
@@ -78,7 +105,7 @@ export default function App() {
                 ) : (
                     <>
                         <Hero />
-                        <About timeline={timeline} />
+                        <About />
                         <Work />
                         <Contact />
                     </>

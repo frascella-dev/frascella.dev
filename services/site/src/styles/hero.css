@@ -19,14 +19,6 @@
   pointer-events: none;
   z-index: 0;
 }
-.ef-hero-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
-  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
-  mask-image: radial-gradient(ellipse 100% 80% at 50% 50%, #000 40%, transparent 95%);
-}
 .ef-rect {
   position: absolute;
   will-change: transform;
@@ -133,6 +125,15 @@
   align-items: baseline;
   gap: clamp(12px, 2.4vw, 48px);
   flex-wrap: wrap;
+  /* Masks the GSAP word-rise entrance (see Hero.tsx) — words translate up
+     from yPercent:120 and this clips them until they arrive. The extra
+     padding-bottom/negative margin gives descenders (g, y, the comma in
+     "systems,") a little breathing room below the tight 0.88 line-height so
+     the mask doesn't shave them off, without adding any visible gap to the
+     line's own layout height. */
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
 }
 .ef-hero-title .ef-line--1 { justify-content: flex-start; }
 .ef-hero-title .ef-line--2 { justify-content: flex-end; padding-right: clamp(20px, 6vw, 120px); }
