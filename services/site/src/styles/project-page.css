@@ -3,7 +3,9 @@
    ============================================================ */
 .ef-pp {
   position: relative;
-  background: var(--paper);
+  /* No paper fill: the body already paints paper and the site-wide grid
+     (see base.css .ef-site-grid) sits behind it, so an opaque fill here
+     would just hide that shared backdrop. */
   padding-top: 120px;
   padding-bottom: 160px;
   overflow: hidden;
@@ -17,14 +19,6 @@
   height: 140vh;
   pointer-events: none;
   z-index: 0;
-}
-.ef-pp-grid-bg {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(17,17,16,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17,17,16,0.05) 1px, transparent 1px);
-  background-size: var(--grid-cell) 100%, 100% var(--grid-cell);
-  mask-image: radial-gradient(ellipse 80% 60% at 60% 40%, #000 20%, transparent 95%);
 }
 .ef-pp-rect--1 { top: 14vh; right: 8vw;  width: 1px;   height: 22vh; background: var(--ink); opacity: 0.55; }
 .ef-pp-rect--2 { top: 36vh; left: 12vw;  width: 110px; height: 80px; border: 1px solid var(--ink); opacity: 0.5; }
@@ -70,6 +64,17 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+/* Transient plate for the Flip shared-element morph (see ProjectPage.tsx):
+   applied for exactly the duration of the box tween, so the clicked Work
+   card visibly "arrives" as a plate before its content fades in, rather
+   than the card silhouette just vanishing into transparent page background
+   mid-flight. Not scoped to .ef-pp-hero specifically — the 404 panel
+   (.ef-proj-missing) can be the Flip target too. */
+.ef-pp-hero--flip-surface {
+  background: var(--paper-2);
+  border: 1px solid var(--ink);
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .ef-pp-meta-row {
   display: flex;

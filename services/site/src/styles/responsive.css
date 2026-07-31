@@ -3,7 +3,6 @@
    ============================================================ */
 @media (max-width: 900px) {
   .ef-nav-items { display: none; }
-  .ef-hero-grid { grid-template-columns: 1fr; }
   .ef-meta-tr { justify-self: start; margin-top: 4px; }
   .ef-hero-foot { grid-template-columns: 1fr; gap: 24px; }
   .ef-foot-col-cta { align-items: flex-start; text-align: left; }

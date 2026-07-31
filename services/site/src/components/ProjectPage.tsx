@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { IconArrowRight } from '@tabler/icons-react';
+import { gsap, Flip, prefersReducedMotion } from '../lib/gsap.ts';
+import { takeProjectFlip, tagProjectFlipTarget } from '../lib/projectFlip.ts';
 
 export const PROJECT_DB = {
     'ledger-works': {
@@ -166,6 +168,18 @@ export default function ProjectPage() {
     const project = PROJECT_DB[slug];
     const [scrollY, setScrollY] = useState(0);
     const mouse = useMouseParallax();
+    // Flip's shared-element target — either the real hero header below, or
+    // the 404 panel above, whichever this render actually mounts.
+    const heroRef = useRef(null);
+    // takeProjectFlip() destructively consumes the stash — call it at most
+    // once per mount. Needed because React StrictMode (dev only) invokes
+    // effects twice (mount -> cleanup -> mount again) on the same component
+    // instance; without this guard the second pass would find the stash
+    // already emptied by the first and silently fall back to the plain
+    // fade-in every time, even in the one case (a genuine Work-tile click)
+    // where the Flip should play. `undefined` (never read) vs `null`
+    // (read, nothing was there) tells the two cases apart.
+    const flipStateRef = useRef(undefined);
 
     useEffect(() => {
         const onScroll = () => setScrollY(window.scrollY);
@@ -173,9 +187,67 @@ export default function ProjectPage() {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
+    // Entrance for the hero block. Two paths:
+    //  - Arrived by clicking a Work tile: a Flip state was stashed just
+    //    before the hash change unmounted it (see src/lib/projectFlip.ts).
+    //    The hero's own content fades out for the duration of the box morph
+    //    (avoids the clicked card's text visibly stretching as the box
+    //    resizes) and back in once Flip lands.
+    //  - Anything else — direct load, a reload, back/forward navigation, or
+    //    reduced motion (which never stashes a Flip state to begin with) —
+    //    a plain fade + rise, the same "graceful fallback" every other
+    //    entrance in this pass uses.
+    // Mount-only: prev/next nav re-renders this same component instance
+    // with a new slug (App.tsx doesn't key <ProjectPage/>, so switching
+    // between case studies doesn't unmount it) rather than remounting it,
+    // so this deliberately doesn't replay on every case-study switch.
+    useLayoutEffect(() => {
+        const hero = heroRef.current;
+        if (!hero) return;
+        const ctx = gsap.context(() => {
+            if (prefersReducedMotion()) return;
+
+            if (flipStateRef.current === undefined) {
+                flipStateRef.current = takeProjectFlip();
+            }
+            const flipState = flipStateRef.current;
+            const content = hero.querySelectorAll(':scope > *');
+
+            if (flipState) {
+                tagProjectFlipTarget(hero);
+                gsap.set(content, { opacity: 0 });
+                hero.classList.add('ef-pp-hero--flip-surface');
+                Flip.from(flipState, {
+                    targets: hero,
+                    duration: 0.6,
+                    ease: 'power2.inOut',
+                    absolute: true,
+                    onComplete: () => {
+                        hero.classList.remove('ef-pp-hero--flip-surface');
+                        gsap.to(content, {
+                            opacity: 1,
+                            duration: 0.4,
+                            stagger: 0.05,
+                            ease: 'power2.out',
+                        });
+                    },
+                });
+            } else {
+                gsap.from(hero, {
+                    opacity: 0,
+                    y: 24,
+                    duration: 0.6,
+                    ease: 'power2.out',
+                });
+            }
+        });
+
+        return () => ctx.revert();
+    }, []);
+
     if (!project) {
         return (
-            <div className="ef-proj-missing">
+            <div className="ef-proj-missing" ref={heroRef}>
                 <div>
                     <span className="ef-label">404 — project not found</span>
                     <h1 className="ef-proj-hero-title">slug «{slug}» is not in the archive.</h1>
@@ -199,7 +271,6 @@ export default function ProjectPage() {
     return (
         <div className="ef-pp">
             <div className="ef-pp-field" aria-hidden>
-                <div className="ef-pp-grid-bg" />
                 <div className="ef-rect ef-pp-rect--1" style={pxy(-12, 0, 0.18)} />
                 <div className="ef-rect ef-pp-rect--2" style={pxy(10, 0, 0.25)} />
                 <div className="ef-rect ef-pp-rect--3" style={pxy(-6, 0, 0.09)} />
@@ -215,7 +286,7 @@ export default function ProjectPage() {
                 <div className="ef-pp-dot" style={pxy(22, 16, 0.26)} />
             </div>
 
-            <header className="ef-pp-hero">
+            <header className="ef-pp-hero" ref={heroRef}>
                 <div className="ef-pp-meta-row">
                     <span className="ef-label">case study № {project.idx}</span>
                     <span className="ef-mono">{project.year}</span>

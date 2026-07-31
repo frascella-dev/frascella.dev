@@ -30,6 +30,17 @@
   align-items: flex-start;
 }
 .ef-contact-h span { display: block; }
+/* Masks the GSAP line-rise entrance (see Contact.tsx) — .ef-line is the
+   outer per-line span (overflow: hidden), .ef-w-line is the inner span the
+   tween actually moves. Same padding/negative-margin buffer as the other
+   headings' word masks, for the same reason (keeps descenders from being
+   shaved by the clip). */
+.ef-contact-h .ef-line {
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.ef-contact-h .ef-w-line { display: inline-block; }
 .ef-contact-h-italic em { font-style: normal; color: var(--accent); }
 .ef-contact-h-underline {
   position: relative;

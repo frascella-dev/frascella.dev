@@ -1,10 +1,11 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import axios from "axios";
 import { IconArrowRight, IconCornerDownRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 import { GithubBlock, LinkedinBlock } from "./Blocks.tsx";
 import { Toast, type ToastState } from "./Toast.tsx";
 import { api, fieldErrors } from "../lib/api.ts";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.ts";
 
 // three.js is heavy, so the 3D blocks are a separate chunk fetched only once
 // the contact section is close to the viewport. Until then (and on mobile, or
@@ -202,6 +203,10 @@ function useIsMobile(bp = 1000) {
 export default function Contact() {
     const [revealRef, shown] = useReveal();
     const sectionRef = useRef<HTMLElement | null>(null);
+    const headingRef = useRef<HTMLHeadingElement | null>(null);
+    const colophonRef = useRef<HTMLDivElement | null>(null);
+    const fieldsRef = useRef<HTMLDivElement | null>(null);
+    const footRef = useRef<HTMLDivElement | null>(null);
     const [rel, setRel] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
     const isMobile = useIsMobile();
@@ -216,6 +221,76 @@ export default function Contact() {
         sectionRef.current = node;
         if (revealRef) revealRef.current = node;
     };
+
+    // GSAP entrance pass: the heading's word-rise (item 1), the colophon's
+    // three mono lines standing in for this section's "intro copy" (item 2
+    // — Contact has no lead paragraph the way Hero/About do, so the
+    // colophon is the closest equivalent: short, scene-setting text ahead
+    // of the main content), and a staggered reveal for the form fields +
+    // footer row (item 3). Independent of the mouse/scroll parallax effect
+    // below and of the section-level `shown`/.is-in state, which still only
+    // drives the heading underline's CSS keyframe (untouched here).
+    useLayoutEffect(() => {
+        if (!sectionRef.current) return;
+        const ctx = gsap.context(() => {
+            if (prefersReducedMotion()) return;
+
+            const words = headingRef.current
+                ? headingRef.current.querySelectorAll(".ef-w-line")
+                : [];
+            if (words.length) {
+                gsap.from(words, {
+                    yPercent: 120,
+                    opacity: 0,
+                    duration: 0.9,
+                    stagger: 0.08,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: headingRef.current,
+                        start: "top 85%",
+                        once: true,
+                    },
+                });
+            }
+
+            if (colophonRef.current) {
+                gsap.from(colophonRef.current.children, {
+                    y: 12,
+                    opacity: 0,
+                    duration: 0.6,
+                    stagger: 0.08,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: colophonRef.current,
+                        start: "top 90%",
+                        once: true,
+                    },
+                });
+            }
+
+            const fieldTargets: Element[] = [];
+            if (fieldsRef.current) {
+                fieldTargets.push(...fieldsRef.current.querySelectorAll(":scope > label"));
+            }
+            if (footRef.current) fieldTargets.push(footRef.current);
+            if (fieldTargets.length) {
+                gsap.from(fieldTargets, {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.6,
+                    stagger: 0.08,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: fieldsRef.current,
+                        start: "top 85%",
+                        once: true,
+                    },
+                });
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
 
     useEffect(() => {
         const onScroll = () => {
@@ -379,19 +454,30 @@ export default function Contact() {
         >
             <div className="ef-colophon">
                 <span className="ef-label">§ 04 — Colophon</span>
-                <div className="ef-colophon-lines ef-mono">
+                <div className="ef-colophon-lines ef-mono" ref={colophonRef}>
                     <span>Set in Outfit &amp; DM Sans.</span>
                     <span>No trackers, no cookies, no regrets.</span>
                     <span>Built by hand, April 2026.</span>
                 </div>
             </div>
 
-            <h2 className="ef-contact-h">
-                <span>Let&rsquo;s build</span>
-                <span className="ef-contact-h-italic">
-                    <em>something</em>
+            {/* Each top-level span is a line — .ef-line masks (overflow:
+                hidden, see contact.css) the inner .ef-w-line, which is what
+                the GSAP word-rise entrance (see the effect above) actually
+                animates. The classes that used to sit directly on these
+                spans (ef-contact-h-italic / ef-contact-h-underline) move to
+                the outer .ef-line so the underline's ::after and the
+                italic's colour still land on the right element. */}
+            <h2 className="ef-contact-h" ref={headingRef}>
+                <span className="ef-line">
+                    <span className="ef-w-line">Let&rsquo;s build</span>
                 </span>
-                <span className="ef-contact-h-underline">that works.</span>
+                <span className="ef-line ef-contact-h-italic">
+                    <span className="ef-w-line"><em>something</em></span>
+                </span>
+                <span className="ef-line ef-contact-h-underline">
+                    <span className="ef-w-line">that works.</span>
+                </span>
             </h2>
 
             <Marquee words={TAPE_WORDS} />
@@ -409,7 +495,7 @@ export default function Contact() {
                         className="ef-cform-honeypot"
                         aria-hidden="true"
                     />
-                    <div className="ef-cform-fields">
+                    <div className="ef-cform-fields" ref={fieldsRef}>
                         {/* NAME */}
                         <label
                             className={`ef-cfield ef-cfield--name ${
@@ -499,7 +585,7 @@ export default function Contact() {
                     </div>
 
                     {/* footer with progress + send */}
-                    <div className="ef-cform-foot">
+                    <div className="ef-cform-foot" ref={footRef}>
                         <div className="ef-cform-progress" aria-hidden>
                             <span className="ef-mono ef-label">Signal</span>
                             <span className="ef-cform-bars">

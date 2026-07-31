@@ -1,7 +1,9 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { useReveal } from "./Hooks.tsx";
 import { projects } from "../data/projects.ts";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "../lib/gsap.ts";
+import { stashProjectFlip } from "../lib/projectFlip.ts";
 
 // three.js is heavy, so the corridor showcase is a separate chunk fetched
 // only once the section is near the viewport — same lazy pattern Contact.tsx
@@ -142,7 +144,7 @@ function WorkCorridorFallback({
 }: {
     items: any[];
     activeIndex: number;
-    onSelect: (i: number) => void;
+    onSelect: (i: number, el?: HTMLElement | null) => void;
 }) {
     return (
         <div className="ef-work-fallback">
@@ -156,8 +158,13 @@ function WorkCorridorFallback({
                     >
                         <button
                             type="button"
-                            onClick={() => onSelect(i)}
+                            onClick={(e) => onSelect(i, e.currentTarget)}
                             data-cursor="view"
+                            data-cursor-label={
+                                i === activeIndex && it.kind === "shipped"
+                                    ? "Open"
+                                    : "View"
+                            }
                         >
                             <span className="ef-mono ef-work-fallback-idx">
                                 № {pad2(i + 1)}
@@ -300,7 +307,6 @@ function WorkFinale({ finale }: { finale: number }) {
 function AmbientField({ mouse }: { mouse: { x: number; y: number } }) {
     return (
         <div className="ef-work-field" aria-hidden>
-            <div className="ef-about-grid-bg" />
             <div
                 className="ef-rect ef-w-rect--1"
                 style={{ transform: `translate3d(${(mouse.x - 0.5) * -10}px, 0, 0)` }}
@@ -317,9 +323,11 @@ function AmbientField({ mouse }: { mouse: { x: number; y: number } }) {
 
 export default function Work() {
     const [revealRef, shown] = useReveal();
-    const [stripRef, stripShown] = useReveal<HTMLDivElement>({ threshold: 0.6 });
     const sectionRef = useRef<HTMLElement | null>(null);
     const wrapRef = useRef<HTMLDivElement | null>(null);
+    const headRef = useRef<HTMLDivElement | null>(null);
+    const titleRef = useRef<HTMLHeadingElement | null>(null);
+    const stripRef = useRef<HTMLDivElement | null>(null);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
     const [activeFloat, setActiveFloat] = useState(0);
     const [finale, setFinale] = useState(0);
@@ -333,6 +341,78 @@ export default function Work() {
         sectionRef.current = node;
         if (revealRef) revealRef.current = node;
     };
+
+    // GSAP entrance pass — scoped to exactly the two areas the brief allows
+    // touching here (.ef-work-title, .ef-work-head copy), plus the closing
+    // .ef-work-strip, which used to reveal via useReveal/.is-in (see the
+    // removed second useReveal() call above and the CSS comment in
+    // work.css). None of this touches the corridor's own scroll math
+    // (activeFloat/finale, the wrapper height, goTo) — those stay exactly
+    // as they were.
+    useLayoutEffect(() => {
+        if (!sectionRef.current) return;
+        const ctx = gsap.context(() => {
+            if (prefersReducedMotion()) return;
+
+            const words = titleRef.current
+                ? titleRef.current.querySelectorAll(".ef-w")
+                : [];
+            if (words.length) {
+                gsap.from(words, {
+                    yPercent: 120,
+                    opacity: 0,
+                    duration: 0.9,
+                    stagger: 0.06,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: titleRef.current,
+                        start: "top 85%",
+                        once: true,
+                    },
+                });
+            }
+
+            // The rest of the head: the eyebrow label, the count/note foot
+            // row — everything in .ef-work-head except the title (handled
+            // above) and the decorative AmbientField (aria-hidden, never
+            // animated).
+            if (headRef.current) {
+                const copy = headRef.current.querySelectorAll(
+                    ":scope > .ef-label, :scope > .ef-work-head-foot > *",
+                );
+                if (copy.length) {
+                    gsap.from(copy, {
+                        y: 16,
+                        opacity: 0,
+                        duration: 0.7,
+                        stagger: 0.06,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: headRef.current,
+                            start: "top 85%",
+                            once: true,
+                        },
+                    });
+                }
+            }
+
+            if (stripRef.current) {
+                gsap.from(stripRef.current, {
+                    y: 18,
+                    opacity: 0,
+                    duration: 0.7,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: stripRef.current,
+                        start: "top 92%",
+                        once: true,
+                    },
+                });
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
 
     // The title is normal, in-flow content — it scrolls away like any
     // heading, no pin, no fade. Only the corridor wrapper below it pins:
@@ -391,8 +471,22 @@ export default function Work() {
     // just scroll the page to the exact position where the corridor camera
     // rests centred on that project, same as any anchor jump, so Lenis /
     // keyboard / back-button all keep working.
-    const goTo = (i: number) => {
+    //
+    // Clicking a card that's already the centred one is treated as "open
+    // it": for a shipped project that means navigating to its case study,
+    // with a GSAP Flip morphing the clicked card into the ProjectPage hero
+    // (see src/lib/projectFlip.ts and ProjectPage.tsx) instead of a hard
+    // cut. WIP placeholders have no case study to open, so they only ever
+    // recentre, same as clicking any other card. This is additive — it
+    // doesn't touch activeFloat/finale or the wrapper's scroll math above.
+    const goTo = (i: number, sourceEl?: HTMLElement | null) => {
         const idx = Math.max(0, Math.min(n - 1, i));
+        const item = items[idx];
+        if (idx === activeIndex && item?.kind === "shipped" && item?.slug) {
+            if (!prefersReducedMotion()) stashProjectFlip(sourceEl);
+            window.location.hash = `#/project/${item.slug}`;
+            return;
+        }
         const el = wrapRef.current;
         if (!el) return;
         const vh = window.innerHeight || 1;
@@ -426,11 +520,11 @@ export default function Work() {
             ref={setRefs}
             data-screen-label="03 Work"
         >
-            <div className="ef-work-head">
+            <div className="ef-work-head" ref={headRef}>
                 <AmbientField mouse={mouse} />
 
                 <span className="ef-label">§ 03 — Selected work</span>
-                <h2 className="ef-work-title">
+                <h2 className="ef-work-title" ref={titleRef}>
                     <span className="ef-line ef-line--1">
                         <span className="ef-w">systems,</span>
                         <em className="ef-w ef-w--em">apis</em>
@@ -509,10 +603,7 @@ export default function Work() {
                 is the one obvious way out, so this strip doesn't repeat
                 it. It closes the record instead: a colophon, not a second
                 CTA. */}
-            <div
-                className={`ef-work-strip ${stripShown ? "is-in" : ""}`}
-                ref={stripRef}
-            >
+            <div className="ef-work-strip" ref={stripRef}>
                 <span className="ef-label">Archive</span>
                 <span className="ef-mono">EST. 2021 — ∞</span>
             </div>

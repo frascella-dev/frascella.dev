@@ -1,11 +1,59 @@
-import { useEffect, useRef, useState } from "react";
-import { useClock } from "./Hooks.tsx";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { gsap, prefersReducedMotion } from "../lib/gsap.ts";
 
 export default function Hero() {
-    const time = useClock();
     const stageRef = useRef(null);
+    const titleRef = useRef(null);
+    const subRef = useRef(null);
+    const botrowRef = useRef(null);
     const [scrollY, setScrollY] = useState(0);
     const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+
+    // GSAP entrance pass. Hero sits above the fold, so unlike every other
+    // section's scroll-triggered reveal, its content plays immediately on
+    // load rather than waiting for a ScrollTrigger: the headline words rise
+    // up out of their masked lines, then the sub-copy and the bottom meta
+    // row settle in just behind them.
+    useLayoutEffect(() => {
+        if (!stageRef.current) return;
+        const ctx = gsap.context(() => {
+            if (prefersReducedMotion()) return; // final state IS the DOM's resting state — nothing to set.
+
+            // Headline words rise up from behind their line's mask (see the
+            // `.ef-hero-title .ef-line { overflow: hidden }` rule in
+            // hero.css) — the word spans are already `display: inline-block`
+            // there, which is what lets a yPercent transform apply cleanly.
+            const words = titleRef.current
+                ? titleRef.current.querySelectorAll(".ef-w")
+                : [];
+            if (words.length) {
+                gsap.from(words, {
+                    yPercent: 120,
+                    opacity: 0,
+                    duration: 0.9,
+                    stagger: 0.06,
+                    ease: "power3.out",
+                    delay: 0.15,
+                });
+            }
+
+            const tail = [subRef.current, botrowRef.current].filter(Boolean);
+            if (tail.length) {
+                gsap.from(tail, {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.8,
+                    stagger: 0.12,
+                    ease: "power2.out",
+                    delay: 0.6,
+                });
+            }
+        }, stageRef);
+
+        // ctx.revert() cleans up the tweens on unmount — matters here since the
+        // React island can remount.
+        return () => ctx.revert();
+    }, []);
 
     useEffect(() => {
         const onScroll = () => setScrollY(window.scrollY);
@@ -38,8 +86,6 @@ export default function Hero() {
             ref={stageRef}
         >
             <div className="ef-hero-field" aria-hidden>
-                <div className="ef-hero-grid" />
-
                 <div className="ef-rect ef-rect--a" style={pxy(-8, 0, -0.12)} />
                 <div className="ef-rect ef-rect--b" style={pxy(12, 0, -0.22)} />
                 <div className="ef-rect ef-rect--c" style={pxy(-6, 0, -0.34)} />
@@ -76,7 +122,7 @@ export default function Hero() {
             </div>
 
             <div className="ef-hero-stage">
-                <h1 className="ef-hero-title">
+                <h1 className="ef-hero-title" ref={titleRef}>
                     <span className="ef-line ef-line--1">
                         <span className="ef-w">software</span>
                         <em className="ef-w ef-w--em">engineer</em>
@@ -91,7 +137,7 @@ export default function Hero() {
                     </span>
                 </h1>
 
-                <div className="ef-hero-sub">
+                <div className="ef-hero-sub" ref={subRef}>
                     <div className="ef-hero-sub-col">
                         <span className="ef-label">idx — 01</span>
                         <p>
@@ -111,7 +157,7 @@ export default function Hero() {
                 </div>
             </div>
 
-            <div className="ef-hero-botrow">
+            <div className="ef-hero-botrow" ref={botrowRef}>
                 <div className="ef-hero-botcol">
                     <span className="ef-label">lat — 40.47° n</span>
                     <span className="ef-label">lon — 17.24° e</span>
