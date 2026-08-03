@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// Standalone three.js lab. Separate from the portfolio (services/site) so it
+// Standalone three.js lab. Separate from the portfolio (services/site-v2) so it
 // can stay a plain React + Vite playground. Different port to run alongside it.
 export default defineConfig({
     plugins: [react()],

@@ -5,10 +5,12 @@ vendor-neutral companion to `CLAUDE.md` — read that first for the project map.
 
 ## The repo in one breath
 
-A two-service monorepo: `services/site` (React + Vite portfolio SPA) and
-`services/api` (NestJS, sends the contact email). No database, no admin, no
-Laravel. The client/server seam is a single CORS request to `/api/contact`
-with a `422 { message, errors }` validation contract.
+A two-service monorepo: `services/site-v2` (the portfolio — a static Astro site
+with a vanilla-TS motion layer) and `services/api` (NestJS, sends the contact
+email). No database, no admin, no Laravel, no framework runtime on the page.
+`services/site-v1` is the previous React-island version, archived. The
+client/server seam is a single CORS request to `/api/contact` with a
+`422 { message, errors }` validation contract.
 
 ## The agents (`.claude/agents/`)
 
@@ -17,9 +19,9 @@ Reason about cross-cutting changes, decide what belongs on the client vs. the
 server, and produce an ordered implementation plan citing `file:line`. Does not
 edit files; hands work to `frontend`/`backend`. Use before non-trivial features.
 
-### `frontend` — the portfolio SPA
-Owns `services/site`: React components, CSS, animation, layout, responsive and
-touch behaviour, the contact-form UI. **This agent can run the app and see its
+### `frontend` — the portfolio site
+Owns `services/site-v2`: Astro components, CSS, the `src/lib/` motion modules,
+layout, responsive and touch behaviour, the contact-form UI. **This agent can run the app and see its
 own output** — it drives a browser (Playwright) to screenshot the page at desktop
 and mobile sizes, read the result, interact with it, and iterate until the craft
 bar is met. Consults the `frontend-design` plugin for aesthetic direction and the
@@ -50,11 +52,10 @@ especially the entrance and exit of every pinned range.
 ### `seo` — search visibility & machine-readability
 Owns metadata, per-route titles/descriptions, Open Graph and Twitter cards,
 JSON-LD, `robots.txt`/`sitemap.xml`, heading and `alt` semantics, and the SEO
-half of Core Web Vitals. Specialised in the constraint that actually bites here:
-this is a **client-rendered SPA with no SSR**, so the served HTML is near-empty
-and anything a non-rendering bot must see has to be static or build-time. Where
-that can't be satisfied client-side it presents the options and their costs —
-it does not introduce SSR or prerendering on its own authority.
+half of Core Web Vitals. The site is **statically rendered by Astro**, so the
+served HTML already contains the copy — the thing to watch is that anything
+painted into a canvas (the work corridor) also exists as real text, which is
+what `.work-fallback` is for. Don't let content regress into script-only DOM.
 
 ## Division of labour
 

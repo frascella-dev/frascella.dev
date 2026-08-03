@@ -1,0 +1,70 @@
+---
+// The HTML shell: head, fonts, favicons. Everything below it is static
+// markup plus a handful of plain ES modules — there is no framework
+// runtime on this page.
+import "../styles/base.css";
+import "../styles/cursor.css";
+import { owner } from "../data/site.ts";
+
+interface Props {
+    title?: string;
+    description?: string;
+}
+
+const {
+    title = `${owner.name} — ${owner.role}`,
+    description = `Portfolio of ${owner.name}, a software engineer born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.dev");
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/apple-touch-icon.png" />
+        <meta name="twitter:card" content="summary" />
+
+        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Gloock&family=Schibsted+Grotesk:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Blocking on purpose, and tiny. The stylesheet hides the splash,
+             the collapsed accordion and the whole work stage unless `motion`
+             is set, so this has to land before the first paint or the page
+             flashes its static self and then jumps. -->
+        <script is:inline>
+            (function () {
+                var d = document.documentElement;
+                d.classList.add("js");
+                if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                    // `splash-open` is dropped by lib/splash.ts once the panel
+                    // has irised away; it keeps the custom cursor off the
+                    // intro, which is its own scene.
+                    d.classList.add("motion", "splash-open");
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>

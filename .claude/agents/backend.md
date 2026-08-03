@@ -24,4 +24,4 @@ The API's job is server-side effects the browser cannot do safely — today that
 3. Verify: `cd services/api && npm run build`, then start (`npm run dev`) and exercise the endpoint with `curl` — check both the success body and the error/validation path. Report the actual responses.
 4. Never commit secrets. Update `.env.example` when you add a new env var.
 
-Do not touch `services/site` — hand front-of-the-wire changes to the `frontend` agent, and keep the request/response contract in sync with it.
+Do not touch `services/site-v2` — hand front-of-the-wire changes to the `frontend` agent, and keep the request/response contract in sync with it.

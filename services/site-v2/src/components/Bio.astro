@@ -1,0 +1,390 @@
+---
+// Four rows, one open at a time. Each headline is drawn twice — an outlined
+// copy underneath and a solid copy on top, clipped to zero width — so the
+// scroll trigger can wipe the ink in from the left. The tile that trails the
+// cursor over the rows is the fifth element here because nothing else on the
+// page uses it. `data-cursor="tile"` on the section tells the custom cursor
+// to fade out for as long as the pointer is in here — the image is the
+// pointer, and two of them is one too many.
+import { Picture } from "astro:assets";
+import { bioRows, footerFacts } from "../data/site.ts";
+
+import swingBridge from "../assets/taranto/swing-bridge.jpg";
+import marinaiMonument from "../assets/taranto/marinai-monument.jpg";
+import oldTownAlley from "../assets/taranto/old-town-alley.jpg";
+import procreateKoi from "../assets/drawing/procreate-koi.png";
+import serverRack from "../assets/production/server-rack.jpg";
+import phoneTeardown from "../assets/teardown/phone-teardown.jpg";
+import portStacks from "../assets/containers/port-stacks.jpg";
+
+// Keyed by the `gallery` field on a row. Every frame of every gallery is
+// rendered up front and hidden — they are small, and a tile that has to wait
+// for a network round trip to fill in has already missed the hover.
+const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
+    taranto: [
+        { src: swingBridge, alt: "The swing bridge and the Aragonese castle in Taranto at sunset" },
+        { src: marinaiMonument, alt: "The Marinai d'Italia monument in Taranto against an evening sky" },
+        { src: oldTownAlley, alt: "An alley in Taranto's old town opening onto the sea" },
+    ],
+    drawing: [
+        { src: procreateKoi, alt: "A koi tattoo design drawn in Procreate on an iPad, Apple Pencil alongside" },
+    ],
+    production: [
+        { src: serverRack, alt: "A server rack in a dim machine room, one amber status light among the cables" },
+    ],
+    teardown: [
+        { src: phoneTeardown, alt: "An old Android phone opened up on a desk, screws and a screwdriver beside it" },
+    ],
+    containers: [
+        { src: portStacks, alt: "Stacked shipping containers and gantry cranes at a port at sunset" },
+    ],
+};
+---
+
+<div data-cursor-tile class="cursor-tile" aria-hidden="true">
+    <div class="cursor-tile-inner">
+        {
+            Object.entries(galleries).map(([key, frames]) =>
+                frames.map((frame, i) => (
+                    <Picture
+                        class="cursor-tile-photo"
+                        data-gallery={key}
+                        data-frame={i}
+                        src={frame.src}
+                        alt={frame.alt}
+                        formats={["avif", "webp"]}
+                        fallbackFormat="webp"
+                        widths={[420, 640]}
+                        sizes="24vw"
+                        loading="lazy"
+                    />
+                )),
+            )
+        }
+        <span data-cursor-label>taranto, italy</span>
+    </div>
+</div>
+
+<section id="bio" class="bio" data-cursor="tile">
+    <div class="section-head label">
+        <span class="label--strong">01 — bio</span>
+        <span>open any line</span>
+    </div>
+
+    <div class="acc">
+        {
+            bioRows.map((row, i) => {
+                const n = String(i + 1).padStart(2, "0");
+                return (
+                    <div data-acc class="acc-row">
+                        <button
+                            data-acc-head
+                            data-img={row.tile}
+                            data-gallery={row.gallery}
+                            class="acc-head"
+                            type="button"
+                            aria-expanded="true"
+                            aria-controls={`acc-panel-${i}`}
+                        >
+                            <span data-acc-index class="label">
+                                {n}
+                            </span>
+                            <span class="acc-title">
+                                <span class="acc-title-outline" aria-hidden="true">
+                                    {row.lead} {row.trail}
+                                </span>
+                                <span data-fill class="acc-title-fill">
+                                    {row.lead} <span class="dim">{row.trail}</span>
+                                </span>
+                            </span>
+                            <span data-acc-meta class="label acc-meta">
+                                {row.meta}
+                            </span>
+                            <span class="acc-toggle" aria-hidden="true"></span>
+                        </button>
+
+                        <div data-acc-panel id={`acc-panel-${i}`} class="acc-panel">
+                            <div class="acc-panel-grid">
+                                <span />
+                                <p>{row.body[0]}</p>
+                                <p class="muted">{row.body[1]}</p>
+                                <span />
+                            </div>
+                        </div>
+                    </div>
+                );
+            })
+        }
+    </div>
+
+    <div class="bio-facts label">
+        {
+            footerFacts.map((fact, i) => (
+                <span class={i === 0 ? "label--strong" : undefined}>{fact}</span>
+            ))
+        }
+    </div>
+</section>
+
+<style is:global>
+    .bio {
+        position: relative;
+        padding: 14vh var(--gutter) 12vh;
+        background: transparent;
+        overflow: hidden;
+    }
+
+    .acc {
+        position: relative;
+        margin-top: 7vh;
+    }
+
+    .acc-row {
+        border-bottom: 1px solid var(--rule);
+    }
+
+    .acc-head {
+        display: grid;
+        grid-template-columns: 4vw minmax(0, 1fr) auto;
+        gap: 2vw;
+        align-items: center;
+        width: 100%;
+        padding: 1.9vw 0;
+        border: 0;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        color: inherit;
+    }
+
+    /* Nothing collapses without the motion layer, so nothing is expandable
+       either — the rows stay readable but stop pretending to be controls. */
+    html:not(.motion) .acc-head {
+        cursor: default;
+    }
+
+    .acc-head:focus-visible {
+        outline: 1px solid var(--accent-deep);
+        outline-offset: 6px;
+    }
+
+    .acc-title {
+        position: relative;
+        display: inline-block;
+        font-family: var(--serif);
+        font-size: clamp(26px, 3.8vw, 68px);
+        line-height: 1.06;
+        white-space: nowrap;
+    }
+
+    .acc-title-outline {
+        display: block;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(20, 20, 20, 0.32);
+    }
+
+    .acc-title-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: var(--ink);
+    }
+
+    /* The ink is wiped in from the left on scroll — but only when there is
+       a timeline to do the wiping. Otherwise the headline is just set. */
+    html.motion .acc-title-fill {
+        clip-path: inset(0 100% 0 0);
+    }
+
+    .acc-title-fill .dim {
+        opacity: 0.38;
+    }
+
+    .acc-meta {
+        white-space: nowrap;
+    }
+
+    /* On a pointer device the row announces itself by moving and raising the
+       tile. A thumb gets neither, so it gets a sign instead. */
+    .acc-toggle {
+        display: none;
+        font-family: var(--sans);
+        font-size: 18px;
+        line-height: 1;
+        color: rgba(20, 20, 20, 0.45);
+        transition: color 0.3s var(--ease);
+    }
+
+    .acc-toggle::after {
+        content: "+";
+    }
+
+    [aria-expanded="true"] .acc-toggle {
+        color: var(--accent-deep);
+    }
+
+    [aria-expanded="true"] .acc-toggle::after {
+        content: "\2212";
+    }
+
+    /* Collapsed only where something can expand it again; everywhere else
+       the four rows read as a plain list with all of their copy showing. */
+    .acc-panel {
+        overflow: hidden;
+    }
+
+    html.motion .acc-panel {
+        height: 0;
+    }
+
+    .acc-panel-grid {
+        display: grid;
+        grid-template-columns: 4vw minmax(0, 1fr) minmax(0, 1fr) 10vw;
+        gap: 2vw;
+        padding: 0 0 3vw;
+    }
+
+    .acc-panel-grid p {
+        font-size: max(13px, 1vw);
+        line-height: 1.75;
+        color: var(--ink-soft);
+        text-wrap: pretty;
+    }
+
+    .acc-panel-grid p.muted {
+        color: rgba(61, 61, 61, 0.55);
+    }
+
+    .bio-facts {
+        position: relative;
+        margin-top: 12vh;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 40px;
+        letter-spacing: 0.18em;
+    }
+
+    /* The tile that follows the pointer across the rows. */
+    .cursor-tile {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 22vw;
+        height: 15vw;
+        z-index: 20;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        will-change: transform;
+    }
+
+    .cursor-tile-inner {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            135deg,
+            #f4f2ee 0 10px,
+            #e9e6df 10px 20px
+        );
+        border: 1px solid rgba(20, 20, 20, 0.12);
+        display: flex;
+        align-items: flex-end;
+        padding: 12px;
+    }
+
+    .cursor-tile-inner span {
+        position: relative;
+        font-weight: 500;
+        font-size: max(9px, 0.7vw);
+        letter-spacing: 0.16em;
+        color: rgba(20, 20, 20, 0.45);
+    }
+
+    .cursor-tile-photo {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.4s var(--ease);
+    }
+
+    .cursor-tile-photo[data-on] {
+        opacity: 1;
+    }
+
+    /* Over a photograph the label needs its own ground to sit on. */
+    .cursor-tile[data-photo] .cursor-tile-inner::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 45%;
+        background: linear-gradient(to top, rgba(11, 11, 11, 0.62), transparent);
+    }
+
+    .cursor-tile[data-photo] .cursor-tile-inner span {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    @media (max-width: 900px) {
+        .bio {
+            padding: 8vh var(--gutter) 10vh;
+        }
+
+        .acc-head {
+            grid-template-columns: 30px minmax(0, 1fr) 20px;
+            gap: 12px;
+            padding: 22px 0;
+            align-items: start;
+        }
+
+        /* Placed rather than auto-flowed: it belongs on the headline's own
+           line, hard right, not tacked on after the meta. */
+        .acc-toggle {
+            display: block;
+            grid-row: 1;
+            grid-column: 3;
+            justify-self: end;
+            padding-top: 6px;
+        }
+
+        .acc-title {
+            white-space: normal;
+            font-size: clamp(24px, 7.4vw, 38px);
+        }
+
+        .acc-meta {
+            grid-column: 2 / span 2;
+            margin-top: 8px;
+        }
+
+        .acc-panel-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            padding: 0 0 26px 42px;
+        }
+
+        .bio-facts {
+            margin-top: 9vh;
+        }
+
+        .acc-panel-grid > span {
+            display: none;
+        }
+
+    }
+
+    /* No pointer, no tile — it only exists to trail one. Same cut-off the
+       custom cursor uses, so the two are never half-on. */
+    @media (hover: none), (pointer: coarse), (max-width: 900px) {
+        .cursor-tile {
+            display: none;
+        }
+    }
+</style>

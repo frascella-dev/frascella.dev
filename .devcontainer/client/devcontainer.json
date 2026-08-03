@@ -2,7 +2,7 @@
     "name": "Portfolio — Client (Astro + React)",
     "dockerComposeFile": "../docker-compose.yml",
     "service": "client",
-    "workspaceFolder": "/workspace/services/site",
+    "workspaceFolder": "/workspace/services/site-v2",
     "remoteUser": "node",
     "runServices": ["client", "server"],
     "forwardPorts": [5173, 3000],

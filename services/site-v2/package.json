@@ -1,0 +1,25 @@
+{
+    "name": "@portfolio/site-v2",
+    "private": true,
+    "version": "2.0.0",
+    "type": "module",
+    "description": "Emanuele Frascella — public portfolio (Astro, vanilla islands)",
+    "scripts": {
+        "dev": "astro dev --port 5173 --host",
+        "build": "astro build",
+        "preview": "astro preview --port 5173",
+        "astro": "astro",
+        "typecheck": "astro check"
+    },
+    "dependencies": {
+        "astro": "^5.13.0",
+        "axios": "^1.7.9",
+        "gsap": "^3.15.0",
+        "three": "^0.169.0"
+    },
+    "devDependencies": {
+        "@astrojs/check": "^0.9.4",
+        "@types/three": "^0.169.0",
+        "typescript": "^5.6.3"
+    }
+}

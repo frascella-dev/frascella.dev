@@ -25,7 +25,7 @@
 
 > Tick what this touches and note the client/server seam if it crosses it.
 
-- [ ] `services/site` (SPA)
+- [ ] `services/site-v2` (SPA)
 - [ ] `services/api` (NestJS)
 - [ ] Contract change (request/response shape, new endpoint, new env var)
 
@@ -36,7 +36,7 @@
 
 ## Design notes
 
-> For visual work: reference the design tokens in `services/site/src/styles/base.css`
+> For visual work: reference the design tokens in `services/site-v2/src/styles/base.css`
 > and the `frontend-design` plugin. Link mockups or describe the intended feel.
 
 ## Acceptance criteria

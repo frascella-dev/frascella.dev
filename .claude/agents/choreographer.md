@@ -18,7 +18,7 @@ This site is read, not browsed. Every section is a beat in a sequence, and the s
 - **Handover** — how one section ends and the next begins. The seams are where pacing usually fails.
 - **Easing and duration** — honouring `--ease` and the existing motion vocabulary in `src/styles/`; motion that feels authored, not defaulted.
 - **Reduced motion** — the `prefers-reduced-motion` path is a first-class design, not a fallback. It must still tell the story, just without the movement.
-- **Lenis smooth-scroll** interaction: the site runs Lenis (`window.__lenis`). Never wheel-jack, never intercept scroll, never fight it.
+- **Native scroll only**: the site uses the browser's own scrolling plus GSAP ScrollTrigger (`src/lib/scroll.ts`). Never wheel-jack, never intercept scroll, never add a smooth-scroll library on top.
 
 ## The craft bar
 

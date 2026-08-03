@@ -1,0 +1,296 @@
+---
+// The closing section, and the only part of the page that talks to a server.
+// The form posts to the NestJS API; `lib/contact.ts` owns the submit, the 422
+// field errors and the 429 backoff. `website` is the honeypot the API expects
+// — it has to reach the request body, so it is hidden from sight and from
+// assistive tech rather than removed.
+import { owner } from "../data/site.ts";
+import ArrowUpRight from "./ArrowUpRight.astro";
+
+const fields = [
+    { key: "name", index: "01", label: "name", placeholder: "Mario Rossi", type: "text" },
+    { key: "email", index: "02", label: "email", placeholder: "mario@studio.it", type: "email" },
+    { key: "message", index: "03", label: "message", placeholder: "What are you building?", type: "textarea" },
+] as const;
+---
+
+<section id="contact" class="contact" data-cursor-scheme="dark">
+    <div class="section-head label contact-head">
+        <span style="color:#fff">03 — contact</span>
+        <span>{owner.city} · {owner.timezone}</span>
+    </div>
+
+    <div class="contact-grid">
+        <div class="contact-intro">
+            <h2 data-reveal class="contact-title">say <span class="dim">hello.</span></h2>
+            <p class="contact-lede">
+                Freelance work, mostly. If you just want to talk about something on this
+                page, that works too — I reply within two working days.
+            </p>
+            <div class="contact-socials">
+                <a class="pill" href={owner.github} target="_blank" rel="noopener">github <ArrowUpRight /></a>
+                <a class="pill" href={owner.linkedin} target="_blank" rel="noopener">linkedin <ArrowUpRight /></a>
+            </div>
+        </div>
+
+        <form data-contact-form class="contact-form" novalidate>
+            {
+                fields.map((f) => (
+                    <label data-field class="cfield">
+                        <span class="label cfield-label">
+                            {f.index} / {f.label}
+                        </span>
+                        {f.type === "textarea" ? (
+                            <textarea
+                                name={f.key}
+                                rows="4"
+                                required
+                                placeholder={f.placeholder}
+                                aria-describedby={`err-${f.key}`}
+                            />
+                        ) : (
+                            <input
+                                name={f.key}
+                                type={f.type}
+                                required
+                                placeholder={f.placeholder}
+                                aria-describedby={`err-${f.key}`}
+                            />
+                        )}
+                        <span data-error-for={f.key} id={`err-${f.key}`} class="cfield-error" />
+                    </label>
+                ))
+            }
+
+            <div class="cfield-honeypot" aria-hidden="true">
+                <label>
+                    Leave this field empty
+                    <input name="website" type="text" tabindex="-1" autocomplete="off" />
+                </label>
+            </div>
+
+            <div class="contact-actions">
+                <button data-submit type="submit">send message</button>
+                <span data-form-status class="contact-status" role="status" aria-live="polite"></span>
+            </div>
+        </form>
+    </div>
+
+    <footer class="contact-footer label">
+        <span>© {new Date().getFullYear()} emanuele frascella</span>
+        <span>no trackers, no cookie banner</span>
+    </footer>
+</section>
+
+<style is:global>
+    .contact {
+        position: relative;
+        /* At least one full viewport, always. The work stage is a fixed
+           overlay that only stands down once the top of the viewport clears
+           the work section — if contact were shorter than the screen, the
+           page would bottom out with the stage still covering it. The spare
+           96px is slack, so clearing the stage doesn't come down to the very
+           last pixel of the document. */
+        min-height: calc(100vh + 96px);
+        /* Last section on the page, so its bottom padding is the one place
+           that has to clear both the home indicator and Safari's bottom URL
+           bar — see the `@supports` block below for the second part. */
+        padding: 15vh var(--gutter) 7vh;
+        background: var(--dark);
+        color: #fff;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contact-head {
+        border-top-color: var(--rule-dark);
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .contact-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 24px;
+        margin: 8vh 0 14vh;
+        align-items: start;
+    }
+
+    .contact-intro {
+        grid-column: 1 / span 5;
+    }
+
+    .contact-title {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(46px, 7vw, 116px);
+        line-height: 1;
+        color: #fff;
+    }
+
+    .contact-title .dim {
+        opacity: 0.4;
+    }
+
+    .contact-lede {
+        margin-top: 34px;
+        max-width: 34ch;
+        font-size: 15.5px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.62);
+        text-wrap: pretty;
+    }
+
+    .contact-socials {
+        display: flex;
+        gap: 12px;
+        margin-top: 36px;
+    }
+
+    .contact-form {
+        grid-column: 7 / span 6;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .cfield {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cfield-label {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .cfield input,
+    .cfield textarea {
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.26);
+        background: transparent;
+        padding: 10px 0;
+        font-size: 20px;
+        color: #fff;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+    .cfield textarea {
+        resize: none;
+    }
+
+    .cfield input::placeholder,
+    .cfield textarea::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .cfield input:focus,
+    .cfield textarea:focus {
+        border-bottom-color: #fff;
+    }
+
+    .cfield[data-invalid] input,
+    .cfield[data-invalid] textarea {
+        border-bottom-color: var(--accent);
+    }
+
+    .cfield-error {
+        min-height: 0;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+    }
+
+    .cfield-error:empty {
+        display: none;
+    }
+
+    /* Off-screen rather than display:none — a hidden input still has to be
+       submitted for the honeypot to mean anything. */
+    .cfield-honeypot {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .contact-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .contact-actions button {
+        border: 0;
+        background: #fff;
+        color: var(--dark);
+        padding: 16px 30px;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .contact-actions button:hover:not(:disabled) {
+        background: var(--accent);
+    }
+
+    .contact-actions button:disabled {
+        opacity: 0.55;
+        cursor: default;
+    }
+
+    .contact-status {
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+    }
+
+    .contact-status[data-kind="error"] {
+        color: oklch(0.72 0.15 30);
+    }
+
+    .contact-footer {
+        position: relative;
+        margin-top: auto;
+        border-top: 1px solid var(--rule-dark);
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    @media (max-width: 900px) {
+        .contact {
+            padding: 12vh var(--gutter) 7vh;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+            gap: 8vh;
+            margin: 6vh 0 10vh;
+        }
+
+        .contact-intro,
+        .contact-form {
+            grid-column: 1;
+        }
+
+        .contact-footer {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+
+</style>
