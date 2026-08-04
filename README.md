@@ -6,8 +6,7 @@ Independent services:
 
 | Path              | Stack              | Role                                                                 |
 | ----------------- | ------------------ | ------------------------------------------------------------------- |
-| `services/site-v2`| Astro (static) + vanilla TS | The public portfolio site. Static HTML; WebGL, three.js and GSAP layered on as plain ES modules. |
-| `services/site-v1`| Astro + React islands | The previous portfolio. Archived for reference — don't develop against it. |
+| `services/site`| Astro (static) + vanilla TS | The public portfolio site. Static HTML; WebGL, three.js and GSAP layered on as plain ES modules. |
 | `services/lab`    | React + Vite (SPA) | Standalone three.js experimentation lab (dev playground).           |
 | `services/api`    | NestJS (Node)      | Thin, stateless API. Server-side effects only (today: contact email). |
 
@@ -23,7 +22,7 @@ Run each service in its own terminal:
 cd services/api    && cp .env.example .env && npm install && npm run dev
 
 # Public site — http://localhost:5173
-cd services/site-v2 && cp .env.example .env && npm install && npm run dev
+cd services/site && cp .env.example .env && npm install && npm run dev
 
 # three.js lab — http://localhost:5174 (optional, standalone)
 cd services/lab    && npm install && npm run dev
@@ -36,14 +35,13 @@ The API logs contact messages to the console instead of sending them until
 
 ```bash
 cd services/api    && npm run build
-cd services/site-v2 && npm run build
+cd services/site && npm run build
 ```
 
 ## Layout
 
 ```
-services/site-v2  Astro static site + vanilla TS motion layer (portfolio)
-services/site-v1  previous portfolio, archived
+services/site  Astro static site + vanilla TS motion layer (portfolio)
 services/lab      React + Vite SPA (three.js lab)
 services/api      NestJS API
 .devcontainer     client/ + server/ dev containers

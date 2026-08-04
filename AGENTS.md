@@ -5,11 +5,10 @@ vendor-neutral companion to `CLAUDE.md` — read that first for the project map.
 
 ## The repo in one breath
 
-A two-service monorepo: `services/site-v2` (the portfolio — a static Astro site
+A two-service monorepo: `services/site` (the portfolio — a static Astro site
 with a vanilla-TS motion layer) and `services/api` (NestJS, sends the contact
 email). No database, no admin, no Laravel, no framework runtime on the page.
-`services/site-v1` is the previous React-island version, archived. The
-client/server seam is a single CORS request to `/api/contact` with a
+The client/server seam is a single CORS request to `/api/contact` with a
 `422 { message, errors }` validation contract.
 
 ## The agents (`.claude/agents/`)
@@ -20,7 +19,7 @@ server, and produce an ordered implementation plan citing `file:line`. Does not
 edit files; hands work to `frontend`/`backend`. Use before non-trivial features.
 
 ### `frontend` — the portfolio site
-Owns `services/site-v2`: Astro components, CSS, the `src/lib/` motion modules,
+Owns `services/site`: Astro components, CSS, the `src/lib/` motion modules,
 layout, responsive and touch behaviour, the contact-form UI. **This agent can run the app and see its
 own output** — it drives a browser (Playwright) to screenshot the page at desktop
 and mobile sizes, read the result, interact with it, and iterate until the craft
