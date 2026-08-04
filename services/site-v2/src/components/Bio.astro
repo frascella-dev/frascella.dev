@@ -9,13 +9,13 @@
 import { Picture } from "astro:assets";
 import { bioRows, footerFacts } from "../data/site.ts";
 
-import swingBridge from "../assets/taranto/swing-bridge.jpg";
-import marinaiMonument from "../assets/taranto/marinai-monument.jpg";
-import oldTownAlley from "../assets/taranto/old-town-alley.jpg";
-import procreateKoi from "../assets/drawing/procreate-koi.png";
-import serverRack from "../assets/production/server-rack.jpg";
-import phoneTeardown from "../assets/teardown/phone-teardown.jpg";
-import portStacks from "../assets/containers/port-stacks.jpg";
+import swingBridge from "../assets/taranto/swing-bridge.webp";
+import marinaiMonument from "../assets/taranto/marinai-monument.webp";
+import oldTownAlley from "../assets/taranto/old-town-alley.webp";
+import procreateKoi from "../assets/drawing/procreate-koi.webp";
+import phoneTeardown from "../assets/repair/phone-teardown.webp";
+import laptopEditor from "../assets/coding/laptop-editor.webp";
+import portStacks from "../assets/containers/port-stacks.webp";
 
 // Keyed by the `gallery` field on a row. Every frame of every gallery is
 // rendered up front and hidden — they are small, and a tile that has to wait
@@ -29,11 +29,11 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
     drawing: [
         { src: procreateKoi, alt: "A koi tattoo design drawn in Procreate on an iPad, Apple Pencil alongside" },
     ],
-    production: [
-        { src: serverRack, alt: "A server rack in a dim machine room, one amber status light among the cables" },
+    repair: [
+        { src: phoneTeardown, alt: "An old phone opened up under a desk lamp, its back cover and screws set aside next to a screwdriver" },
     ],
-    teardown: [
-        { src: phoneTeardown, alt: "An old Android phone opened up on a desk, screws and a screwdriver beside it" },
+    coding: [
+        { src: laptopEditor, alt: "A laptop on a wooden desk with a Python file open in the editor" },
     ],
     containers: [
         { src: portStacks, alt: "Stacked shipping containers and gantry cranes at a port at sunset" },

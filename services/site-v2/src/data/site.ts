@@ -28,22 +28,18 @@ export type Project = {
     desc: string;
     /** Year · stack, rendered as the meta line under the description. */
     meta: string;
-    /** Baked into the slab texture inside the three.js corridor. */
-    tag: string;
 };
 
 export const projects: Project[] = [
     {
         title: "vitrine",
-        desc: "A transparent overlay that lives behind the desktop icons, built the week work swapped my Ubuntu box (and Conky with it) for Windows 11. Themes in React, vibecoded, and it still starts with the PC every morning.",
+        desc: "A transparent overlay that lives behind the desktop icons, built the week work swapped my Ubuntu box (and Conky with it) for Windows 11. Themes in React, and it still starts with the PC every morning.",
         meta: "2026 · c# · wpf · webview2",
-        tag: "vitrine / system monitor",
     },
     {
         title: "proxima",
         desc: "Started as a way to plan and log my own gym programs instead of a spreadsheet, then grew an MCP server so Claude could read my progress, exercises, and stats directly. Since opened up to other people too — each connecting a Claude of their own, with real MFA behind it.",
         meta: "2026 · flutter · python · mysql",
-        tag: "proxima / training app",
     },
 ];
 
@@ -82,7 +78,7 @@ export const bioRows: BioRow[] = [
         lead: "broke it,",
         trail: "fixed it",
         meta: "in production",
-        gallery: "production",
+        gallery: "repair",
         body: [
             "Things break in production. That isn't the interesting part — the interesting part is how long they stay broken, and whether the same thing breaks again next month.",
             "Knowing whose fault it was has never made a fix land any sooner. Sort it, write down what happened so it doesn't happen twice, get on with it. You win as a team.",
@@ -93,7 +89,7 @@ export const bioRows: BioRow[] = [
         lead: "coding since",
         trail: "2013",
         meta: "as a kid",
-        gallery: "teardown",
+        gallery: "coding",
         body: [
             "I've been writing code since 2013 — Android apps first, then C++ through high school. Before that I was already taking things apart: decompiling Android APKs, poking through Minecraft mods, anything I could get inside.",
             "It was never about building something. It was about finding out how the thing in front of me had been built.",
@@ -101,8 +97,8 @@ export const bioRows: BioRow[] = [
     },
     {
         tile: "procreate",
-        lead: "drawing",
-        trail: "tattoos",
+        lead: "ink,",
+        trail: "not code",
         meta: "off hours",
         gallery: "drawing",
         body: [

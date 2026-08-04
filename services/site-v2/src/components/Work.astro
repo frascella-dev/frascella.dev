@@ -8,11 +8,23 @@
 // `.work-fallback` is the whole section without any of that: it is what a
 // reader gets with JavaScript off or reduced motion on, and it carries the
 // same three projects as real, crawlable text.
+import { getImage } from "astro:assets";
 import { projects, owner } from "../data/site.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
+import vitrineHero from "../assets/work/vitrine-hero.webp";
+import proximaHero from "../assets/work/proxima-hero.webp";
+
+// Artwork for the slab faces in the corridor. The three.js side paints these
+// into a 2D canvas, so what it needs is a plain URL at exactly the texture's
+// size — hence `getImage` here rather than an <Image> anywhere. Keyed by
+// project title; a project without one keeps the drawn placeholder.
+const slabArt: Record<string, string> = {
+    vitrine: (await getImage({ src: vitrineHero, width: 1024, height: 640, format: "webp" })).src,
+    proxima: (await getImage({ src: proximaHero, width: 1024, height: 640, format: "webp" })).src,
+};
 ---
 
-<section id="work" data-work class="work">
+<section id="work" data-work data-slab-art={JSON.stringify(slabArt)} class="work">
     <div class="work-tail"></div>
 
     <div data-work-stage class="work-stage">
@@ -94,13 +106,16 @@ import ArrowUpRight from "./ArrowUpRight.astro";
     }
 
     /* The black band that stays put underneath the stage so the section can
-       hand over to the (also black) contact section without a seam. */
+       hand over to the (also black) contact section without a seam. It has to
+       reach at least as far up as the point the stage starts dissolving —
+       EXIT_VH + EXIT_GAP_VH screens from the bottom — or the paper page shows
+       through the top of the frame as the corridor fades. */
     .work-tail {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        height: 120vh;
+        height: 340vh;
         background: var(--dark);
     }
 
@@ -310,11 +325,13 @@ import ArrowUpRight from "./ArrowUpRight.astro";
 
     /* When the motion layer is running the corridor takes over and the
        plain list steps aside. Otherwise the list *is* the section. */
-    /* Seven screens of scroll: roughly one to arrive, three to walk the
-       projects, and the rest to hand over to contact. The exit was the part
-       that was short — see EXIT_VH in lib/scroll.ts. */
+    /* Nine and a half screens: one to arrive, four and a half to walk the
+       projects and hold on the last one, and the rest to hand over — the last
+       screen of which is plain black, so contact never turns up while the
+       corridor is still dissolving. See DWELL and the *_VH constants in
+       lib/scroll.ts for how it is spent. */
     html.motion .work {
-        height: 700vh;
+        height: 940vh;
     }
 
     html.motion .work-tail,
@@ -331,7 +348,7 @@ import ArrowUpRight from "./ArrowUpRight.astro";
        the *_VH constants in lib/scroll.ts). */
     @media (max-width: 900px), (pointer: coarse) {
         html.motion .work {
-            height: 420vh;
+            height: 700vh;
         }
     }
 

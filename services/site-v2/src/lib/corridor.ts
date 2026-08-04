@@ -17,29 +17,63 @@ export type CorridorState = {
 
 const GAP = 10.4;
 
-/** The slab face: a hatched card with its index and label drawn into it. */
-function slabTexture(label: string, i: number) {
-    const c = document.createElement("canvas");
-    c.width = 1024;
-    c.height = 640;
-    const x = c.getContext("2d")!;
+/** The camera's vertical field of view at the height the scene was framed for. */
+const FOV = 38;
+
+const SLAB_W = 1024;
+const SLAB_H = 640;
+
+/**
+ * A film of white laid over the artwork, so the card reads as something lit
+ * inside a dark room rather than a photograph cut out and pasted onto it.
+ * It lifts the blacks and takes the edge off the saturation — which is what
+ * the missing sRGB decode used to do by accident, at roughly three times
+ * this strength. Keep it low: past ~0.12 it stops reading as light and
+ * starts reading as haze.
+ */
+const FACE_LIFT = 0.08;
+
+/**
+ * The slab face: the project's own artwork, cover-fitted, with nothing on top
+ * of it but the lift above — no number, no caption. Until the image arrives
+ * (and for a project that has none) it falls back to the drawn hatch the
+ * design started from.
+ */
+function paintSlab(x: CanvasRenderingContext2D, art?: HTMLImageElement) {
+    if (art?.complete && art.naturalWidth) {
+        const scale = Math.max(SLAB_W / art.naturalWidth, SLAB_H / art.naturalHeight);
+        const w = art.naturalWidth * scale;
+        const h = art.naturalHeight * scale;
+        x.drawImage(art, (SLAB_W - w) / 2, (SLAB_H - h) / 2, w, h);
+        x.fillStyle = `rgba(255,255,255,${FACE_LIFT})`;
+        x.fillRect(0, 0, SLAB_W, SLAB_H);
+        return;
+    }
+
     x.fillStyle = "#f6f4f0";
-    x.fillRect(0, 0, 1024, 640);
+    x.fillRect(0, 0, SLAB_W, SLAB_H);
     x.strokeStyle = "rgba(20,20,20,.10)";
     x.lineWidth = 14;
-    for (let k = -640; k < 1024; k += 34) {
+    for (let k = -SLAB_H; k < SLAB_W; k += 34) {
         x.beginPath();
         x.moveTo(k, 0);
-        x.lineTo(k + 640, 640);
+        x.lineTo(k + SLAB_H, SLAB_H);
         x.stroke();
     }
-    x.fillStyle = "#141414";
-    x.font = '400 104px Gloock, serif';
-    x.fillText(String(i + 1).padStart(2, "0"), 44, 132);
-    x.font = '500 24px "Schibsted Grotesk", Helvetica, sans-serif';
-    x.fillText(label, 44, 596);
+}
+
+function slabTexture(art?: HTMLImageElement) {
+    const c = document.createElement("canvas");
+    c.width = SLAB_W;
+    c.height = SLAB_H;
+    paintSlab(c.getContext("2d")!, art);
     const t = new THREE.CanvasTexture(c);
     t.anisotropy = 8;
+    // Colour data, not linear data. Without this three treats the canvas as
+    // already-linear, skips the sRGB decode and still applies the encode on
+    // output — which lifts the blacks and drains the saturation. It reads as
+    // a haze over the photograph.
+    t.colorSpace = THREE.SRGBColorSpace;
     return t;
 }
 
@@ -103,19 +137,36 @@ export function initCorridor(
     opts: CorridorOptions = {},
 ) {
     const lite = opts.lite ?? false;
-    // Slab faces are baked once into a 2D canvas. Bake them before Gloock
-    // and Schibsted Grotesk arrive and they are baked in the fallback face
-    // forever — so refresh the textures when the fonts land.
+    // Slab faces are baked once into a 2D canvas, before the artwork has
+    // arrived. It lands later, so the faces are repainted when it does.
     const textures: THREE.CanvasTexture[] = [];
-    document.fonts?.ready.then(() => {
+    const art: Record<string, HTMLImageElement> = {};
+
+    const repaint = () => {
         projects.forEach((it, i) => {
             const t = textures[i];
             if (!t) return;
-            const next = slabTexture(it.tag, i);
-            t.image = next.image;
+            t.image = slabTexture(art[it.title]).image;
             t.needsUpdate = true;
         });
-    });
+    };
+
+    // URLs come off the section as a data attribute — Astro optimised them at
+    // build time and only it knows the hashed filenames.
+    try {
+        const raw = document.querySelector<HTMLElement>("[data-work]")?.dataset.slabArt;
+        for (const [title, url] of Object.entries(JSON.parse(raw || "{}") as Record<string, string>)) {
+            const img = new Image();
+            img.decoding = "async";
+            img.onload = () => {
+                art[title] = img;
+                repaint();
+            };
+            img.src = url;
+        }
+    } catch {
+        // No artwork is a perfectly good state — the hatch stands in.
+    }
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -126,26 +177,26 @@ export function initCorridor(
     renderer.setPixelRatio(Math.min(devicePixelRatio, lite ? 1.5 : 2));
 
     const scene = new THREE.Scene();
-    const cam = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+    const cam = new THREE.PerspectiveCamera(FOV, 1, 0.1, 200);
     cam.position.set(0, 0, 12);
 
     const group = new THREE.Group();
-    projects.forEach((it, i) => {
+    // The outlines that hang behind each card. Kept to hand so a narrow frame
+    // can pull them in closer than the desktop proportion.
+    const halos: THREE.LineSegments[] = [];
+    projects.forEach((_, i) => {
         const g = new THREE.Group();
         const geo = new THREE.PlaneGeometry(6.4, 4);
-        textures[i] = slabTexture(it.tag, i);
+        textures[i] = slabTexture();
         g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: textures[i] })));
-        g.add(
-            new THREE.LineSegments(
-                new THREE.EdgesGeometry(geo),
-                new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }),
-            ),
-        );
+        // No outline hugging the image — only the outer one, which reads as a
+        // frame the card hangs in rather than a border drawn on it.
         const halo = new THREE.LineSegments(
             new THREE.EdgesGeometry(new THREE.PlaneGeometry(7.6, 5.2)),
             new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.16 }),
         );
         halo.position.z = -0.9;
+        halos.push(halo);
         g.add(halo);
         // Alternate the slabs above/below and near/far so the corridor has depth.
         g.position.set(i * GAP, i % 2 ? -0.5 : 0.5, i % 2 ? -5.2 : 1.2);
@@ -161,9 +212,13 @@ export function initCorridor(
     });
 
     const columns = new THREE.Group();
+    // x, z, height, line opacity. The second one sits deep on purpose: the
+    // camera now parks on the last slab, and at that rest position this
+    // column lands square in front of it. Behind the slab it reads as a
+    // backdrop instead of an obstruction.
     const layout: [number, number, number, number][] = [
         [-6.4, -8.4, 14.5, 0.34],
-        [3.2, -3.1, 12.5, 0.32],
+        [3.2, -7.5, 12.5, 0.32],
         [17.6, -7.8, 15, 0.3],
         [10.4, 3.6, 13, 0.19],
     ];
@@ -202,11 +257,34 @@ export function initCorridor(
     // the loop below.
     let portrait = false;
 
+    // The height the phone's scale is pinned to — see `resize`. Re-taken
+    // whenever the width changes, which is the only resize on a phone that
+    // isn't the URL bar coming and going.
+    let baseW = 0;
+    let baseH = 0;
+
     const resize = () => {
         const r = canvas.getBoundingClientRect();
-        if (!r.width) return;
+        if (!r.width || !r.height) return;
         renderer.setSize(r.width, r.height, false);
         cam.aspect = r.width / r.height;
+
+        // A phone's URL bar grows and shrinks as you scroll, and the viewport
+        // with it. At a fixed vertical field of view every one of those
+        // changes rescales the whole room, which is distracting in the middle
+        // of a scroll. So hold the world-units-per-pixel the first layout
+        // gave us and widen the field of view to match the new height
+        // instead: the cards keep exactly the size they had, and the strip
+        // the bar hands back simply shows more of the room.
+        if (lite) {
+            if (r.width !== baseW) {
+                baseW = r.width;
+                baseH = r.height;
+            }
+            const half = Math.tan((FOV * Math.PI) / 360) * (r.height / baseH);
+            cam.fov = (2 * Math.atan(half) * 180) / Math.PI;
+        }
+
         cam.updateProjectionMatrix();
         portrait = cam.aspect < 0.9;
     };
@@ -274,7 +352,14 @@ export function initCorridor(
             g.position.z = portrait ? -3 : i % 2 ? -5.2 : 1.2;
             g.position.y =
                 (portrait ? 0 : i % 2 ? -0.5 : 0.5) + Math.sin(now / 2600 + i) * 0.12;
-            g.scale.setScalar(1 - Math.min(0.22, Math.abs(d) * 0.12));
+            // Smaller in a portrait frame: at full size the card crowds the
+            // caption underneath it on a phone.
+            const base = portrait ? 0.81 : 1;
+            g.scale.setScalar(base * (1 - Math.min(0.22, Math.abs(d) * 0.12)));
+            // …and the outline sits closer in, so the card doesn't read as
+            // floating inside a frame two sizes too big for it. Tight in
+            // either frame; a touch tighter still on a phone.
+            halos[i]?.scale.setScalar(portrait ? 0.92 : 0.945);
         });
 
         // Parallax: the columns and dust drift slower than the slabs.

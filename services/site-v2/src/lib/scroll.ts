@@ -405,10 +405,20 @@ function workStage(state: CorridorState) {
     const lite = isLite();
     const INTRO_HOLD_VH = lite ? 0.45 : 0.8;
     const INTRO_END_VH = lite ? 0.9 : 1.6;
-    const CONTENT_END_VH = lite ? 1.35 : 2.6;
-    const OUTRO_FULL_VH = lite ? 0.9 : 1.7;
-    /** Screens spent dissolving the stage into the contact section. */
+    const CONTENT_END_VH = lite ? 3.3 : 3.8;
+    const OUTRO_FULL_VH = lite ? 2.6 : 3.0;
+    /** Screens spent dissolving the stage away. */
     const EXIT_VH = lite ? 0.7 : 1.15;
+    /**
+     * Where the dissolve finishes, measured in screens from the bottom of the
+     * section. Contact's top edge reaches the bottom of the viewport exactly
+     * one screen from there, so anything less than 1 means the two overlap and
+     * the next section turns up while the corridor is still dissolving. The
+     * amount over 1 is the beat of plain black in between — worth having on a
+     * phone in particular, where the URL bar retracting hands back height and
+     * pulls contact into view earlier than the cached viewport says it should.
+     */
+    const EXIT_GAP_VH = lite ? 1.55 : 1.45;
 
     const work = document.querySelector<HTMLElement>("[data-work]");
     const ripple = document.querySelector<HTMLElement>("[data-ripple]");
@@ -470,7 +480,7 @@ function workStage(state: CorridorState) {
         // only the columns and the outro card actually go, while contact
         // scrolls up through what's left. Driven off scroll position rather
         // than the ScrollTrigger so it holds on refresh and on a jump-scroll.
-        const exit = between(bottom - vh * EXIT_VH, bottom, y);
+        const exit = between(bottom - vh * (EXIT_VH + EXIT_GAP_VH), bottom - vh * EXIT_GAP_VH, y);
         stage.style.opacity = (1 - exit * exit * (3 - 2 * exit)).toFixed(3);
 
         // The stage doesn't take pointer events, so nothing under the cursor
@@ -514,7 +524,12 @@ function workStage(state: CorridorState) {
                 intro.style.transform = `translateY(${((1 - introVis) * -26).toFixed(1)}px)`;
             }
 
-            const inner = between(INTRO_END, CONTENT_END, p);
+            // The camera finishes its travel before the captions do. Without
+            // this the last project is centred at exactly the frame the outro
+            // starts on — it arrives and leaves in the same instant. Spending
+            // the last quarter of the range parked on it gives it a beat.
+            const DWELL = 0.25;
+            const inner = Math.min(1, between(INTRO_END, CONTENT_END, p) / (1 - DWELL));
             state.progress = inner;
             syncCopy(inner);
 
@@ -525,7 +540,7 @@ function workStage(state: CorridorState) {
             const o = between(MID, OUTRO_FULL, p);
             // Same window the stage fades over, so the card drifting up and
             // the corridor dissolving are one gesture rather than two.
-            const away = between(1 - vhP * EXIT_VH, 1, p);
+            const away = between(1 - vhP * (EXIT_VH + EXIT_GAP_VH), 1 - vhP * EXIT_GAP_VH, p);
             const visible = o * (1 - away);
 
             state.outro = copyOut;
