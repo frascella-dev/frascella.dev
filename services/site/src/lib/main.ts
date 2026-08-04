@@ -32,15 +32,18 @@ if (!reducedMotion()) {
         // away; the module is small enough not to be worth branching on.)
         import("./cursor.ts").then(({ initCursor }) => initCursor());
 
-        const [{ playSplash }, { initScroll, stageCoversViewport }] = await Promise.all([
-            import("./splash.ts"),
-            import("./scroll.ts"),
-        ]);
+        const [{ playSplash }, { initScroll, prepareHero, stageCoversViewport }] =
+            await Promise.all([import("./splash.ts"), import("./scroll.ts")]);
 
         // The splash owns the first seconds and locks scrolling; layout is
         // measured after it lifts, so ScrollTrigger sees final positions.
         // Same drawing at the same pace everywhere.
         const splash = playSplash();
+
+        // While the panel still covers the page, park the hero in its hidden
+        // starting pose — done any later, the iris would reveal the finished
+        // layout for a beat before it snapped back to animate in.
+        prepareHero();
 
         const workCanvas = document.querySelector<HTMLCanvasElement>("[data-three]");
 

@@ -40,8 +40,10 @@ export function initNav(root: ParentNode = document) {
         document.documentElement.classList.toggle("menu-open", next);
         toggle.setAttribute("aria-expanded", String(next));
         toggle.setAttribute("aria-label", next ? "Close menu" : "Open menu");
-        // The overlay covers the page but does not stop it scrolling, and a
-        // pointer would still reach what is behind the glass.
+        // The page holds still while the sheet is up — the lock is counted
+        // in env.ts, so it composes with the splash's own lock, and it never
+        // touches scroll position, so closing puts the reader back exactly
+        // where they were.
         if (next) lockScroll();
         else unlockScroll();
         if (page) page.inert = next;

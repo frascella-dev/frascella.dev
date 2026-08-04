@@ -26,12 +26,17 @@ export const isLite = () => matchMedia(MOBILE_QUERY).matches;
  */
 let locks = 0;
 
+// A class rather than an inline `overflow`, because `overflow: hidden` alone
+// is not a scroll lock on iOS Safari — touch panning has to be refused too,
+// and that (`touch-action`, `overscroll-behavior`, the body mirror) lives in
+// one place in base.css. Nothing here touches scroll position, so releasing
+// the lock puts the reader back exactly where they were.
 export function lockScroll() {
     locks += 1;
-    document.documentElement.style.overflow = "hidden";
+    document.documentElement.classList.add("is-locked");
 }
 
 export function unlockScroll() {
     locks = Math.max(0, locks - 1);
-    if (locks === 0) document.documentElement.style.overflow = "";
+    if (locks === 0) document.documentElement.classList.remove("is-locked");
 }

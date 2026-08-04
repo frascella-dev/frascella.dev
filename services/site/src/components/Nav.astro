@@ -197,7 +197,6 @@ import ArrowUpRight from "./ArrowUpRight.astro";
         flex-direction: column;
         justify-content: flex-end;
         padding: 0 var(--gutter) calc(42px + env(safe-area-inset-bottom, 0px));
-        background: var(--paper);
         color: var(--ink);
         /* Origin is written by lib/nav.ts from the toggle's own position. */
         clip-path: circle(0% at var(--ripple-x, 100%) var(--ripple-y, 32px));
@@ -205,6 +204,19 @@ import ArrowUpRight from "./ArrowUpRight.astro";
         transition:
             clip-path 0.58s var(--ease),
             visibility 0s linear 0.58s;
+    }
+
+    /* The sheet's paper is an absolute child, not a background on the fixed
+       element itself. iOS 26 Safari tints its bars from the background-color
+       of fixed viewport-wide elements — even `visibility: hidden` ones — and
+       a white sample here would fight the ink-dark bars the rest of the page
+       asks for. Absolute children are not sampled; the look is identical. */
+    .nav-drawer::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: var(--paper);
     }
 
     .nav-drawer.is-open {

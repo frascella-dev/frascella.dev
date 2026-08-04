@@ -37,7 +37,6 @@ export const stageCoversViewport = () => stageCovered;
 export function initScroll(state: CorridorState) {
     watchViewport();
     parallax();
-    heroDrift();
     heroEntrance();
     navHover();
     reveals();
@@ -82,6 +81,13 @@ function parallax() {
  * image has depth while the layout around it stays exactly where it is.
  * Deliberately one element — on a small screen, type that slides while you
  * read it reads as jank rather than as depth.
+ *
+ * Created from `prepareHero`, under the splash: the frame is usually already
+ * partway up the viewport when the page loads, and a scrubbed trigger born
+ * in view *animates* from the `from` pose to the current scroll's value — a
+ * quick downward lurch of the image right as the splash lifted. Building it
+ * while the panel still covers the page and snapping it to the live progress
+ * means the reveal shows the image already settled.
  */
 function heroDrift() {
     if (!isLite()) return;
@@ -89,7 +95,7 @@ function heroDrift() {
     const img = frame?.querySelector("img");
     if (!frame || !img) return;
 
-    gsap.fromTo(
+    const tw = gsap.fromTo(
         img,
         { yPercent: -8 },
         {
@@ -104,14 +110,27 @@ function heroDrift() {
             },
         },
     );
+    const st = tw.scrollTrigger;
+    if (st) tw.progress(st.progress);
 }
 
-/** Splits the headline into words so they can rise in one at a time. */
-function heroEntrance() {
+/**
+ * The hero entrance, in two halves. `prepareHero` splits the headline into
+ * words and parks everything in its hidden starting pose; it runs while the
+ * splash still covers the page, so by the time the panel irises away the
+ * hero is already waiting off-stage — no flash of the finished layout
+ * snapping back to frame one. `heroEntrance` then only has to play.
+ */
+const heroWords: HTMLElement[] = [];
+let heroPrepared = false;
+
+export function prepareHero() {
+    if (heroPrepared) return;
+    heroPrepared = true;
+
     const title = document.querySelector<HTMLElement>("[data-hero-title]");
     if (title && !title.dataset.split) {
         title.dataset.split = "1";
-        const words: HTMLElement[] = [];
         const walk = (node: Node) => {
             for (const n of [...node.childNodes]) {
                 if (n.nodeType === Node.TEXT_NODE) {
@@ -126,7 +145,7 @@ function heroEntrance() {
                         sp.style.display = "inline-block";
                         sp.setAttribute("data-w", "1");
                         frag.appendChild(sp);
-                        words.push(sp);
+                        heroWords.push(sp);
                     }
                     node.replaceChild(frag, n);
                 } else if (n.nodeType === Node.ELEMENT_NODE) {
@@ -135,10 +154,25 @@ function heroEntrance() {
             }
         };
         walk(title);
-        gsap.from(words, {
-            yPercent: 108,
-            rotate: 5,
-            opacity: 0,
+        gsap.set(heroWords, { yPercent: 108, rotate: 5, opacity: 0 });
+    }
+
+    const chips = document.querySelector<HTMLElement>("[data-hero-chips]");
+    if (chips) gsap.set(chips.children, { opacity: 0, y: 16 });
+
+    heroDrift();
+}
+
+function heroEntrance() {
+    // Belt and braces: on any path that never called `prepareHero` this
+    // degrades to exactly the old behaviour — set and play in the same tick.
+    prepareHero();
+
+    if (heroWords.length) {
+        gsap.to(heroWords, {
+            yPercent: 0,
+            rotate: 0,
+            opacity: 1,
             duration: 1.05,
             ease: "power4.out",
             stagger: 0.035,
@@ -148,9 +182,9 @@ function heroEntrance() {
 
     const chips = document.querySelector<HTMLElement>("[data-hero-chips]");
     if (chips) {
-        gsap.from(chips.children, {
-            opacity: 0,
-            y: 16,
+        gsap.to(chips.children, {
+            opacity: 1,
+            y: 0,
             duration: 0.6,
             ease: "power3.out",
             stagger: 0.05,

@@ -23,7 +23,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.d
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+
+        {/* One fixed colour, deliberately not media-queried: the browser bars
+            stay ink-dark whatever the page behind them is showing. iOS 26
+            Safari ignores this and samples the page instead — that side is
+            handled by the `.bar-tint` strips and the dark body in base.css. */}
+        <meta name="theme-color" content="#0b0b0b" />
 
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -55,6 +64,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.d
             (function () {
                 var d = document.documentElement;
                 d.classList.add("js");
+                // iOS Safari ignores `user-scalable=no`; refusing its
+                // proprietary gesture events is what actually stops the pinch.
+                document.addEventListener("gesturestart", function (e) {
+                    e.preventDefault();
+                });
                 if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
                     // `splash-open` is dropped by lib/splash.ts once the panel
                     // has irised away; it keeps the custom cursor off the
@@ -65,6 +79,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.d
         </script>
     </head>
     <body>
+        <!-- Sampling targets for iOS 26 Safari's bar tinting — see base.css. -->
+        <div class="bar-tint bar-tint-top" aria-hidden="true"></div>
+        <div class="bar-tint bar-tint-bottom" aria-hidden="true"></div>
         <slot />
     </body>
 </html>
