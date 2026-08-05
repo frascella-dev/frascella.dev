@@ -5,9 +5,9 @@ vendor-neutral companion to `CLAUDE.md` — read that first for the project map.
 
 ## The repo in one breath
 
-A two-service monorepo: `services/site` (the portfolio — a static Astro site
-with a vanilla-TS motion layer) and `services/api` (NestJS, sends the contact
-email). No database, no admin, no Laravel, no framework runtime on the page.
+A monorepo: `services/site` (the portfolio — a static Astro site with a
+vanilla-TS motion layer), `services/api` (plain PHP, sends the contact
+email) and `services/builder` (packages both into a CloudPanel tarball). No database, no admin, no Laravel, no framework runtime on the page.
 The client/server seam is a single CORS request to `/api/contact` with a
 `422 { message, errors }` validation contract.
 
@@ -26,10 +26,11 @@ and mobile sizes, read the result, interact with it, and iterate until the craft
 bar is met. Consults the `frontend-design` plugin for aesthetic direction and the
 `base.css` design tokens. A visual change isn't done without a screenshot.
 
-### `backend` — the NestJS API
-Owns `services/api`: endpoints, DTOs/validation, throttling, mail. Keeps the API
-small and stateless, preserves the `/api` prefix and the 422 error contract,
-reads all config from env, and verifies by building + curling the endpoint.
+### `backend` — the PHP API
+Owns `services/api`: routes, validation, rate-limiting, mail. Keeps the API
+small and stateless (flat-file throttle state, no database), preserves the
+`/api` prefix and the 422 error contract, reads all config from env, and
+verifies with `php -l` + curling the endpoint.
 
 ### `typewriter` — the copy
 Owns the *words*, not the layout: headlines, section intros, project

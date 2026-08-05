@@ -10,14 +10,15 @@ The personal portfolio of **Emanuele Frascella**, backend engineer (Taranto, Ita
 | ----------------- | ------------------ | ------------------------------------------------------------------- |
 | `services/site`| Astro (static) + vanilla TS | **The live portfolio.** Astro renders the whole page at build time; every moving part (WebGL fluid background, splash, GSAP scroll layer, three.js work corridor) is a plain ES module loaded from an Astro `<script>`. No framework runtime on the page. |
 | `services/lab`    | React + Vite (SPA) | Standalone three.js experimentation lab (formerly `/lab` inside the site). Dev-only playground, never shipped with the portfolio. |
-| `services/api`    | NestJS (Node)      | Small stateless API. Its only job is server-side effects — today, sending the contact-form email. |
+| `services/api`    | PHP 8 (no framework) | Small stateless API. Its only job is server-side effects — today, sending the contact-form email. One front controller + a few `Api\` classes; PHPMailer is the only dependency. |
+| `services/builder` | bash             | `build.sh` packages site + API into one tarball deployable on CloudPanel by extracting it once (see its `DEPLOY.md`). |
 
 There is **no database and no admin panel**. The site is static; the API is a thin server for things the browser can't do safely (SMTP, secrets, rate-limiting). This repo was migrated off a Laravel + Inertia monolith — that stack has been fully removed. Don't reintroduce Laravel, Inertia, an admin area, or a database without an explicit request.
 
 ## Architecture & the client/server seam
 
 - The site talks to the API **only** through `services/site/src/lib/api.ts` (axios, base URL `PUBLIC_API_URL`, with `VITE_API_URL` still honored as a fallback).
-- The contact form `POST`s `/api/contact`. The API validates, applies a honeypot + throttle + per-email cooldown, and emails the owner via nodemailer.
+- The contact form `POST`s `/api/contact`. The API validates, applies a honeypot + throttle + per-email cooldown (flat-file state under `var/state` — PHP-FPM has no memory between requests), and emails the owner via PHPMailer.
 - **Error contract (keep both sides in sync):** validation failures return `422` with `{ message, errors: { field: [msg] } }` — Laravel's shape, preserved so the frontend's `fieldErrors()` helper works unchanged.
 - All API routes live under the `/api` global prefix. CORS origins come from `CORS_ORIGINS`.
 
@@ -31,7 +32,7 @@ There is **no database and no admin panel**. The site is static; the API is a th
 
 ```bash
 # API  (http://localhost:3000/api) — logs mail instead of sending when MAIL_HOST is unset
-cd services/api && npm install && npm run dev
+cd services/api && composer install && composer dev
 
 # Public site (http://localhost:5173)
 cd services/site && npm install && npm run dev
@@ -40,17 +41,18 @@ cd services/site && npm install && npm run dev
 cd services/lab && npm install && npm run dev
 ```
 
-Copy each service's `.env.example` to `.env` and fill it in. The devcontainers (`.devcontainer/`) run the two as separate `client` and `server` containers.
+Copy each service's `.env.example` to `.env` and fill it in.
 
 ## Build / verify
 
 - `services/site`: `npm run build` (Astro; underlying Vite/esbuild does **not** type-gate — types are intentionally loose, `noImplicitAny: false`). `npm run typecheck` (`astro check`) is opt-in.
 - `services/lab`: `npm run build` (Vite). Standalone, no API contract.
-- `services/api`: `npm run build` (`nest build`, real `tsc`). Smoke-test endpoints with `curl` after changing them.
+- `services/api`: `php -l` on touched files (no build step). Smoke-test endpoints with `curl` after changing them.
+- **Deploy package:** `services/builder/build.sh` → `dist/portfolio-<ts>.tar.gz` (site built with `PUBLIC_API_URL=""`, same-origin `/api`).
 
 ## Working conventions
 
-- **Agents:** specialised subagents live in `.claude/agents/` — `architect` (design/plan, read-only), `frontend` (the SPA; can screenshot and evaluate its own work via Playwright), `backend` (the NestJS API). Prefer them for scoped work.
+- **Agents:** specialised subagents live in `.claude/agents/` — `architect` (design/plan, read-only), `frontend` (the SPA; can screenshot and evaluate its own work via Playwright), `backend` (the PHP API). Prefer them for scoped work.
 - **`/ship`** — stage + commit all changes with a concise message; `--push` also pushes.
 - **`briefs/`** — one markdown brief per feature we plan in chat (`briefs/_template.md`).
 - **`docs/`** — living documentation (`docs/_template.md`).

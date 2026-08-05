@@ -20,7 +20,7 @@ A change with any visual outcome is not done until you've looked at it. Loop:
 
 ## Conventions
 - **Structure:** `.astro` components in `src/components/` (markup + its own `<style is:global>`), page in `src/pages/index.astro`, shell in `src/layouts/Base.astro`, copy and project data in `src/data/site.ts`, tokens in `src/styles/base.css`, motion modules and the API client in `src/lib/`.
-- **No backend coupling:** the site is static. It talks to the NestJS API only through `src/lib/api.ts` (base URL `PUBLIC_API_URL`). The contact form POSTs `/api/contact` and reads the `422 { errors }` contract via `fieldErrors`. Keep that shape in sync with the `backend` agent.
+- **No backend coupling:** the site is static. It talks to the PHP API only through `src/lib/api.ts` (base URL `PUBLIC_API_URL`). The contact form POSTs `/api/contact` and reads the `422 { errors }` contract via `fieldErrors`. Keep that shape in sync with the `backend` agent.
 - **Motion is gated on `html.motion`,** set by the inline head script in `Base.astro`. Anything the CSS hides expecting a timeline to reveal it must sit behind that class, so the page still reads with JS off or reduced motion on. Verify both paths before calling a motion change done.
 - **No Inertia, no Laravel, no admin.** Those are gone. Don't reference them.
 - **Types are loose by design** (`noImplicitAny: false`). Don't add heavy typing churn; match the surrounding style.

@@ -133,6 +133,15 @@ html.splash-open .cursor-ring {
     html.motion body * {
         cursor: none;
     }
+
+    /* Astro's dev toolbar sits above the custom cursor's layer, so hiding
+       the native pointer there means having no pointer at all. Give it the
+       system cursor back. Dev-only by construction: the element doesn't
+       exist in a build, so the rule never matches one. */
+    html.motion body astro-dev-toolbar,
+    html.motion body astro-dev-toolbar * {
+        cursor: auto;
+    }
 }
 
 /* No pointer to replace. Nothing to hide, and the native `cursor: pointer`

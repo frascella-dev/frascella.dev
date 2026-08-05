@@ -121,7 +121,16 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
           force /= length(force) + 1e-4;
           force *= uCurlStrength * C;
           force.y *= -1.0;
-          vec2 vel = texture2D(uVelocity, vUv).xy + force * uDt;
+          vec2 vel = texture2D(uVelocity, vUv).xy;
+          // Confinement is the one term that ADDS energy, and above a
+          // certain speed it adds more than dissipation removes — the field
+          // then feeds itself into a page-wide jet that ignores the pointer
+          // (drift growing with zero input, caught by the fluid log). Fade
+          // the force out as speed rises: full curl at stroke speeds
+          // (~100–450), a quarter of it up where the runaway used to live,
+          // so decay always wins before the blow-up regime.
+          force *= 1.0 / (1.0 + dot(vel, vel) / (450.0 * 450.0));
+          vel += force * uDt;
           gl_FragColor = vec4(clamp(vel, -1000.0, 1000.0), 0.0, 1.0);
         }`,
         {
@@ -213,6 +222,41 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         },
     );
 
+    // ------------------------------------------------------------------ //
+    // Dev-only diagnostics, switched from the Astro toolbar ("Log the
+    // fluid" in src/devtools/settings.ts). Everything below the flag is
+    // behind `import.meta.env.DEV`, so a production build carries none of
+    // it. One line per event (splat, wipe, rebuild, dropped teleport) and,
+    // once a second, a reading of the velocity field itself — mean drift
+    // vector, peak speed, NaN count — taken through an 8-bit probe pass
+    // because half-float readback is driver lottery.
+    const DEBUG =
+        import.meta.env.DEV && localStorage.getItem("portfolio:dev:fluid-log") === "1";
+
+    /** Packs velocity into bytes: xy → [0,1] over ±1500, blue flags NaN. */
+    const probeMat = DEBUG
+        ? prog(
+              `
+        uniform sampler2D uVelocity;
+        void main(){
+          vec2 v = texture2D(uVelocity, vUv).xy;
+          float bad = (v.x != v.x || v.y != v.y) ? 1.0 : 0.0;
+          vec2 n = clamp(v / 1500.0, -1.0, 1.0) * 0.5 + 0.5;
+          gl_FragColor = vec4(n, bad, 1.0);
+        }`,
+              { uVelocity: { value: null } },
+          )
+        : null;
+
+    const t0 = performance.now();
+    const dlog = (msg: string) =>
+        console.log(
+            `%c[fluid ${((performance.now() - t0) / 1000).toFixed(1).padStart(6, " ")}s]%c ${msg}`,
+            "color:#96703c;font-weight:600",
+            "",
+        );
+    const stats = { frames: 0, dtMax: 0, ptr: 0, ptrMax: 0, auto: 0, drops: 0 };
+
     const rt = (w: number, h: number) =>
         new THREE.WebGLRenderTarget(w, h, {
             type: THREE.HalfFloatType,
@@ -250,6 +294,8 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
 
     let velocity: Double, dye: Double, pressure: Double;
     let divergence: THREE.WebGLRenderTarget, curl: THREE.WebGLRenderTarget;
+    let probe: THREE.WebGLRenderTarget | null = null;
+    let probeBuf: Uint8Array;
     const simTexel = new THREE.Vector2();
     const dyeTexel = new THREE.Vector2();
     let aspect = 1;
@@ -278,6 +324,16 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         curl = rt(sw, sh);
         simTexel.set(1 / sw, 1 / sh);
         dyeTexel.set(1 / dw, 1 / dh);
+        if (DEBUG) {
+            probe?.dispose();
+            // Plain 8-bit target the probe pass packs velocity into.
+            probe = new THREE.WebGLRenderTarget(sw, sh, {
+                depthBuffer: false,
+                stencilBuffer: false,
+            });
+            probeBuf = new Uint8Array(sw * sh * 4);
+            dlog(`build ${r.width}×${r.height} → sim ${sw}×${sh}, dye ${dw}×${dh} (fields wiped)`);
+        }
     };
     build();
 
@@ -295,14 +351,46 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         // fire them all in a single frame on the way back — a surge that
         // reads as the ink collapsing rather than following the pointer.
         if (px !== null && py !== null && !paused()) {
-            splats.push({ x, y, dx: (x - px) * 5200, dy: (y - py) * 5200 });
+            // A fifth of the screen between two move events isn't a movement,
+            // it's a re-entry: the pointer left for the browser's own chrome,
+            // another window or another monitor, and `px` is wherever it was
+            // last seen. Scaled up and splatted, that phantom stroke is a jet
+            // strong enough to shove the whole field one way for seconds —
+            // the ink "stops following the mouse". Real motion between two
+            // events is an order of magnitude below this, so nothing genuine
+            // is ever discarded; the event still re-anchors below.
+            if (Math.hypot(x - px, y - py) < 0.2) {
+                const dx = (x - px) * 5200;
+                const dy = (y - py) * 5200;
+                splats.push({ x, y, dx, dy });
+                if (DEBUG) {
+                    stats.ptr += 1;
+                    stats.ptrMax = Math.max(stats.ptrMax, Math.hypot(dx, dy));
+                }
+            } else if (DEBUG) {
+                stats.drops += 1;
+                dlog(
+                    `DROP teleport Δ=(${(x - px).toFixed(2)}, ${(y - py).toFixed(2)}) → re-anchor at (${x.toFixed(2)}, ${y.toFixed(2)})`,
+                );
+            }
         }
         px = x;
         py = y;
     };
 
+    // Losing the pointer (or the whole window) drops the anchor entirely, so
+    // coming back always starts a fresh stroke instead of continuing a stale
+    // one. The distance guard above stays as the backstop for the cases that
+    // fire no leave event — dev tools, some browser chrome.
+    const onLeave = () => {
+        if (DEBUG && px !== null) dlog("anchor reset (pointer left / window blurred)");
+        px = py = null;
+    };
+
     addEventListener("resize", build);
     addEventListener("pointermove", onPointer, { passive: true });
+    document.addEventListener("pointerleave", onLeave);
+    addEventListener("blur", onLeave);
 
     const doSplat = (sp: Splat) => {
         splatMat.uniforms.uAspect.value = aspect;
@@ -340,14 +428,59 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
     let raf = 0;
     let stopped = false;
     let wasPaused = false;
+    let nextLog = performance.now() + 1000;
+
+    /**
+     * Renders the probe pass and reads it back, then prints the second's
+     * summary: what went in (splats) next to what the field is doing (mean
+     * drift vector, peak speed, NaN pixels). A drift that grows while the
+     * splat columns stay quiet is the sim misbehaving on its own; a drift
+     * that follows a logged splat is an input problem.
+     */
+    const logSecond = () => {
+        if (!probeMat || !probe) return;
+        probeMat.uniforms.uVelocity.value = velocity.read.texture;
+        blit(probeMat, probe);
+        const { width: w, height: h } = probe;
+        renderer.readRenderTargetPixels(probe, 0, 0, w, h, probeBuf);
+        let sx = 0;
+        let sy = 0;
+        let peak = 0;
+        let nan = 0;
+        const n = w * h;
+        for (let i = 0; i < n; i++) {
+            const vx = (probeBuf[i * 4] / 255 - 0.5) * 3000;
+            const vy = (probeBuf[i * 4 + 1] / 255 - 0.5) * 3000;
+            if (probeBuf[i * 4 + 2] > 0) nan += 1;
+            sx += vx;
+            sy += vy;
+            const m = Math.abs(vx) + Math.abs(vy);
+            if (m > peak) peak = m;
+        }
+        const fmt = (v: number) => (v >= 0 ? "+" : "") + v.toFixed(0);
+        dlog(
+            `${String(stats.frames).padStart(3)}f dt≤${Math.round(stats.dtMax * 1000)}ms | ` +
+                `ptr ${String(stats.ptr).padStart(3)} splats ≤${Math.round(stats.ptrMax)} | ` +
+                `auto ${stats.auto} | drops ${stats.drops} | ` +
+                `field μ=(${fmt(sx / n)}, ${fmt(sy / n)}) peak ${peak >= 2990 ? "≥3000" : Math.round(peak)} NaN ${nan}` +
+                (nan ? " ⚠ FIELD CORRUPT" : ""),
+        );
+        stats.frames = stats.dtMax = stats.ptr = stats.ptrMax = stats.auto = stats.drops = 0;
+    };
 
     const tick = () => {
         if (stopped) return;
         raf = requestAnimationFrame(tick);
         const now = performance.now();
-        const dt = Math.min(0.017, (now - last) / 1000);
+        const rawDt = (now - last) / 1000;
+        const dt = Math.min(0.017, rawDt);
         last = now;
         if (!velocity) return;
+        if (DEBUG) {
+            stats.frames += 1;
+            // The real gap, not the clamped one — a stall shows here.
+            stats.dtMax = Math.max(stats.dtMax, rawDt);
+        }
 
         if (paused()) {
             wasPaused = true;
@@ -367,6 +500,7 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
             wipe(velocity);
             wipe(dye);
             wipe(pressure);
+            if (DEBUG) dlog("resume from pause → fields wiped, anchor reset");
         }
 
         // A page nobody is touching still moves — an occasional nudge from a
@@ -374,12 +508,19 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         if (now > nextAuto) {
             nextAuto = now + 2200 + Math.random() * 2600;
             const ang = Math.random() * Math.PI * 2;
-            splats.push({
+            const auto = {
                 x: 0.15 + Math.random() * 0.7,
                 y: 0.15 + Math.random() * 0.7,
                 dx: Math.cos(ang) * 620,
                 dy: Math.sin(ang) * 620,
-            });
+            };
+            splats.push(auto);
+            if (DEBUG) {
+                stats.auto += 1;
+                dlog(
+                    `auto nudge at (${auto.x.toFixed(2)}, ${auto.y.toFixed(2)}) dir ${Math.round((ang * 180) / Math.PI)}°`,
+                );
+            }
         }
         while (splats.length) doSplat(splats.shift()!);
 
@@ -435,7 +576,19 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         displayMat.uniforms.uVelocity.value = velocity.read.texture;
         (displayMat.uniforms.uTexel.value as THREE.Vector2).copy(dyeTexel);
         blit(displayMat, null);
+
+        if (DEBUG && now > nextLog) {
+            nextLog = now + 1000;
+            logSecond();
+        }
     };
+    if (DEBUG) {
+        dlog(
+            "diagnostics on (toolbar → Portfolio → Log the fluid). " +
+                "Per second: frames, worst frame gap, pointer splats (count, strongest), " +
+                "auto nudges, dropped teleports, field mean drift / peak speed / NaN pixels.",
+        );
+    }
     tick();
 
     return () => {
@@ -443,6 +596,8 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         cancelAnimationFrame(raf);
         removeEventListener("resize", build);
         removeEventListener("pointermove", onPointer);
+        document.removeEventListener("pointerleave", onLeave);
+        removeEventListener("blur", onLeave);
         for (const d of [velocity, dye, pressure]) {
             if (d) {
                 d.a.dispose();
@@ -451,6 +606,7 @@ export function initFluid(canvas: HTMLCanvasElement, opts: FluidOptions = {}) {
         }
         divergence?.dispose();
         curl?.dispose();
+        probe?.dispose();
         renderer.dispose();
     };
 }

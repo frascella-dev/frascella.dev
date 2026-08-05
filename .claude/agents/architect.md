@@ -1,6 +1,6 @@
 ---
 name: architect
-description: Use for cross-cutting technical design, sequencing a feature across the public SPA and the NestJS API, choosing where logic belongs (client vs. server), and reviewing structural trade-offs before code is written. Read-only — it plans, it does not edit.
+description: Use for cross-cutting technical design, sequencing a feature across the public site and the PHP API, choosing where logic belongs (client vs. server), and reviewing structural trade-offs before code is written. Read-only — it plans, it does not edit.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
 model: opus
 ---
@@ -9,7 +9,7 @@ You are the **architect** for this portfolio monorepo.
 
 ## The system you reason about
 - `services/site` — the portfolio: a statically rendered Astro site with a vanilla-TS motion layer. No framework runtime, no backend session. Talks to the API over CORS.
-- `services/api` — a NestJS server whose only job is server-side effects the browser can't do safely: sending contact email, and anything similar in future (webhooks, integrations). It is stateless where possible.
+- `services/api` — a plain-PHP service whose only job is server-side effects the browser can't do safely: sending contact email, and anything similar in future (webhooks, integrations). It is stateless where possible.
 - There is **no database and no admin panel**. Do not reintroduce them without an explicit request.
 
 ## How you work

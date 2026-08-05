@@ -17,6 +17,26 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.dev");
+
+// The dev toolbar's "skip the splash" switch (src/devtools/settings.ts) writes
+// a localStorage flag; this reads it before the first paint and turns it into
+// a class, exactly the way `js` and `motion` are set below. Both strings are
+// rendered into the head only under `astro dev` — a production build emits
+// neither, so there is nothing to strip and nothing to leak.
+const DEV_SKIP_SPLASH_JS = `
+(function () {
+    if (localStorage.getItem("portfolio:dev:skip-splash") !== "1") return;
+    var d = document.documentElement;
+    d.classList.remove("splash-open");
+    d.classList.add("dev-no-splash");
+})();
+`;
+
+// The panel is only ever painted because a timeline is going to take it away
+// again (see Splash.astro). Skipping that timeline means hiding it here, or it
+// simply stays up. `!important` because the rule it has to beat —
+// `html.motion .splash` — carries the same specificity.
+const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !important; }`;
 ---
 
 <!doctype html>
@@ -77,6 +97,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.d
                 }
             })();
         </script>
+
+        {import.meta.env.DEV && <script is:inline set:html={DEV_SKIP_SPLASH_JS} />}
+        {import.meta.env.DEV && <style is:inline set:html={DEV_SKIP_SPLASH_CSS} />}
     </head>
     <body>
         <!-- Sampling targets for iOS 26 Safari's bar tinting — see base.css. -->

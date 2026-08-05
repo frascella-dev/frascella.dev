@@ -4,7 +4,7 @@
 > how to work with it — the durable counterpart to a `brief`, which describes a
 > change. Delete the guidance blockquotes as you fill it in.
 
-- **Area:** public SPA | API | infra / devcontainers | cross-cutting
+- **Area:** public SPA | API | infra / build | cross-cutting
 - **Last updated:** YYYY-MM-DD
 - **Related:** `briefs/<...>.md`, source files (`path:line`)
 

@@ -38,7 +38,15 @@ if (!reducedMotion()) {
         // The splash owns the first seconds and locks scrolling; layout is
         // measured after it lifts, so ScrollTrigger sees final positions.
         // Same drawing at the same pace everywhere.
-        const splash = playSplash();
+        //
+        // Unless the dev toolbar asked for the page without it: the class is
+        // stamped in the head before first paint (the stylesheet hides the
+        // panel to match), and everything downstream just sees a splash that
+        // finished instantly. `import.meta.env.DEV` folds the whole branch
+        // away in a build.
+        const skipSplash =
+            import.meta.env.DEV && document.documentElement.classList.contains("dev-no-splash");
+        const splash = skipSplash ? Promise.resolve() : playSplash();
 
         // While the panel still covers the page, park the hero in its hidden
         // starting pose — done any later, the iris would reveal the finished

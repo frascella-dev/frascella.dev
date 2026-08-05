@@ -37,11 +37,25 @@ html {
     /* The canvas behind the page is ink, not paper: it's what browsers show
        in the overscroll glow at either end of the page. */
     background: var(--dark);
-    /* The splash and the menu hide the scrollbar while they hold the page.
-       Reserving its gutter up front means handing the scroll back doesn't
-       reflow the layout sideways — that reflow read as the hero "jumping"
-       the moment its entrance began. */
-    scrollbar-gutter: stable;
+}
+
+/* No scrollbar anywhere. It was the one piece of browser chrome painted over
+   a page that is otherwise a composed scene, and the corridor in particular
+   reads as a frame rather than a document. Only the indicator goes —
+   scrolling by wheel, keys, touch, scrollbar-drag aside, and every
+   ScrollTrigger below behaves exactly as before.
+
+   It also settles the reflow the scroll lock used to cause: with the bar
+   taking no width, hiding the overflow for the splash or the menu can't
+   shift the layout sideways any more. */
+html,
+body {
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
 }
 
 /* The scroll lock. `is-locked` is counted on and off by lib/env.ts (the
