@@ -1,0 +1,474 @@
+---
+// The privacy page. Not a template: it describes what this site actually
+// does, table by table, because the whole argument for asking permission is
+// that the answer is short and checkable.
+//
+// `bare` — it shares the shell and the tokens with the portfolio and nothing
+// else. No splash to lift, no motion layer, no custom cursor.
+import Base from "../layouts/Base.astro";
+import Footer from "../components/Footer.astro";
+import { owner } from "../data/site.ts";
+
+const cookies = [
+    {
+        name: "pf_consent",
+        purpose: "Records your answer to the banner — yes or no — so you are not asked again. Written by the page itself, and it is the only cookie that exists before you have answered.",
+        life: "6 months",
+        consent: "No. It exists to remember a choice, including a refusal.",
+    },
+    {
+        name: "pf_vid",
+        purpose: "A random number that tells one browser from another, so a second visit is not counted as a second person. Written by the server, and only once you have said yes.",
+        life: "13 months, renewed on each visit",
+        consent: "Yes",
+    },
+    {
+        name: "pf_sid",
+        purpose: "Groups the events of one visit together. A new one starts after 30 minutes of silence.",
+        life: "30 minutes",
+        consent: "Yes",
+    },
+    {
+        name: "pf_admin",
+        purpose: "Signs me in to my own dashboard. It is only ever issued against a correct password, so it never reaches a visitor's browser.",
+        life: "7 days",
+        consent: "No. Technical, and not a visitor's cookie.",
+    },
+];
+
+const collected = [
+    ["Which sections you reached, and how long each one was on screen", "To find out whether the page is worth scrolling."],
+    ["How far down the page you got — 25%, 50%, 75%, 100%", "Same question, blunter."],
+    ["Whether you opened a bio row, moved through the work corridor, or followed a link out", "To tell which parts hold attention."],
+    ["Whether you saw the contact form, started writing, and sent it", "To find out where the form loses people."],
+    ["Your device type, operating system and browser — three short labels like mobile, ios, safari. The full identifying string your browser sends is read, sorted into those three, and thrown away.", "To know what the site has to look right on."],
+    ["Screen and window size, language, time zone", "Same question, in more detail."],
+    ["The site you arrived from, and any campaign tags on the link", "To know where visitors come from."],
+    ["A two-letter country code, but only when the network in front of the site has already worked one out and says so. There is no lookup here and no database to do one with, so this is often simply blank.", "To know which countries the site is read in. No city, no coordinates, nothing finer."],
+];
+---
+
+<Base
+    bare
+    title={`Privacy — ${owner.name}`}
+    description="What this site collects, why, how long it keeps it, and how to say no."
+>
+    <main class="doc">
+        <div class="doc-inner">
+            <a class="label doc-back" href="/">← back to the site</a>
+
+            <h1 class="doc-title">Privacy</h1>
+            <p class="doc-lede">
+                This site measures itself. There is no Google Analytics, no advertising
+                network, no third-party script, and nothing on the page that your browser
+                fetches from anybody else — not a font, not a video player, not a social
+                button. The code that counts is part of the site, and what it counts lands
+                in a database on the same server that serves the page. One thing leaves,
+                and only if you send it: your message, which goes out as an email.
+            </p>
+
+            <h2>Who is responsible</h2>
+            <p>
+                {owner.name}, {owner.city} — VAT no. {owner.vat}. I am the controller of
+                everything described here. This site is run by one person; there is no
+                organization behind it and no data protection officer, because neither is
+                required at this scale.
+            </p>
+            <p>
+                {
+                    owner.email
+                        ? <>For anything on this page, write to <a href={`mailto:${owner.email}`}>{owner.email}</a>.</>
+                        : <>For anything on this page — including any of the requests listed
+                          under <a href="#rights">your rights</a> — use the{" "}
+                          <a href="/#contact">contact form</a>. It reaches my inbox directly,
+                          and replying to it puts my address in front of you.</>
+                }
+            </p>
+
+            <h2>What is collected, and why</h2>
+            <p>
+                Only with your consent, and only after you have given it. Nothing in the
+                list below is measured until you answer the banner, and answering no keeps
+                it that way — the code that does the measuring is not even downloaded.
+                Declining costs you nothing: the site behaves identically either way.
+            </p>
+            <dl class="doc-list">
+                {collected.map(([what, why]) => (
+                    <div class="doc-list-row">
+                        <dt>{what}</dt>
+                        <dd>{why}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <h2>The contact form</h2>
+            <p>
+                This one is not about consent. You type a name, an email address and a
+                message, and sending it is the request — I would be ignoring you, not
+                protecting you, if I refused to read it. All three fields are required: a
+                message I cannot read or reply to is not a message, and the form will not
+                send without them. There is no other field, hidden or otherwise, except a
+                decoy input that only a spam bot fills in.
+            </p>
+            <p>
+                What you send is emailed to me and <strong>never written to the
+                database</strong>. It then sits in my mailbox for as long as the
+                conversation is worth keeping, which is a judgment and not a schedule — ask
+                me to delete it and I will. Your email address is also used to hold a
+                fifteen-minute cooldown, so a double-click does not send twice.
+            </p>
+
+            <h2>What is not collected</h2>
+            <p>
+                <strong>Your IP address is never written to the database.</strong> No table
+                that records a visit has a column for it. It is used for one thing: counting
+                requests, so that one machine cannot flood the contact form or the counter.
+                Even there the address itself is not written down — it is hashed, and the
+                hash is the name of a small file holding a number. Those files are swept
+                once they go a couple of hours untouched.
+            </p>
+            <p>
+                Being exact about the edges of that, because it is the kind of claim worth
+                checking: the web server in front of the application keeps its own access
+                log, the way every web server on the internet does, and a line in a web
+                server log has an address in it. That is plumbing, not measurement. It is
+                never joined to anything on this page, and there is one row in this
+                database that holds an IP address — mine, from my own sign-ins, described
+                below.
+            </p>
+            <p>
+                There is no profiling, no automated decision-making, no tracking across
+                other websites, and no attempt to work out who you are. The identifier in
+                <code>pf_vid</code> is a random number that means nothing outside this site.
+                No name, no email address and no account is attached to it, because there
+                are no visitor accounts here to attach.
+            </p>
+
+            <h2>Cookies</h2>
+            <table class="doc-table">
+                <thead>
+                    <tr><th>Name</th><th>What it does</th><th>Lifetime</th><th>Needs consent</th></tr>
+                </thead>
+                <tbody>
+                    {cookies.map((c) => (
+                        <tr>
+                            <td><code>{c.name}</code></td>
+                            <td>{c.purpose}</td>
+                            <td>{c.life}</td>
+                            <td>{c.consent}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <p class="doc-note">
+                All four are first-party: set on this domain, sent back only to this domain,
+                and unreadable by anybody else. There are no others — no advertising cookie,
+                no embedded video player, no social button — and nothing about your visit is
+                tucked away in your browser's local storage instead.
+            </p>
+
+            <h2>What leaves this server</h2>
+            <p>
+                <strong>Your message, if you send one.</strong> It leaves over SMTP and lands
+                in my mailbox. The provider that carries it and the provider that hosts that
+                mailbox handle it the way the postal service handles a letter — they are in
+                the path because there is no way to send mail without one. That is the whole
+                list.
+            </p>
+            <p>
+                Loading a page here contacts no one else. Every file the page needs —
+                stylesheets, scripts, images, and the two typefaces it is set in — comes from
+                this domain, so your browser never announces itself to a server I do not run.
+                There is no analytics vendor, no advertising partner, no CRM, no newsletter
+                tool, and no list your address is added to. The company that hosts the server
+                can of course reach its disks, as is true of every hosted site anywhere, and
+                if a network sits in front of the site and hands it a country code, that
+                network sees the traffic too — see the last row of what is collected.
+            </p>
+            <p>
+                Nothing here is deliberately sent outside the EEA. The mail path is the only
+                place it could happen at all, and that depends on which provider is carrying
+                the message.
+            </p>
+
+            <h2>Legal basis, and how long things are kept</h2>
+            <p>
+                <strong>Analytics — your consent</strong>, art. 6(1)(a) GDPR, together with
+                art. 122 of the Codice Privacy for the cookies themselves. You can withdraw
+                it at any moment, below, and withdrawing is exactly as easy as giving it.
+            </p>
+            <p>
+                Two different clocks run here, and they are worth keeping apart. The
+                identifier in your browser, <code>pf_vid</code>, lasts <strong>13
+                months</strong> — the ceiling the Garante puts on an analytics identifier —
+                and is renewed each time you come back. The rows on the server are deleted
+                after <strong>400 days</strong>, by a job that runs nightly. The second
+                number is not the first one rounded off; they govern different things, which
+                is why the page gives both.
+            </p>
+            <p>
+                <strong>The contact form — art. 6(1)(b)</strong>: steps taken at your own
+                request, before anything like a contract exists. Nothing is stored server
+                side; the email lives in my mailbox, as described above.
+            </p>
+            <p>
+                <strong>Flood protection — art. 6(1)(f)</strong>, my legitimate interest in
+                a site that stays up. Counters only, and they expire within hours.
+            </p>
+            <p>
+                <strong>The consent cookie and the sign-in cookie</strong> need no consent
+                at all: art. 122 of the Codice Privacy exempts a cookie that is strictly
+                necessary to do the thing you asked for, and remembering that you said no is
+                exactly that.
+            </p>
+
+            <h2>My own account</h2>
+            <p>
+                The numbers are read on a dashboard behind a login, and that login is an
+                account: a name, an email address, a password kept only as a hash, and the
+                second factor — the secret an authenticator app uses, and a set of recovery
+                codes, also stored as hashes. Nothing there can be replayed as a login on
+                its own, and a code that has been used once is remembered as used, so it
+                cannot be presented twice.
+            </p>
+            <p>
+                Signing in records the sign-in — when it happened, the address it came from,
+                the browser it used — so the session can be recognized later and revoked.
+                Those rows go when the session expires, within seven days.
+            </p>
+            <p>
+                None of that is your data — it is mine, about me, and a person does not owe
+                himself an informativa. It is written down here for one reason: a page that
+                says your address is never stored owes you the one place in this database
+                where an address <em>is</em>.
+            </p>
+
+            <h2 id="rights">Your rights</h2>
+            <p>
+                Under articles 15 to 22 GDPR you may ask what is held about you, ask for it
+                to be corrected or deleted, ask for its use to be restricted, object to it,
+                or ask for a copy in a portable form. Under art. 7(3) you may withdraw your
+                consent whenever you like, and doing so does not make what was collected
+                before it unlawful. Under art. 77 you may complain to the Garante per la
+                protezione dei dati personali — <a
+                    href="https://www.garanteprivacy.it"
+                    rel="noopener noreferrer">garanteprivacy.it</a
+                > — without going through me first.
+            </p>
+            <p>
+                In practice, the fastest route is the button below: it deletes the
+                identifiers from your browser on the spot, after which nothing further can
+                be linked to you. Rows already written stay, and they carry no name, no
+                address and nothing that points back at a person — which is also the reason
+                I cannot pick yours out of them on request. If you want those gone too, send
+                me the value of your <code>pf_vid</code> cookie before you clear it; that is
+                the only key that exists, and with it I can delete the rows by hand.
+            </p>
+
+            <div class="doc-consent">
+                <p data-consent-state class="doc-consent-state">Checking…</p>
+                <div class="doc-consent-actions">
+                    <button data-consent-choose="granted" type="button">allow analytics</button>
+                    <button data-consent-choose="denied" type="button">turn analytics off</button>
+                </div>
+            </div>
+
+            <p class="doc-note">Last updated 6 August 2026.</p>
+
+            <Footer tone="light" />
+        </div>
+    </main>
+
+    <script>
+        import { initPrivacyControls } from "../lib/privacy.ts";
+        initPrivacyControls();
+    </script>
+</Base>
+
+<style is:global>
+    .doc {
+        min-height: 100vh;
+        background: var(--paper);
+        padding: 12vh var(--gutter) 14vh;
+    }
+
+    .doc-inner {
+        max-width: 74ch;
+        margin: 0 auto;
+    }
+
+    .doc-back {
+        display: inline-block;
+        margin-bottom: 8vh;
+        color: rgba(20, 20, 20, 0.5);
+    }
+
+    .doc-back:hover {
+        color: var(--ink);
+    }
+
+    .doc-title {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(48px, 9vw, 104px);
+        line-height: 0.94;
+        letter-spacing: -0.02em;
+        margin-bottom: 32px;
+    }
+
+    .doc-lede {
+        font-size: clamp(17px, 2vw, 21px);
+        line-height: 1.55;
+        color: var(--ink-soft);
+        margin-bottom: 8vh;
+    }
+
+    .doc h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(24px, 3.2vw, 34px);
+        line-height: 1.15;
+        margin: 7vh 0 20px;
+        padding-top: 24px;
+        border-top: 1px solid var(--rule);
+    }
+
+    .doc p {
+        font-size: 15.5px;
+        line-height: 1.7;
+        color: var(--ink-soft);
+        margin-bottom: 18px;
+    }
+
+    .doc p strong {
+        color: var(--ink);
+        font-weight: 500;
+    }
+
+    .doc a {
+        color: var(--ink);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+    }
+
+    .doc code {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 0.9em;
+        background: rgba(20, 20, 20, 0.06);
+        padding: 1px 5px;
+    }
+
+    .doc-list {
+        margin: 0 0 24px;
+    }
+
+    .doc-list-row {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+        padding: 16px 0;
+        border-top: 1px solid var(--rule);
+    }
+
+    .doc-list dt {
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--ink);
+    }
+
+    .doc-list dd {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(20, 20, 20, 0.55);
+    }
+
+    .doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .doc-table th {
+        text-align: left;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(20, 20, 20, 0.5);
+        padding: 0 16px 10px 0;
+        border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .doc-table td {
+        vertical-align: top;
+        padding: 14px 16px 14px 0;
+        border-bottom: 1px solid var(--rule);
+        line-height: 1.5;
+        color: var(--ink-soft);
+    }
+
+    .doc-note {
+        font-size: 13px !important;
+        color: rgba(20, 20, 20, 0.45) !important;
+    }
+
+    .doc-consent {
+        margin: 6vh 0 4vh;
+        padding: 28px;
+        border: 1px solid var(--rule-strong);
+        background: rgba(20, 20, 20, 0.03);
+    }
+
+    .doc-consent-state {
+        margin-bottom: 18px !important;
+        color: var(--ink) !important;
+    }
+
+    .doc-consent-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .doc-consent-actions button {
+        appearance: none;
+        border: 1px solid rgba(20, 20, 20, 0.28);
+        background: transparent;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        padding: 11px 20px;
+        cursor: pointer;
+        transition:
+            background 0.25s var(--ease),
+            border-color 0.25s var(--ease);
+    }
+
+    .doc-consent-actions button:hover,
+    .doc-consent-actions button:focus-visible {
+        background: rgba(20, 20, 20, 0.06);
+        border-color: var(--ink);
+    }
+
+    .doc-consent-actions button[aria-pressed="true"] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+    }
+
+    @media (max-width: 720px) {
+        .doc-list-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .doc-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+</style>

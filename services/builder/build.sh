@@ -3,8 +3,16 @@
 # Packages the whole portfolio into one tarball ready for CloudPanel:
 #
 #   htdocs/           ← document root: the built static site + api/index.php
-#   app/              ← private: PHP sources, vendor/, .env(.example), var/
+#   app/              ← private: PHP sources, bin/, composer.*, .env(.example), var/
 #   DEPLOY.md         ← the CloudPanel steps, including the nginx snippet
+#
+# `app/bin` holds the CLI side — migrations, admin users, the retention job.
+# It ships in the archive because the first thing a fresh deployment has to do
+# is run several of them.
+#
+# `vendor/` is not in the archive: it is reproducible from composer.lock, and
+# `composer install` on the server is both smaller to ship and compiled
+# against the server's own PHP. See DEPLOY.md.
 #
 # Usage:
 #   ./build.sh                  # build site + api, produce dist/portfolio-<ts>.tar.gz
@@ -44,11 +52,11 @@ else
 fi
 [[ -f "$SITE/dist/index.html" ]] || { echo "site build produced no dist/index.html" >&2; exit 1; }
 
-step "api: composer install (no dev)"
-(cd "$API" && composer install --no-dev --optimize-autoloader --quiet)
-
 step "stage"
 rm -rf "$STAGE"
+# app/var holds both the rate-limit state files and — under DB_DRIVER=sqlite —
+# the analytics database. Shipping it empty means PHP-FPM never has to create
+# a directory it may not have rights to.
 mkdir -p "$STAGE/htdocs/api" "$STAGE/app/var/state" "$OUT"
 
 # Document root: the static site, plus the API's one public file.
@@ -56,7 +64,14 @@ cp -r "$SITE/dist/." "$STAGE/htdocs/"
 cp "$API/public/index.php" "$STAGE/htdocs/api/index.php"
 
 # Private side, next to the docroot rather than inside it.
-cp -r "$API/src" "$API/vendor" "$STAGE/app/"
+#
+# vendor/ is deliberately *not* in here. It is the heaviest thing in the
+# archive by a wide margin and it is fully reproducible from the lock file, so
+# the tarball carries composer.json + composer.lock and the server runs
+# `composer install --no-dev` once per deploy. That also means the PHP
+# extensions vendor is compiled against are the server's, not this machine's.
+cp -r "$API/src" "$API/bin" "$STAGE/app/"
+cp "$API/composer.json" "$API/composer.lock" "$STAGE/app/"
 cp "$API/.env.example" "$STAGE/app/.env.example"
 
 cp "$HERE/DEPLOY.md" "$STAGE/DEPLOY.md"

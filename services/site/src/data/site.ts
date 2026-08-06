@@ -8,6 +8,14 @@ export const owner = {
     name: "Emanuele Frascella",
     role: "Software engineer",
     city: "Taranto, Italy",
+    /** Italian VAT number — a legal identifier, so it stays in its native form. */
+    vat: "03462650734",
+    /**
+     * Where data-protection requests should go. The privacy page falls back
+     * to pointing at the contact form while this is empty — which is a valid
+     * contact channel, just a slower one than an address.
+     */
+    email: "",
     timezone: "CET / CEST",
     coords: "40.4644° n / 17.2470° e",
     github: "https://github.com/manuto276",

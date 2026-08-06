@@ -6,6 +6,7 @@
 // assistive tech rather than removed.
 import { owner } from "../data/site.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
+import Footer from "./Footer.astro";
 
 const fields = [
     { key: "name", index: "01", label: "name", placeholder: "Mario Rossi", type: "text" },
@@ -76,10 +77,11 @@ const fields = [
         </form>
     </div>
 
-    <footer class="contact-footer label">
-        <span>© {new Date().getFullYear()} emanuele frascella</span>
-        <span>no trackers, no cookie banner</span>
-    </footer>
+    {/* "no trackers, no cookie banner" used to be the third line here, and it
+        was true right up until the site started counting its own visits. It
+        now points at the page that says what it counts — which is the only
+        version of that claim worth making. */}
+    <Footer />
 </section>
 
 <style is:global>
@@ -259,18 +261,6 @@ const fields = [
         color: oklch(0.72 0.15 30);
     }
 
-    .contact-footer {
-        position: relative;
-        margin-top: auto;
-        border-top: 1px solid var(--rule-dark);
-        padding-top: 20px;
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        letter-spacing: 0.18em;
-        color: rgba(255, 255, 255, 0.45);
-    }
-
     @media (max-width: 900px) {
         .contact {
             padding: 12vh var(--gutter) 7vh;
@@ -285,11 +275,6 @@ const fields = [
         .contact-intro,
         .contact-form {
             grid-column: 1;
-        }
-
-        .contact-footer {
-            flex-direction: column;
-            gap: 10px;
         }
     }
 

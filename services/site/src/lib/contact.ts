@@ -1,5 +1,6 @@
 import axios from "axios";
 import { api, fieldErrors } from "./api.ts";
+import { track } from "./track.ts";
 
 type FieldKey = "name" | "email" | "message";
 
@@ -35,11 +36,36 @@ export function initContactForm(root: ParentNode = document) {
         else delete status.dataset.kind;
     };
 
+    // The funnel, in four beats: the form came into view, somebody started
+    // writing, they pressed send, it went. `track` is a no-op unless consent
+    // was granted — see lib/track.ts — so this costs nothing either way.
+    let startedTyping = false;
+    const noteStart = () => {
+        if (startedTyping) return;
+        startedTyping = true;
+        track("contact_start");
+    };
+
+    if ("IntersectionObserver" in window) {
+        const seen = new IntersectionObserver(
+            (entries) => {
+                if (!entries.some((e) => e.isIntersecting)) return;
+                seen.disconnect();
+                track("contact_view");
+            },
+            { threshold: 0.4 },
+        );
+        seen.observe(form);
+    }
+
     // Errors clear as soon as the reader starts fixing them, and only
     // re-appear on blur — nobody wants to be told their email is invalid
     // while they are still typing the first character of it.
     for (const key of Object.keys(RULES) as FieldKey[]) {
-        field(key).addEventListener("input", () => showError(key, null));
+        field(key).addEventListener("input", () => {
+            noteStart();
+            showError(key, null);
+        });
         field(key).addEventListener("blur", () => {
             const v = field(key).value;
             if (v.trim()) showError(key, RULES[key](v));
@@ -65,6 +91,7 @@ export function initContactForm(root: ParentNode = document) {
         button.disabled = true;
         button.textContent = "sending…";
         say("");
+        track("contact_submit");
 
         try {
             await api.post("/api/contact", {
@@ -75,8 +102,10 @@ export function initContactForm(root: ParentNode = document) {
             });
             form.reset();
             say("received — i'll reply shortly.");
+            track("contact_success");
         } catch (err) {
             const st = axios.isAxiosError(err) ? err.response?.status : undefined;
+            track("contact_error", st ? String(st) : "network");
             if (st === 422) {
                 // The API mirrors Laravel's 422 shape, so the flattener from
                 // `api.ts` hands back one message per field.

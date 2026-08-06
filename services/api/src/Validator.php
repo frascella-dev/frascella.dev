@@ -49,4 +49,43 @@ final class Validator
 
         return $errors;
     }
+
+    /**
+     * The dashboard's sign-in form. Shape only — whether the account exists
+     * is deliberately not answered here, or by the response that follows.
+     *
+     * @param array<string, mixed> $input
+     * @return array<string, list<string>>
+     */
+    public static function adminLogin(array $input): array
+    {
+        $errors = [];
+
+        $email = $input['email'] ?? null;
+        if (!is_string($email) || filter_var(trim($email), FILTER_VALIDATE_EMAIL) === false) {
+            $errors['email'] = ['Enter your email address'];
+        }
+
+        $password = $input['password'] ?? null;
+        if (!is_string($password) || $password === '') {
+            $errors['password'] = ['Enter your password'];
+        }
+
+        return $errors;
+    }
+
+    /**
+     * A `YYYY-MM-DD` day from a query string, or null. Both the shape and
+     * the calendar have to agree — `2026-02-31` parses as a date and is not
+     * one, and every stats query interpolates the result into a range.
+     */
+    public static function day(mixed $value): ?string
+    {
+        if (!is_string($value) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
+            return null;
+        }
+        [$y, $m, $d] = array_map('intval', explode('-', $value));
+
+        return checkdate($m, $d, $y) ? $value : null;
+    }
 }

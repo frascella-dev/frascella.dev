@@ -1,0 +1,126 @@
+---
+// The consent bar. Rendered into the static HTML but `hidden` until
+// `lib/consent.ts` decides it is needed — a returning visitor who already
+// answered never sees it flash.
+//
+// Three things about the shape of it are deliberate. The buttons are the same
+// size, the same weight and the same colour, because a bright "accept" beside
+// a greyed-out "decline" is the exact pattern the Garante's June 2021
+// guidelines call out. "decline" comes first, so the way out is the thing the
+// eye lands on rather than the thing it has to hunt for. And it sits inset
+// from the bottom edge rather than flush against it, so it stays clear of the
+// strip iOS 26 samples to tint its bars (see base.css) — a full-width panel on
+// the edge would repaint the browser chrome.
+//
+// The copy has to survive a line-by-line reading against the code, because
+// /privacy invites exactly that. Nothing here claims more than lib/consent.ts
+// and the API do: no cookie before an answer, nothing measured on a refusal,
+// and a decision that can be reversed on the privacy page at any time.
+---
+
+<aside data-consent class="consent" hidden aria-label="Cookies">
+    <p class="consent-copy">
+        This site counts its own visits — how far people read, and whether the form works.
+        Its own cookies, counted on its own server, never shared and never used for ads.
+        Decline and nothing is measured; either answer can be changed
+        whenever you like on the <a href="/privacy">privacy page</a>, which lists every
+        cookie and everything counted.
+    </p>
+
+    <div class="consent-actions">
+        <button data-consent-deny type="button">decline</button>
+        <button data-consent-accept type="button">accept</button>
+    </div>
+</aside>
+
+<style is:global>
+    .consent {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: clamp(16px, 3vw, 40px);
+        padding: 18px clamp(18px, 2.4vw, 28px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(11, 11, 11, 0.94);
+        backdrop-filter: blur(10px);
+        color: rgba(255, 255, 255, 0.72);
+        font-family: var(--sans);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .consent[hidden] {
+        display: none;
+    }
+
+    /* Arrives with the page settled, not on top of the splash. */
+    html.motion .consent {
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+            opacity 0.5s var(--ease),
+            transform 0.5s var(--ease);
+    }
+
+    html.motion .consent.is-in {
+        opacity: 1;
+        transform: none;
+    }
+
+    .consent-copy {
+        margin: 0;
+        max-width: 78ch;
+    }
+
+    .consent-copy a {
+        color: #fff;
+        text-underline-offset: 3px;
+    }
+
+    .consent-actions {
+        display: flex;
+        gap: 10px;
+        flex: none;
+    }
+
+    /* Same size, same weight, same colour — the choice is not being nudged. */
+    .consent-actions button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: #fff;
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: lowercase;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition:
+            background 0.25s var(--ease),
+            border-color 0.25s var(--ease);
+    }
+
+    .consent-actions button:hover,
+    .consent-actions button:focus-visible {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.55);
+    }
+
+    @media (max-width: 900px) {
+        .consent {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+            font-size: 12.5px;
+        }
+
+        .consent-actions button {
+            flex: 1;
+        }
+    }
+</style>

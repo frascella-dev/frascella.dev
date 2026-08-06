@@ -1,0 +1,85 @@
+---
+// The one footer. It carries the three things every page of this site has to
+// say: whose it is, the VAT number an Italian business has to publish, and
+// where the privacy terms are.
+//
+// It was three lines inside Contact.astro until the site grew pages that are
+// not the portfolio. Duplicating it would have meant the dashboard and the
+// privacy page slowly drifting away from the front page, which is exactly the
+// kind of drift a legal notice cannot afford.
+import { owner } from "../data/site.ts";
+
+interface Props {
+    /** `dark` on ink grounds (the contact section, the dashboard), `light` on paper. */
+    tone?: "dark" | "light";
+}
+
+const { tone = "dark" } = Astro.props;
+
+// Linking a page to itself is a dead link with extra steps. The item stays —
+// the footer has to read the same everywhere — it just stops being an anchor.
+const here = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const onPrivacy = here === "/privacy";
+---
+
+<footer class:list={["site-footer", "label", `site-footer--${tone}`]}>
+    <span>© {new Date().getFullYear()} emanuele frascella</span>
+    <span>p. iva {owner.vat}</span>
+    {
+        onPrivacy ? (
+            <span>privacy &amp; cookies</span>
+        ) : (
+            <a href="/privacy">privacy &amp; cookies</a>
+        )
+    }
+</footer>
+
+<style is:global>
+    .site-footer {
+        position: relative;
+        /* Pins it to the bottom of a flex-column section — the contact
+           section is one; on the other pages it simply has no effect. */
+        margin-top: auto;
+        border-top: 1px solid;
+        padding-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        letter-spacing: 0.18em;
+    }
+
+    /* Doubled class: `.label` sets a colour at the same specificity, and the
+       tone has to win that regardless of stylesheet order. */
+    .site-footer.site-footer--dark {
+        border-top-color: var(--rule-dark);
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .site-footer.site-footer--light {
+        border-top-color: var(--rule);
+        color: rgba(20, 20, 20, 0.45);
+    }
+
+    .site-footer a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.25s var(--ease);
+    }
+
+    .site-footer--dark a:hover,
+    .site-footer--dark a:focus-visible {
+        color: #fff;
+    }
+
+    .site-footer--light a:hover,
+    .site-footer--light a:focus-visible {
+        color: var(--ink);
+    }
+
+    @media (max-width: 900px) {
+        .site-footer {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
