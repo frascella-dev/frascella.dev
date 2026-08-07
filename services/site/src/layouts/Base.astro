@@ -24,7 +24,11 @@ interface Props {
 
 const {
     title = `${owner.name} — ${owner.role}`,
-    description = `Portfolio of ${owner.name}, a software engineer born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
+    // `owner.role` rather than the words again: this is the fourth place the
+    // job title is read, and the only reason they have never disagreed is
+    // that none of them spells it out. The article assumes a role that starts
+    // with a consonant, which every plausible value of the field does.
+    description = `Portfolio of ${owner.name}, a ${owner.role.toLowerCase()} born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
     bare = false,
     noindex = false,
 } = Astro.props;

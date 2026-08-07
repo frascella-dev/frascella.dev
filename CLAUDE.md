@@ -4,12 +4,11 @@ Guidance for Claude Code (and any agent) working in this repository.
 
 ## What this is
 
-The personal portfolio of **Emanuele Frascella**, backend engineer (Taranto, Italy). A monorepo split into independent services:
+The personal portfolio of **Emanuele Frascella**, software engineer (Taranto, Italy). A monorepo split into independent services:
 
 | Path              | Stack              | Role                                                                 |
 | ----------------- | ------------------ | ------------------------------------------------------------------- |
 | `services/site`| Astro (static) + vanilla TS | **The live portfolio.** Astro renders the whole page at build time; every moving part (WebGL fluid background, splash, GSAP scroll layer, three.js work corridor) is a plain ES module loaded from an Astro `<script>`. No framework runtime on the page. |
-| `services/lab`    | React + Vite (SPA) | Standalone three.js experimentation lab (formerly `/lab` inside the site). Dev-only playground, never shipped with the portfolio. |
 | `services/api`    | PHP 8 (no framework) | Server-side effects: the contact-form email, and first-party analytics (ingest + the dashboard's queries). One front controller + a handful of `Api\` classes; PHPMailer and PDO are the only dependencies. |
 | `services/builder` | bash             | `build.sh` packages site + API into one tarball deployable on CloudPanel by extracting it once (see its `DEPLOY.md`). |
 | `infra`           | Docker            | The deployed shape on your machine: one image with the CloudPanel layout (docroot + private `app/`, nginx proxying to a PHP server) and a MySQL beside it. Not a dev environment — it is where deployment assumptions get tested. |
@@ -38,6 +37,16 @@ There is a database, and it is **only** for analytics. Everything the portfolio 
 
 `/privacy` describes exactly what the code does. **If you change what is collected, change that page in the same commit** — it is the whole basis for asking.
 
+### Consent has a version, and the prose does not
+
+`CONSENT_VERSION` in `services/site/src/lib/consent.ts` numbers **the scope being asked for**, not the wording of the page. It is stored in `pf_consent` as `granted.1`, and bumping it makes every stored answer read as "not asked yet" — the banner comes back for everyone.
+
+- **Bump it** when the request changes: a new cookie that needs consent, a third party appearing anywhere on the page, a new purpose, a new kind of thing in `Analytics::VOCABULARY`, a materially longer retention. Bump it, and add a `revisions` entry on `/privacy` with `reasked: true` — the two are the same event and cannot appear apart.
+- **Do not bump it** for rewording, corrections, clarifications, a shorter banner, a moved link. Those are transparency duties: add the `revisions` entry, leave the number alone. Re-asking without cause is consent fatigue, and the Garante disfavours it — the same reason a refusal is not re-proposed inside six months.
+- **The API deliberately does not check the number.** `Analytics::consented()` accepts `granted` with any scope suffix. The current version living in two languages is a constant that can drift, and it is unnecessary: a visitor whose consent is out of scope never downloads the tracker, so no stale-scope event ever reaches the ingest. The server enforces *consented*; the client enforces *consented to this*.
+
+The cheapest fix for a page that overstates what the code does is usually **to narrow the code**, not to bump the version and re-ask everyone.
+
 ## How `site` is put together
 
 - **Markup is static.** `src/pages/index.astro` composes the portfolio's components; the served HTML already contains every word on the page. Copy and project data live in `src/data/site.ts` — the single source both the markup and the client scripts read, so the DOM and the canvas can't drift.
@@ -56,9 +65,6 @@ cd services/api && composer install && composer migrate && composer dev
 
 # Public site (http://localhost:5173)
 cd services/site && npm install && npm run dev
-
-# three.js lab (http://localhost:5174) — optional, standalone
-cd services/lab && npm install && npm run dev
 ```
 
 Copy each service's `.env.example` to `.env` and fill it in.
@@ -66,7 +72,6 @@ Copy each service's `.env.example` to `.env` and fill it in.
 ## Build / verify
 
 - `services/site`: `npm run build` (Astro; underlying Vite/esbuild does **not** type-gate — types are intentionally loose, `noImplicitAny: false`). `npm run typecheck` (`astro check`) is opt-in.
-- `services/lab`: `npm run build` (Vite). Standalone, no API contract.
 - `services/api`: `php -l` on touched files (no build step). Smoke-test endpoints with `curl` after changing them. A schema change also means `php bin/migrate.php` against **both** drivers before it ships.
 - **Deploy package:** `services/builder/build.sh` → `dist/portfolio-<ts>.tar.gz` (site built with `PUBLIC_API_URL=""`, same-origin `/api`).
 - **The deployed shape:** `docker compose -f infra/docker-compose.yml up --build` → <http://localhost:8080>. Use it before shipping anything that touches the layout, the nginx routing, the proxy hop, or MySQL — those are the four things a local `npm run dev` cannot be wrong about, and therefore cannot check.

@@ -66,10 +66,28 @@ final class Analytics
         'contact_error' => 'contact',   // label: field or reason
     ];
 
-    /** True when this visitor said yes and the cookie still says so. */
+    /**
+     * True when this visitor said yes and the cookie still says so.
+     *
+     * The cookie's value is `answer` or `answer.scope` — the client versions
+     * the *scope* it asked consent for (`consent.ts`), so it can re-ask when
+     * that scope changes. The server deliberately does not read or compare
+     * that version: a visitor whose consent is out of scope is re-asked by
+     * `initConsent()` and never starts the tracker, so no batch stamped with
+     * a stale scope ever reaches this endpoint. Comparing the version here
+     * as well would just be the same constant living in two languages —
+     * bump one and not the other, and it fails silently in the direction
+     * that keeps collecting. So: the server enforces "consented", the
+     * client enforces "consented to this scope".
+     */
     public static function hasConsent(): bool
     {
-        return Http::cookie(self::CONSENT_COOKIE) === 'granted';
+        $cookie = Http::cookie(self::CONSENT_COOKIE);
+        if ($cookie === null) {
+            return false;
+        }
+        $answer = explode('.', $cookie, 2)[0];
+        return $answer === 'granted';
     }
 
     /**
@@ -170,13 +188,13 @@ final class Analytics
         Db::run(
             'INSERT INTO sessions (
                 id, visitor_id, started_at, last_seen, day, hour, entry_path,
-                referrer_host, referrer_url, utm_source, utm_medium, utm_campaign,
+                referrer_host, utm_source, utm_medium, utm_campaign,
                 device, os, browser, viewport_w, viewport_h, screen_w, screen_h,
                 language, timezone, country
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $id, $visitorId, $now, $now, self::day($now), self::hour($now), $path,
-                $referrer['host'], $referrer['url'], $utm['source'], $utm['medium'], $utm['campaign'],
+                $referrer['host'], $utm['source'], $utm['medium'], $utm['campaign'],
                 UserAgent::device($ua), UserAgent::os($ua), UserAgent::browser($ua),
                 self::int($ctx['vw'] ?? null), self::int($ctx['vh'] ?? null),
                 self::int($ctx['sw'] ?? null), self::int($ctx['sh'] ?? null),
@@ -297,26 +315,27 @@ final class Analytics
 
     /**
      * Where the visit came from, minus ourselves — a referrer on the same
-     * host is an internal navigation, not a source of traffic.
+     * host is an internal navigation, not a source of traffic. Only the
+     * host is kept: the full URL was never read anywhere past ingest, and
+     * a query string can carry more than a host does.
      *
-     * @return array{host: ?string, url: ?string}
+     * @return array{host: ?string}
      */
     private static function referrer(string $ref): array
     {
         if ($ref === '') {
-            return ['host' => null, 'url' => null];
+            return ['host' => null];
         }
         $host = parse_url($ref, PHP_URL_HOST);
         if (!is_string($host) || $host === '') {
-            return ['host' => null, 'url' => null];
+            return ['host' => null];
         }
         $own = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
         if (strcasecmp($host, $own) === 0) {
-            return ['host' => null, 'url' => null];
+            return ['host' => null];
         }
         return [
             'host' => self::clamp(preg_replace('/^www\./i', '', $host) ?? $host, 190),
-            'url' => self::clamp($ref, 500),
         ];
     }
 

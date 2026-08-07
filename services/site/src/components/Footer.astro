@@ -1,13 +1,32 @@
 ---
-// The one footer. It carries the three things every page of this site has to
-// say: whose it is, the VAT number an Italian business has to publish, and
-// where the privacy terms are.
+// The one footer, shared by all three pages: the portfolio's contact section,
+// /privacy and the dashboard. Duplicating it would mean the legal notice
+// slowly drifting apart page by page, which is the one kind of drift a legal
+// notice cannot afford.
 //
-// It was three lines inside Contact.astro until the site grew pages that are
-// not the portfolio. Duplicating it would have meant the dashboard and the
-// privacy page slowly drifting away from the front page, which is exactly the
-// kind of drift a legal notice cannot afford.
-import { owner } from "../data/site.ts";
+// It is a colophon, not a second pitch, and it is one block rather than two.
+// The small print used to sit in a rule-separated bar of its own along the
+// bottom, which read as a second footer under the first; it now closes the
+// brand column, where it is the same piece of furniture as the name above it.
+//
+// The link columns earn their place on /privacy and /admin in particular —
+// neither has the header nav, so without this the only way back into the site
+// is the browser's back button.
+//
+// Two things adapt per page rather than being duplicated:
+//   · `tone` swaps the whole palette through three custom properties, so no
+//     rule below is written twice.
+//   · section links are bare hashes on the portfolio and root-relative
+//     everywhere else, because `#work` from /privacy points at nothing.
+//
+// The "cookies" item is a link in the markup and stays one with JS off. On
+// the portfolio page `lib/consent.ts` upgrades it in place: the click reopens
+// the same bar that asked in the first place, which is the plainest possible
+// reading of "withdrawing must be as easy as consenting". Elsewhere it lands
+// on `#choice`, the controls at the foot of /privacy.
+import { owner, navLinks } from "../data/site.ts";
+import ArrowUpRight from "./ArrowUpRight.astro";
+import Mark from "./Mark.astro";
 
 interface Props {
     /** `dark` on ink grounds (the contact section, the dashboard), `light` on paper. */
@@ -16,22 +35,99 @@ interface Props {
 
 const { tone = "dark" } = Astro.props;
 
-// Linking a page to itself is a dead link with extra steps. The item stays —
-// the footer has to read the same everywhere — it just stops being an anchor.
 const here = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const onHome = here === "/";
 const onPrivacy = here === "/privacy";
+
+// `#top` needs no element to point at: with nothing carrying that id, the
+// spec sends the browser to the top of the document — which is what /privacy
+// and /admin want, and what the portfolio's own `#top` anchor gives anyway.
+const sections = navLinks.map((link) => ({
+    label: link.label,
+    href: onHome ? link.href : `/${link.href}`,
+}));
+
+const elsewhere = [
+    { label: "github", href: owner.github },
+    { label: "linkedin", href: owner.linkedin },
+];
+
+const year = new Date().getFullYear();
 ---
 
-<footer class:list={["site-footer", "label", `site-footer--${tone}`]}>
-    <span>© {new Date().getFullYear()} emanuele frascella</span>
-    <span>p. iva {owner.vat}</span>
-    {
-        onPrivacy ? (
-            <span>privacy &amp; cookies</span>
-        ) : (
-            <a href="/privacy">privacy &amp; cookies</a>
-        )
-    }
+<footer class:list={["site-footer", `site-footer--${tone}`]}>
+    <div class="site-footer-main">
+        <div class="site-footer-brand">
+            <div class="site-footer-id">
+                <Mark />
+                <span class="site-footer-name">{owner.name}</span>
+            </div>
+            {/* Not a second pitch: what got made. The contact section right
+                above owns the word "freelance" and the bio strip owns "remote
+                since 2026" — a colophon that repeated either would be the
+                reader being told the same thing twice on one scroll.
+                The role is read, never typed: it is also the <title> and the
+                JSON-LD jobTitle, and a second copy here is a second copy to
+                forget. */}
+            <p class="site-footer-tagline">
+                {owner.role} in {owner.city}. This page, the counting behind it,
+                and the occasional thing built for no reason at all.
+            </p>
+            <a class="site-footer-top" href="#top">
+                <span class="site-footer-top-arrow" aria-hidden="true"></span>
+                back to top
+            </a>
+
+        </div>
+
+        <nav class="site-footer-cols" aria-label="Footer">
+            <div class="site-footer-col">
+                {/* "index", not "sections" — the same register as the two
+                    headings beside it, which are a colophon's own vocabulary
+                    rather than a UI's. */}
+                <p class="label site-footer-col-title" id="ft-sections">index</p>
+                <ul aria-labelledby="ft-sections">
+                    {sections.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+                </ul>
+            </div>
+
+            <div class="site-footer-col">
+                <p class="label site-footer-col-title" id="ft-elsewhere">elsewhere</p>
+                <ul aria-labelledby="ft-elsewhere">
+                    {
+                        elsewhere.map((l) => (
+                            <li>
+                                <a href={l.href} target="_blank" rel="noopener">
+                                    {l.label}
+                                    <ArrowUpRight />
+                                </a>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+            <div class="site-footer-col">
+                <p class="label site-footer-col-title" id="ft-legal">legal</p>
+                <ul aria-labelledby="ft-legal">
+                    <li>
+                        {/* Linking a page to itself is a dead link with extra steps. */}
+                        {onPrivacy ? <span>privacy</span> : <a href="/privacy">privacy</a>}
+                    </li>
+                    <li><a data-consent-reopen href="/privacy#choice">cookies</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        {/* A third grid item, not a bar of its own: auto-placement drops it
+            into the second row under the brand, so it closes the same block
+            instead of opening another one. Stacked, it is simply last. */}
+        <p class="site-footer-small">
+            <span>© {year} {owner.name.toLowerCase()}</span>
+            <span>p. iva {owner.vat}</span>
+            <span class="site-footer-coords">{owner.coords}</span>
+        </p>
+    </div>
 </footer>
 
 <style is:global>
@@ -40,46 +136,246 @@ const onPrivacy = here === "/privacy";
         /* Pins it to the bottom of a flex-column section — the contact
            section is one; on the other pages it simply has no effect. */
         margin-top: auto;
-        border-top: 1px solid;
-        padding-top: 20px;
+        padding-top: 24px;
+        border-top: 1px solid var(--f-line);
+        color: var(--f-dim);
+        font-family: var(--sans);
+    }
+
+    /* The whole palette, in three properties. Everything below reads these,
+       so no rule in this file is written twice for the two grounds. */
+    .site-footer--dark {
+        --f-line: var(--rule-dark);
+        --f-dim: rgba(255, 255, 255, 0.45);
+        --f-strong: #fff;
+    }
+
+    .site-footer--light {
+        --f-line: var(--rule);
+        --f-dim: rgba(20, 20, 20, 0.5);
+        --f-strong: var(--ink);
+    }
+
+    .site-footer-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.75fr);
+        column-gap: clamp(40px, 6vw, 96px);
+        row-gap: clamp(34px, 4vw, 52px);
+        padding: clamp(28px, 4vw, 44px) 0 clamp(30px, 4vw, 44px);
+    }
+
+    /* ---------------------------------------------------------- brand */
+
+    .site-footer-id {
         display: flex;
-        justify-content: space-between;
-        gap: 20px;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .site-footer-id .mark {
+        width: 30px;
+        height: 30px;
+        flex: none;
+        fill: var(--f-strong);
+    }
+
+    .site-footer-name {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(21px, 1.7vw, 26px);
+        line-height: 1;
+        color: var(--f-strong);
+    }
+
+    /* Scoped, not bare: on /privacy this paragraph sits inside `.doc`, whose
+       own `p` rule is written later and would otherwise size it as prose.
+       Every rule below that targets an element rather than a class is nested
+       for the same reason. */
+    .site-footer .site-footer-tagline {
+        margin: 20px 0 0;
+        max-width: 34ch;
+        font-size: 14px;
+        line-height: 1.65;
+        letter-spacing: 0;
+        color: inherit;
+        text-wrap: pretty;
+    }
+
+    /* `.pill`, the same one the work section's github link uses — same
+       geometry, same 0.35s inversion of ground and text. It is rewritten here
+       rather than reused because `.pill` hardcodes white and would disappear
+       on the paper page.
+       Doubled class: the generic `a` rule further down is more specific than
+       a single class, and it carries a `transition` of its own. Left at one
+       class this rule loses the shorthand, and the ground and border snap
+       while only the text fades — which is the wrong half animating. */
+    .site-footer.site-footer .site-footer-top {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 30px;
+        border: 1px solid var(--f-line);
+        border-radius: 999px;
+        padding: 11px 20px;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        color: inherit;
+        transition:
+            background 0.35s var(--ease),
+            color 0.35s var(--ease),
+            border-color 0.35s var(--ease);
+    }
+
+    /* An upward chevron drawn from two borders, so it inherits the text
+       colour through the inversion rather than needing a rule of its own.
+       It does not move on hover: the link it is modelled on doesn't either,
+       and one gesture reads better than two. */
+    .site-footer-top-arrow {
+        width: 6px;
+        height: 6px;
+        border-top: 1px solid currentColor;
+        border-right: 1px solid currentColor;
+        transform: rotate(-45deg) translate(1px, 1px);
+    }
+
+    /* ------------------------------------------------------- columns */
+
+    .site-footer-cols {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(24px, 3vw, 48px);
+    }
+
+    .site-footer .site-footer-col-title {
+        margin: 0 0 18px;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        color: inherit;
+        opacity: 0.65;
+    }
+
+    .site-footer .site-footer-col ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+        font-size: 14px;
+    }
+
+    .site-footer .site-footer-col li {
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .site-footer .site-footer-col a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .site-footer .site-footer-col svg {
+        width: 9px;
+        height: 9px;
+        opacity: 0.6;
+    }
+
+    /* --------------------------------------------------- small print */
+
+    /* No rule above it and no band of its own — it closes the brand column
+       rather than running the full width under a line. That line was the
+       whole of what made this read as two footers. */
+    .site-footer .site-footer-small {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 22px;
+        margin: 0;
+        font-weight: 500;
+        font-size: 10px;
         letter-spacing: 0.18em;
+        color: inherit;
+        opacity: 0.8;
     }
 
-    /* Doubled class: `.label` sets a colour at the same specificity, and the
-       tone has to win that regardless of stylesheet order. */
-    .site-footer.site-footer--dark {
-        border-top-color: var(--rule-dark);
-        color: rgba(255, 255, 255, 0.45);
+    .site-footer-coords {
+        text-transform: lowercase;
     }
 
-    .site-footer.site-footer--light {
-        border-top-color: var(--rule);
-        color: rgba(20, 20, 20, 0.45);
-    }
+    /* ---------------------------------------------------------- links */
 
-    .site-footer a {
+    /* Doubled for the same reason the tone classes are: /privacy styles its
+       own links — ink, underlined — and its stylesheet comes after this one.
+       The footer sits inside that page's prose and must not read as prose. */
+    .site-footer.site-footer a {
         color: inherit;
         text-decoration: none;
-        transition: color 0.25s var(--ease);
+        transition: color 0.3s var(--ease);
     }
 
-    .site-footer--dark a:hover,
-    .site-footer--dark a:focus-visible {
-        color: #fff;
+    .site-footer.site-footer a:hover,
+    .site-footer.site-footer a:focus-visible {
+        color: var(--f-strong);
     }
 
-    .site-footer--light a:hover,
-    .site-footer--light a:focus-visible {
-        color: var(--ink);
+    .site-footer.site-footer .site-footer-top:hover,
+    .site-footer.site-footer .site-footer-top:focus-visible {
+        background: var(--f-strong);
+        border-color: var(--f-strong);
+        /* The ground this sits on, whichever it is. */
+        color: var(--f-invert);
     }
+
+    .site-footer--dark {
+        --f-invert: var(--dark);
+    }
+
+    .site-footer--light {
+        --f-invert: var(--paper);
+    }
+
+    /* ----------------------------------------------------- narrow */
 
     @media (max-width: 900px) {
-        .site-footer {
+        .site-footer-main {
+            grid-template-columns: 1fr;
+            gap: 40px;
+            padding: 30px 0 36px;
+        }
+
+        .site-footer-cols {
+            /* Three columns do not survive a phone; two do, and "legal" wraps
+               under the first rather than being squeezed beside it. */
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 30px clamp(20px, 6vw, 48px);
+        }
+
+        .site-footer .site-footer-small {
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+        }
+    }
+
+    /* On a phone this whole block is the last screen of a very long page —
+       it should close the document, not become another one. */
+    @media (max-width: 480px) {
+        .site-footer .site-footer-tagline {
+            margin-top: 16px;
+            font-size: 13.5px;
+        }
+
+        .site-footer-top {
+            margin-top: 24px;
+        }
+
+        .site-footer .site-footer-col ul {
+            gap: 9px;
+        }
+
+        .site-footer .site-footer-col-title {
+            margin-bottom: 14px;
         }
     }
 </style>

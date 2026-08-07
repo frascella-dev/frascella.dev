@@ -160,6 +160,15 @@ final class Schema
                 // no owner and must not survive the change.
                 'DELETE FROM admin_sessions',
             ],
+
+            '0007_drop_referrer_url' => [
+                // The full referrer URL was written on every session but
+                // never read — the dashboard groups by referrer_host only.
+                // Collecting it served no purpose, so it stops being
+                // collected. Valid on MySQL 8 and SQLite 3.35+; the column
+                // carries no index, view or trigger.
+                'ALTER TABLE sessions DROP COLUMN referrer_url',
+            ],
         ];
     }
 

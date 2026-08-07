@@ -27,7 +27,11 @@ import { owner, heroChips } from "../data/site.ts";
 
     <div class="hero-copy">
         <h1 data-hero-title class="hero-title">
-            software engineer <span class="dim">who takes things apart</span> for a living.
+            {/* Read, not typed — the same field as the <title>, the JSON-LD
+                and the footer. Lowercased because here it opens a sentence
+                that is set in lower case, not because it is a different name
+                for the job. */}
+            {owner.role.toLowerCase()} <span class="dim">who takes things apart</span> for a living.
         </h1>
 
         <div class="hero-copy-foot">

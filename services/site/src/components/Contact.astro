@@ -5,7 +5,6 @@
 // — it has to reach the request body, so it is hidden from sight and from
 // assistive tech rather than removed.
 import { owner } from "../data/site.ts";
-import ArrowUpRight from "./ArrowUpRight.astro";
 import Footer from "./Footer.astro";
 
 const fields = [
@@ -28,10 +27,10 @@ const fields = [
                 Freelance work, mostly. If you just want to talk about something on this
                 page, that works too — I reply within two working days.
             </p>
-            <div class="contact-socials">
-                <a class="pill" href={owner.github} target="_blank" rel="noopener">github <ArrowUpRight /></a>
-                <a class="pill" href={owner.linkedin} target="_blank" rel="noopener">linkedin <ArrowUpRight /></a>
-            </div>
+            {/* github and linkedin used to sit here as two pills. The footer
+                below lists them, a few hundred pixels down and on every page
+                rather than just this one — two sets of the same two links on
+                one screen was the reader being asked the same question twice. */}
         </div>
 
         <form data-contact-form class="contact-form" novalidate>
@@ -142,12 +141,6 @@ const fields = [
         line-height: 1.7;
         color: rgba(255, 255, 255, 0.62);
         text-wrap: pretty;
-    }
-
-    .contact-socials {
-        display: flex;
-        gap: 12px;
-        margin-top: 36px;
     }
 
     .contact-form {

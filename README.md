@@ -1,13 +1,12 @@
 # frascella.dev — portfolio monorepo
 
-Personal portfolio of **Emanuele Frascella**, backend engineer (Taranto, Italy).
+Personal portfolio of **Emanuele Frascella**, software engineer (Taranto, Italy).
 
 Independent services:
 
 | Path              | Stack              | Role                                                                 |
 | ----------------- | ------------------ | ------------------------------------------------------------------- |
 | `services/site`| Astro (static) + vanilla TS | The public portfolio site. Static HTML; WebGL, three.js and GSAP layered on as plain ES modules. |
-| `services/lab`    | React + Vite (SPA) | Standalone three.js experimentation lab (dev playground).           |
 | `services/api`    | PHP 8 (no framework) | Contact email, plus first-party analytics (SQLite or MySQL).        |
 | `services/builder` | bash              | Packages site + API into one CloudPanel-ready tarball.              |
 
@@ -30,9 +29,6 @@ cd services/api    && cp .env.example .env && composer install && composer migra
 
 # Public site — http://localhost:5173
 cd services/site && cp .env.example .env && npm install && npm run dev
-
-# three.js lab — http://localhost:5174 (optional, standalone)
-cd services/lab    && npm install && npm run dev
 ```
 
 The API logs contact messages to the console instead of sending them until
@@ -55,7 +51,6 @@ docker compose -f infra/docker-compose.yml up --build     # → localhost:8080
 
 ```
 services/site     Astro static site + vanilla TS motion layer (portfolio)
-services/lab      React + Vite SPA (three.js lab)
 services/api      PHP API (contact email + analytics; bin/ holds the CLI jobs)
 services/builder  build.sh → CloudPanel deploy tarball
 infra             docker compose: the deployed layout + MySQL, for verification

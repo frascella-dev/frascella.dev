@@ -12,19 +12,25 @@
 // strip iOS 26 samples to tint its bars (see base.css) — a full-width panel on
 // the edge would repaint the browser chrome.
 //
-// The copy has to survive a line-by-line reading against the code, because
-// /privacy invites exactly that. Nothing here claims more than lib/consent.ts
-// and the API do: no cookie before an answer, nothing measured on a refusal,
-// and a decision that can be reversed on the privacy page at any time.
+// The copy is the standard three moves — whose cookies, what for, where the
+// detail is — and it stops there. It was longer once, and the length was the
+// problem: a banner nobody finishes reading is not more informative than a
+// short one, and the argument for asking rests on /privacy, which says all of
+// it properly. Both claims made here are load-bearing and both are true of
+// the code: the cookies are this site's own, and nothing goes anywhere else.
+//
+// The first sentence is a question, not a statement, on purpose. The
+// Garante's June 2021 guidelines require the short banner to say the site
+// *may*, subject to consent, use these cookies — not that it already does —
+// and a question makes that conditional the reader's own choice rather than
+// something to infer from the buttons below.
 ---
 
 <aside data-consent class="consent" hidden aria-label="Cookies">
     <p class="consent-copy">
-        This site counts its own visits — how far people read, and whether the form works.
-        Its own cookies, counted on its own server, never shared and never used for ads.
-        Decline and nothing is measured; either answer can be changed
-        whenever you like on the <a href="/privacy">privacy page</a>, which lists every
-        cookie and everything counted.
+        Can this site use its own cookies to count visits and see how the page is used?
+        Nothing is shared with third parties and nothing is used for advertising.
+        Details on the <a href="/privacy">privacy page</a>.
     </p>
 
     <div class="consent-actions">
