@@ -1,4 +1,5 @@
 import { initContactForm } from "./contact.ts";
+import { initConsent } from "./consent.ts";
 import { initNav } from "./nav.ts";
 import { isLite } from "./env.ts";
 import { projects } from "../data/site.ts";
@@ -16,6 +17,12 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
 // path — before the motion layer, and whether or not it ever loads.
 initNav();
 initContactForm();
+
+// The consent question belongs to the same set: it has to be asked whether
+// or not the motion layer runs. It puts itself up once the splash is gone,
+// and only it can pull in `analytics.ts` — a visitor who declines never
+// downloads the tracker at all.
+initConsent();
 
 // The form is the only thing that has to work everywhere. Everything past
 // this point is decoration, and a reader who asked for less motion gets the

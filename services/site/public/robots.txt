@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+
+# The dashboard is behind a password; this only keeps it out of search
+# results. The site itself is one page and entirely open.

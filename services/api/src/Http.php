@@ -31,7 +31,14 @@ final class Http
      * CORS, matching what the NestJS service allowed: origins from the
      * CORS_ORIGINS env (comma-separated, "*" allows any), GET and POST only.
      * The allowed origin is echoed rather than "*" so the header stays
-     * correct if credentials are ever enabled.
+     * correct with credentials enabled.
+     *
+     * Credentials are only granted to an origin named *explicitly*. Under a
+     * `*` policy the request still works, but without cookies — "any origin
+     * may read this, with the caller's cookies attached" is how a third-party
+     * page reads someone's admin dashboard. In the deployed layout the site
+     * and the API are same-origin and none of this applies; it exists for
+     * `npm run dev` on :5173 talking to :3000.
      */
     public static function cors(): void
     {
@@ -41,7 +48,8 @@ final class Http
         }
 
         $allowed = array_filter(array_map('trim', explode(',', Env::get('CORS_ORIGINS', '*') ?? '*')));
-        if (!in_array('*', $allowed, true) && !in_array($origin, $allowed, true)) {
+        $named = in_array($origin, $allowed, true);
+        if (!$named && !in_array('*', $allowed, true)) {
             return; // not allowed: no CORS headers, the browser blocks it
         }
 
@@ -53,6 +61,67 @@ final class Http
                 . ($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ?? 'Content-Type, Accept, X-Requested-With'),
         );
         header('Access-Control-Max-Age: 3600');
+        if ($named) {
+            header('Access-Control-Allow-Credentials: true');
+        }
+    }
+
+    /** True when the request reached us over TLS, proxy hop included. */
+    public static function isSecure(): bool
+    {
+        if (($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? 'off') !== 'off') {
+            return true;
+        }
+        return strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    }
+
+    /**
+     * True when the caller's origin is a different site from ours — the dev
+     * setup (:5173 → :3000), never the deployed one. Cookies have to be
+     * SameSite=None there or the browser drops them on the floor.
+     */
+    public static function isCrossSite(): bool
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ($origin === '') {
+            return false;
+        }
+        $originHost = parse_url($origin, PHP_URL_HOST);
+        $host = explode(':', $_SERVER['HTTP_HOST'] ?? '')[0];
+        return $originHost !== null && $originHost !== $host;
+    }
+
+    /** One cookie, with the SameSite/Secure pair the context actually allows. */
+    public static function setCookie(
+        string $name,
+        string $value,
+        int $maxAgeSeconds,
+        bool $httpOnly = false,
+    ): void {
+        $crossSite = self::isCrossSite();
+        setcookie($name, $value, [
+            // 0 means "until the browser closes"; a negative age is a
+            // deletion and has to land in the past, not at zero.
+            'expires' => $maxAgeSeconds === 0 ? 0 : time() + $maxAgeSeconds,
+            'path' => '/',
+            // SameSite=None is only honoured on a secure connection; on
+            // http://localhost browsers count that as secure, which is what
+            // makes the cross-port dev setup work at all.
+            'secure' => $crossSite || self::isSecure(),
+            'httponly' => $httpOnly,
+            'samesite' => $crossSite ? 'None' : 'Lax',
+        ]);
+    }
+
+    public static function cookie(string $name): ?string
+    {
+        $value = $_COOKIE[$name] ?? null;
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    public static function clearCookie(string $name): void
+    {
+        self::setCookie($name, '', -3600, true);
     }
 
     /** Sends a JSON response and stops — every route ends here. */
@@ -64,18 +133,26 @@ final class Http
         exit;
     }
 
+    /** Sends a bodyless response and stops. */
+    public static function noContent(int $status = 204): never
+    {
+        http_response_code($status);
+        exit;
+    }
+
     /**
-     * The contact form posts JSON; a form-encoded body is accepted too so
-     * the endpoint stays curl-friendly. Anything unparseable is just an
-     * empty submission and fails validation downstream.
+     * The contact form posts JSON; the tracker posts JSON labelled
+     * `text/plain`, because that is a CORS-safelisted content type and so
+     * never triggers a preflight — which `sendBeacon` cannot answer. A
+     * form-encoded body is accepted too, so the endpoints stay curl-friendly.
+     * Anything unparseable is an empty submission and fails downstream.
      *
      * @return array<string, mixed>
      */
     public static function readJsonBody(): array
     {
         $raw = file_get_contents('php://input') ?: '';
-        $type = $_SERVER['CONTENT_TYPE'] ?? '';
-        if (str_contains($type, 'application/json')) {
+        if ($raw !== '' && (str_starts_with(ltrim($raw), '{') || str_starts_with(ltrim($raw), '['))) {
             $data = json_decode($raw, true);
             return is_array($data) ? $data : [];
         }

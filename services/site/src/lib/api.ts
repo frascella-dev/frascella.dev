@@ -8,8 +8,17 @@ import axios from "axios";
 const env = import.meta.env as Record<string, string | undefined>;
 const baseURL = env["PUBLIC_API_URL"] ?? env["VITE_API_URL"] ?? "http://localhost:3000";
 
+/** The same base, for the two callers that can't go through axios: the
+    analytics beacon (`fetch(keepalive)` / `sendBeacon`) and the dashboard. */
+export const apiBase = baseURL;
+
 export const api = axios.create({
     baseURL,
+    // The admin dashboard is a session cookie, and the tracker needs the
+    // visitor cookies to come back; in the deployed layout this is all
+    // same-origin anyway, and in dev the API grants credentials only to the
+    // origins named in CORS_ORIGINS.
+    withCredentials: true,
     headers: {
         Accept: "application/json",
         "X-Requested-With": "XMLHttpRequest",

@@ -6,10 +6,17 @@ vendor-neutral companion to `CLAUDE.md` — read that first for the project map.
 ## The repo in one breath
 
 A monorepo: `services/site` (the portfolio — a static Astro site with a
-vanilla-TS motion layer), `services/api` (plain PHP, sends the contact
-email) and `services/builder` (packages both into a CloudPanel tarball). No database, no admin, no Laravel, no framework runtime on the page.
-The client/server seam is a single CORS request to `/api/contact` with a
-`422 { message, errors }` validation contract.
+vanilla-TS motion layer), `services/api` (plain PHP: the contact email plus
+first-party analytics over SQLite or MySQL) and `services/builder` (packages
+both into a CloudPanel tarball). No Laravel, no framework runtime on the page.
+
+The client/server seam is `/api/contact` with a `422 { message, errors }`
+validation contract, `/api/track` for the analytics beacon, and `/api/admin/*`
+behind one password. The database exists **only** for analytics — the site's
+own content is static and the contact form still persists nothing.
+
+Two rules that outrank convenience: consent gates every analytics write, and
+no IP address is ever stored. `/privacy` documents both, and has to stay true.
 
 ## The agents (`.claude/agents/`)
 
@@ -27,10 +34,11 @@ bar is met. Consults the `frontend-design` plugin for aesthetic direction and th
 `base.css` design tokens. A visual change isn't done without a screenshot.
 
 ### `backend` — the PHP API
-Owns `services/api`: routes, validation, rate-limiting, mail. Keeps the API
-small and stateless (flat-file throttle state, no database), preserves the
-`/api` prefix and the 422 error contract, reads all config from env, and
-verifies with `php -l` + curling the endpoint.
+Owns `services/api`: routes, validation, rate-limiting, mail, and the
+analytics side (PDO layer, migrations, ingest, the dashboard's queries).
+Preserves the `/api` prefix and the 422 error contract, keeps the contact
+path stateless so mail still works with the database down, reads all config
+from env, and verifies with `php -l` + curling the endpoint.
 
 ### `typewriter` — the copy
 Owns the *words*, not the layout: headlines, section intros, project
@@ -64,8 +72,10 @@ what `.work-fallback` is for. Don't let content regress into script-only DOM.
 - Anything about **pacing, scroll flow, or animation timing** → `choreographer`
   (with `typewriter` when the beat drags because the words are long).
 - Anything about **being found or parsed by machines** → `seo`.
-- Anything **server-side** (email, secrets, validation, rate-limiting, new
-  endpoints) → `backend`.
+- Anything **server-side** (email, secrets, validation, rate-limiting, the
+  database, new endpoints) → `backend`.
+- Anything that changes **what is measured** → `backend` and `frontend`
+  together, and `/privacy` in the same commit.
 - Anything **spanning both** or structural → `architect` plans it first, then the
   two implement against the agreed contract.
 - Keep the request/response shape in sync across the seam — it's the one place

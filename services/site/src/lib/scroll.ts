@@ -39,6 +39,7 @@ export function initScroll(state: CorridorState) {
     parallax();
     heroEntrance();
     navHover();
+    navRetreat();
     reveals();
     accordion();
     cursorTile();
@@ -211,6 +212,59 @@ function navHover() {
         a.addEventListener("mouseleave", () => run(0, 100));
         a.addEventListener("focus", () => run(-100, 0));
         a.addEventListener("blur", () => run(0, 100));
+    });
+}
+
+/**
+ * The header stands down over the contact section.
+ *
+ * By the time contact slides under it the bar has nothing left to offer: it
+ * is the last section, and its own footer carries the same four links plus
+ * everything else. What is left is one blended white rule lying across a page
+ * that is trying to end — so it leaves, and comes back on the way up.
+ *
+ * Wide viewports only. Narrow, the header holds the menu button, which is the
+ * only way to navigate at all; hiding it there would strand the reader at the
+ * bottom of the page. `gsap.matchMedia` is what puts it back on a resize
+ * across the breakpoint — its cleanup runs when the query stops matching.
+ */
+function navRetreat() {
+    const nav = document.querySelector<HTMLElement>(".nav");
+    const contact = document.querySelector<HTMLElement>("#contact");
+    if (!nav || !contact) return;
+
+    gsap.matchMedia().add("(min-width: 901px)", () => {
+        // `autoAlpha` rather than opacity alone: at zero it also sets
+        // `visibility: hidden`, which takes the links out of the tab order
+        // instead of leaving an invisible header to tab into.
+        const retreat = gsap.to(nav, {
+            yPercent: -140,
+            autoAlpha: 0,
+            duration: 0.4,
+            ease: "power2.inOut",
+            paused: true,
+        });
+
+        const trigger = ScrollTrigger.create({
+            trigger: contact,
+            // The moment the section's top edge reaches the underside of the
+            // bar — that is when the two start overlapping, and not before.
+            start: "top 76px",
+            // Not `max`: a trigger is active for `start <= scroll < end`, so
+            // ending at the last scrollable pixel would make it inactive at
+            // exactly the position the reader stops at — the header would
+            // reappear on the final pixel of the page. Contact is the last
+            // section, so its bottom never reaches the top of the viewport
+            // and this end is simply never crossed.
+            end: "bottom top",
+            onToggle: (self) => (self.isActive ? retreat.play() : retreat.reverse()),
+        });
+
+        return () => {
+            trigger.kill();
+            retreat.kill();
+            gsap.set(nav, { clearProps: "transform,opacity,visibility" });
+        };
     });
 }
 

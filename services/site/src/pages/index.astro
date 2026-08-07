@@ -6,6 +6,7 @@ import Hero from "../components/Hero.astro";
 import Bio from "../components/Bio.astro";
 import Work from "../components/Work.astro";
 import Contact from "../components/Contact.astro";
+import Consent from "../components/Consent.astro";
 import { owner } from "../data/site.ts";
 
 // One page, one JSON-LD blob. The corridor is canvas, so the crawlable copy
@@ -44,6 +45,8 @@ const schema = {
         <Work />
         <Contact />
     </main>
+
+    <Consent />
 
     <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
     <script>
