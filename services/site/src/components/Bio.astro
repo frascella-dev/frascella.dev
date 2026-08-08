@@ -66,8 +66,13 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
 </div>
 
 <section id="bio" class="bio" data-cursor="tile">
+    {/* An h2, not a span: this is the section's heading, and with it a span
+        the document went from the h1 straight to the project titles. It is
+        styled by `.label`, so nothing about it looks like a heading — which
+        is the point. The outline is for the machine; the page is for the
+        reader, and neither has to lose. */}
     <div class="section-head label">
-        <span class="label--strong">01 — bio</span>
+        <h2 class="label--strong">01 — bio</h2>
         <span>open any line</span>
     </div>
 

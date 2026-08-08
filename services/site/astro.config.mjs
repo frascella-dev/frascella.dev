@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import sitemap from "@astrojs/sitemap";
 
 // v2 drops the React island entirely. Every moving part of the page —
 // the fluid canvas, the splash, the scroll orchestration, the three.js
@@ -40,7 +41,19 @@ function devSettings() {
 }
 
 export default defineConfig({
-    integrations: [devSettings()],
+    // The canonical origin. `Base.astro` builds every canonical and every
+    // absolute og: URL from it, and the sitemap below cannot be generated
+    // without it — a sitemap of relative paths is not a sitemap.
+    site: "https://frascella.dev",
+    integrations: [
+        devSettings(),
+        sitemap({
+            // The dashboard is `noindex` and disallowed in robots.txt;
+            // listing it in the sitemap would be asking for the one thing
+            // the other two are asking against.
+            filter: (page) => !page.includes("/admin"),
+        }),
+    ],
     server: {
         host: "0.0.0.0",
         port: 5173,

@@ -5,9 +5,19 @@
 // pulls back and the GitHub link takes the frame. The tail keeps the black
 // behind the stage once it un-pins, so the hand-off into contact is seamless.
 //
-// `.work-fallback` is the whole section without any of that: it is what a
-// reader gets with JavaScript off or reduced motion on, and it carries the
-// same three projects as real, crawlable text.
+// This section is the corridor and nothing else. It used to end with a text
+// index of the same projects, and that was one beat too many: the reader had
+// just been walked past them, and reading the same titles again read as the
+// section starting over.
+//
+// **Nothing here is crawlable, and it cannot be made so.** The slab labels
+// are painted into a canvas, and the captions — the one piece of real text —
+// live inside a fixed overlay that is `visibility: hidden` at rest, which is
+// the state a renderer sees. That is a known and accepted trade: the corridor
+// is an experience, not a document, and the rest of the site is where the
+// words are. Anything that reached a crawler from in here would have to be
+// invisible to the reader, which is the one thing not worth doing.
+
 import { getImage } from "astro:assets";
 import { projects, owner } from "../data/site.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
@@ -36,10 +46,26 @@ const slabArt: Record<string, string> = {
                 <span data-work-counter>01 / {String(projects.length).padStart(2, "0")}</span>
             </div>
 
-            <div data-work-copy class="work-caption">
-                <div data-work-title class="work-title">{projects[0].title}</div>
-                <p data-work-desc class="work-desc">{projects[0].desc}</p>
-                <div data-work-meta class="work-meta label">{projects[0].meta}</div>
+            {/* One block per project, stacked and cross-faded, rather than
+                one block whose text lib/scroll.ts rewrites as the camera
+                moves. The scroll layer stops owning copy: it decides which
+                block is up, site.ts decides what it says — and adding a
+                project stops meaning teaching the timeline a third string.
+
+                Anchored from the bottom: each block is absolute at the foot
+                of a zero-height container, so a long description grows
+                upward and every project's first line sits on the same
+                baseline whatever its length. */}
+            <div data-work-copy data-work-shown="" class="work-caption">
+                {
+                    projects.map((p, i) => (
+                        <div data-work-item data-index={i} class="work-caption-item">
+                            <div class="work-title">{p.title}</div>
+                            <p class="work-desc">{p.desc}</p>
+                            <div class="work-meta label">{p.meta}</div>
+                        </div>
+                    ))
+                }
             </div>
 
             <div data-work-copy class="work-progress">
@@ -67,9 +93,18 @@ const slabArt: Record<string, string> = {
         </div>
     </div>
 
+    {/* The section with the corridor taken out of it — what a reader gets
+        with JavaScript off or reduced motion on, and nothing else. Without
+        it `#work` is an empty element on that path, since the stage and the
+        tail are both `display: none` there.
+
+        It carries the descriptions because there it is the only place they
+        appear. Under `html.motion` it is hidden — so it is a fallback for
+        those readers and not an indexing device: a renderer has motion on,
+        and never sees it. */}
     <div class="work-fallback" data-cursor-scheme="dark">
         <div class="section-head label work-fallback-head">
-            <span style="color:#fff">02 — selected work</span>
+            <h2 style="color:#fff">02 — selected work</h2>
             <span>{String(projects.length).padStart(2, "0")} projects</span>
         </div>
         <ol class="work-list">
@@ -154,12 +189,36 @@ const slabArt: Record<string, string> = {
         color: rgba(255, 255, 255, 0.5);
     }
 
+    /* Zero height on purpose: the items inside are absolute and anchored to
+       its bottom edge, so `bottom: 12vh` fixes the baseline of every caption
+       and a longer description grows upward instead of pushing the block
+       down. */
     .work-caption {
         opacity: 0;
         position: absolute;
         left: var(--gutter);
         bottom: 12vh;
         width: min(40vw, 540px);
+    }
+
+    .work-caption-item {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    /* The scroll layer raises the one in frame. Everything starts down, so
+       nothing flashes before the first cross-fade runs. */
+    .work-caption-item > * {
+        opacity: 0;
+    }
+
+    /* Nothing in here is interactive, and the stage above it takes no
+       pointer events either. Stated anyway, because two blocks are stacked
+       and only one is up. */
+    .work-caption-item {
+        pointer-events: none;
     }
 
     .work-title {
@@ -169,6 +228,9 @@ const slabArt: Record<string, string> = {
         color: #fff;
     }
 
+    /* Inline-flex so the arrow sits on the word rather than under it, and
+       `pointer-events: none` until lib/scroll.ts says a slab is in frame —
+       the stage above is `none`, and this is the one thing carved out of it. */
     .work-desc {
         margin-top: 16px;
         font-size: 15.5px;
@@ -267,7 +329,7 @@ const slabArt: Record<string, string> = {
         border-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* --- the no-JS / reduced-motion reading of the same section --- */
+    /* --- the section without the corridor: JS off, reduced motion on --- */
 
     .work-fallback {
         background: var(--dark);
@@ -323,8 +385,11 @@ const slabArt: Record<string, string> = {
         color: rgba(255, 255, 255, 0.5);
     }
 
-    /* When the motion layer is running the corridor takes over and the
-       plain list steps aside. Otherwise the list *is* the section. */
+    /* The corridor takes over, and the plain list steps aside. */
+    html.motion .work-fallback {
+        display: none;
+    }
+
     /* Nine and a half screens: one to arrive, four and a half to walk the
        projects and hold on the last one, and the rest to hand over — the last
        screen of which is plain black, so contact never turns up while the
@@ -339,10 +404,15 @@ const slabArt: Record<string, string> = {
         display: block;
     }
 
-    html.motion .work-fallback {
-        display: none;
-    }
+    /* Into the foot of the black tail rather than out of the document.
+       Absolute, so the section's measured 940vh is untouched, and on the
+       tail's own black, so it needs no ground of its own.
 
+       It has a height budget: the stage finishes fading EXIT_GAP_VH screens
+       above the section's bottom (1.45, see lib/scroll.ts), so anything
+       taller than that reaches up into the dissolve and shows through the
+       corridor. Measured at 1.09 screens wide and 1.13 narrow — room for a
+       third project, not for a fourth without spending some of the tail. */
     /* Four and a bit screens instead of seven. Three cards still get about a
        screen each to be read; it is the intro and the exit that tighten (see
        the *_VH constants in lib/scroll.ts). */

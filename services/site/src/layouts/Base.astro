@@ -20,6 +20,17 @@ interface Props {
     bare?: boolean;
     /** Keeps the page out of search results. */
     noindex?: boolean;
+    /**
+     * Overrides the link-preview image, as a path relative to the site root.
+     * Project pages hand over their own artwork; everything else shows the
+     * card in `public/og-card.png`.
+     */
+    image?: string;
+    /**
+     * `website` for the portfolio, `article` for a project page. It is the
+     * one og: field that is wrong by default on a multi-page site.
+     */
+    ogType?: "website" | "article";
 }
 
 const {
@@ -31,6 +42,8 @@ const {
     description = `Portfolio of ${owner.name}, a ${owner.role.toLowerCase()} born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
     bare = false,
     noindex = false,
+    image = "/og-card.png",
+    ogType = "website",
 } = Astro.props;
 
 // Written into the head as a string rather than as JSX so the braces below
@@ -55,6 +68,11 @@ const BOOT_JS = `
 `;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.dev");
+
+// og:image has to be absolute. A relative one is legal by the spec and read
+// correctly by roughly nobody: most scrapers fetch the URL as given, get a
+// 404, and fall back to no preview at all.
+const socialImage = new URL(image, canonical);
 
 // The dev toolbar's "skip the splash" switch (src/devtools/settings.ts) writes
 // a localStorage flag; this reads it before the first paint and turns it into
@@ -99,9 +117,18 @@ const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !importa
 
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="/apple-touch-icon.png" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:site_name" content={owner.name} />
+        <meta property="og:locale" content="en_US" />
+        {/* 1200×630 is what every scraper crops to; stating the size lets a
+            preview reserve the space before the image has arrived. */}
+        <meta property="og:image" content={socialImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${owner.name} — ${owner.role}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={socialImage} />
 
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

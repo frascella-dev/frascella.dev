@@ -514,6 +514,8 @@ function workStage(state: CorridorState) {
     const intro = document.querySelector<HTMLElement>("[data-work-intro]");
     const outro = document.querySelector<HTMLElement>("[data-work-outro]");
     const copies = [...document.querySelectorAll<HTMLElement>("[data-work-copy]")];
+    const items = [...document.querySelectorAll<HTMLElement>("[data-work-item]")];
+    const caption = document.querySelector<HTMLElement>("[data-work-shown]");
     if (!work || !ripple || !stage) return;
 
     let shown = -1;
@@ -525,22 +527,31 @@ function workStage(state: CorridorState) {
         if (i === shown) return;
         shown = i;
 
-        const t = document.querySelector<HTMLElement>("[data-work-title]");
-        const d = document.querySelector<HTMLElement>("[data-work-desc]");
-        const m = document.querySelector<HTMLElement>("[data-work-meta]");
+        // Which project is up, stated once as an attribute. lib/analytics.ts
+        // reads it: it used to watch the caption's text for mutations, which
+        // stopped happening the moment the blocks stopped being rewritten —
+        // an event that would have gone quiet without anything failing.
+        if (caption) caption.dataset.workShown = projects[i].title;
+
         const c = document.querySelector<HTMLElement>("[data-work-counter]");
-        const it = projects[i];
         if (c) {
             c.textContent = `${String(i + 1).padStart(2, "0")} / ${String(projects.length).padStart(2, "0")}`;
         }
-        gsap.fromTo(
-            [t, d, m],
-            { opacity: 0, y: 22 },
-            { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power3.out" },
-        );
-        if (t) t.textContent = it.title;
-        if (d) d.textContent = it.desc;
-        if (m) m.textContent = it.meta;
+
+        // Cross-fade the blocks. No text is written here any more — this
+        // decides which caption is up, and site.ts decides what it says.
+        items.forEach((el, k) => {
+            el.style.zIndex = k === i ? "1" : "0";
+            if (k === i) {
+                gsap.fromTo(
+                    el.children,
+                    { opacity: 0, y: 22 },
+                    { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power3.out" },
+                );
+            } else {
+                gsap.to(el.children, { opacity: 0, duration: 0.22, ease: "power2.out" });
+            }
+        });
     };
 
     const updateRipple = () => {
@@ -637,8 +648,9 @@ function workStage(state: CorridorState) {
                 outro.style.pointerEvents = visible > 0.6 ? "auto" : "none";
                 outro.style.transform = `translateY(${((1 - o) * 26 - away * 18).toFixed(1)}px)`;
             }
+            const copyVis = (1 - copyOut) * (1 - introVis);
             for (const el of copies) {
-                el.style.opacity = ((1 - copyOut) * (1 - introVis)).toFixed(3);
+                el.style.opacity = copyVis.toFixed(3);
             }
             stage.style.pointerEvents = visible > 0.6 ? "auto" : "none";
         },

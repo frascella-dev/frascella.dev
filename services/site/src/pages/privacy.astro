@@ -351,78 +351,7 @@ const collected = [
 </Base>
 
 <style is:global>
-    .doc {
-        min-height: 100vh;
-        background: var(--paper);
-        padding: 12vh var(--gutter) 14vh;
-    }
-
-    .doc-inner {
-        max-width: 74ch;
-        margin: 0 auto;
-    }
-
-    .doc-back {
-        display: inline-block;
-        margin-bottom: 8vh;
-        color: rgba(20, 20, 20, 0.5);
-    }
-
-    .doc-back:hover {
-        color: var(--ink);
-    }
-
-    .doc-title {
-        font-family: var(--serif);
-        font-weight: 400;
-        font-size: clamp(48px, 9vw, 104px);
-        line-height: 0.94;
-        letter-spacing: -0.02em;
-        margin-bottom: 32px;
-    }
-
-    .doc-lede {
-        font-size: clamp(17px, 2vw, 21px);
-        line-height: 1.55;
-        color: var(--ink-soft);
-        margin-bottom: 8vh;
-    }
-
-    .doc h2 {
-        font-family: var(--serif);
-        font-weight: 400;
-        font-size: clamp(24px, 3.2vw, 34px);
-        line-height: 1.15;
-        margin: 7vh 0 20px;
-        padding-top: 24px;
-        border-top: 1px solid var(--rule);
-    }
-
-    .doc p {
-        font-size: 15.5px;
-        line-height: 1.7;
-        color: var(--ink-soft);
-        margin-bottom: 18px;
-    }
-
-    .doc p strong {
-        color: var(--ink);
-        font-weight: 500;
-    }
-
-    .doc a {
-        color: var(--ink);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
-    }
-
-    .doc code {
-        font-family: ui-monospace, "SF Mono", Menlo, monospace;
-        font-size: 0.9em;
-        background: rgba(20, 20, 20, 0.06);
-        padding: 1px 5px;
-    }
+    @import "../styles/doc.css";
 
     .doc-list {
         margin: 0 0 24px;

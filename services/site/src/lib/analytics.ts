@@ -219,18 +219,21 @@ function watchInteractions(): void {
         { capture: true, passive: true },
     );
 
-    // How far into the corridor people actually travel. The caption is the
-    // one thing that already knows — no hook to add in the three.js side.
-    const title = document.querySelector<HTMLElement>("[data-work-title]");
-    if (title) {
+    // How far into the corridor people actually travel. `lib/scroll.ts`
+    // names the project in frame on `data-work-shown`; watching an attribute
+    // it sets deliberately beats watching text it happened to rewrite, which
+    // is what this did until the captions became one block per project and
+    // there was nothing left to mutate.
+    const caption = document.querySelector<HTMLElement>("[data-work-shown]");
+    if (caption) {
         let last = "";
         let index = 0;
         new MutationObserver(() => {
-            const now = (title.textContent ?? "").trim();
+            const now = (caption.dataset.workShown ?? "").trim();
             if (now === "" || now === last) return;
             last = now;
             track("work_step", now, index++);
-        }).observe(title, { childList: true, characterData: true, subtree: true });
+        }).observe(caption, { attributes: true, attributeFilter: ["data-work-shown"] });
     }
 }
 
