@@ -1,0 +1,173 @@
+---
+// The HTML shell: head, fonts, favicons. Everything below it is static
+// markup plus a handful of plain ES modules — there is no framework
+// runtime on this page.
+import "../styles/fonts.css";
+import "../styles/base.css";
+import "../styles/cursor.css";
+import { owner } from "../data/site.ts";
+
+interface Props {
+    title?: string;
+    description?: string;
+    /**
+     * A plain document page — `/privacy`, `/admin`. They share the shell and
+     * the tokens and nothing else: no splash to lift, no timeline to reveal
+     * anything, and no custom cursor, which matters because `html.motion`
+     * hides the system one (cursor.css) on the assumption that something is
+     * drawing a replacement.
+     */
+    bare?: boolean;
+    /** Keeps the page out of search results. */
+    noindex?: boolean;
+    /**
+     * Overrides the link-preview image, as a path relative to the site root.
+     * Project pages hand over their own artwork; everything else shows the
+     * card in `public/og-card.png`.
+     */
+    image?: string;
+    /**
+     * `website` for the portfolio, `article` for a project page. It is the
+     * one og: field that is wrong by default on a multi-page site.
+     */
+    ogType?: "website" | "article";
+}
+
+const {
+    title = `${owner.name} — ${owner.role}`,
+    // `owner.role` rather than the words again: this is the fourth place the
+    // job title is read, and the only reason they have never disagreed is
+    // that none of them spells it out. The article assumes a role that starts
+    // with a consonant, which every plausible value of the field does.
+    description = `Portfolio of ${owner.name}, a ${owner.role.toLowerCase()} born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
+    bare = false,
+    noindex = false,
+    image = "/og-card.png",
+    ogType = "website",
+} = Astro.props;
+
+// Written into the head as a string rather than as JSX so the braces below
+// stay JavaScript — the same reason the dev blocks further down use set:html.
+const BOOT_JS = `
+(function () {
+    var d = document.documentElement;
+    d.classList.add("js");
+    // iOS Safari ignores \`user-scalable=no\`; refusing its proprietary
+    // gesture events is what actually stops the pinch.
+    document.addEventListener("gesturestart", function (e) {
+        e.preventDefault();
+    });
+    ${bare ? "" : `if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        // \`splash-open\` is dropped by lib/splash.ts once the panel has
+        // irised away; it keeps the custom cursor off the intro, which is
+        // its own scene. It also locks scrolling, so a page with no splash
+        // must never set it.
+        d.classList.add("motion", "splash-open");
+    }`}
+})();
+`;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.dev");
+
+// og:image has to be absolute. A relative one is legal by the spec and read
+// correctly by roughly nobody: most scrapers fetch the URL as given, get a
+// 404, and fall back to no preview at all.
+const socialImage = new URL(image, canonical);
+
+// The dev toolbar's "skip the splash" switch (src/devtools/settings.ts) writes
+// a localStorage flag; this reads it before the first paint and turns it into
+// a class, exactly the way `js` and `motion` are set below. Both strings are
+// rendered into the head only under `astro dev` — a production build emits
+// neither, so there is nothing to strip and nothing to leak.
+const DEV_SKIP_SPLASH_JS = `
+(function () {
+    if (localStorage.getItem("portfolio:dev:skip-splash") !== "1") return;
+    var d = document.documentElement;
+    d.classList.remove("splash-open");
+    d.classList.add("dev-no-splash");
+})();
+`;
+
+// The panel is only ever painted because a timeline is going to take it away
+// again (see Splash.astro). Skipping that timeline means hiding it here, or it
+// simply stays up. `!important` because the rule it has to beat —
+// `html.motion .splash` — carries the same specificity.
+const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !important; }`;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+
+        {/* One fixed colour, deliberately not media-queried: the browser bars
+            stay ink-dark whatever the page behind them is showing. iOS 26
+            Safari ignores this and samples the page instead — that side is
+            handled by the `.bar-tint` strips and the dark body in base.css. */}
+        <meta name="theme-color" content="#0b0b0b" />
+
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:site_name" content={owner.name} />
+        <meta property="og:locale" content="en_US" />
+        {/* 1200×630 is what every scraper crops to; stating the size lets a
+            preview reserve the space before the image has arrived. */}
+        <meta property="og:image" content={socialImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${owner.name} — ${owner.role}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={socialImage} />
+
+        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+        {/* The typefaces are served from this domain — see styles/fonts.css
+            for why. Preloading the two latin subsets because they are the
+            only fonts the first screen can possibly need, and discovering
+            them through the stylesheet costs a round trip the headline
+            spends in a fallback face. */}
+        <link
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            href="/fonts/gloock-latin.woff2"
+            crossorigin
+        />
+        <link
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            href="/fonts/schibsted-grotesk-latin.woff2"
+            crossorigin
+        />
+
+        <!-- Blocking on purpose, and tiny. The stylesheet hides the splash,
+             the collapsed accordion and the whole work stage unless `motion`
+             is set, so this has to land before the first paint or the page
+             flashes its static self and then jumps. -->
+        <script is:inline set:html={BOOT_JS} />
+
+        {import.meta.env.DEV && <script is:inline set:html={DEV_SKIP_SPLASH_JS} />}
+        {import.meta.env.DEV && <style is:inline set:html={DEV_SKIP_SPLASH_CSS} />}
+    </head>
+    <body>
+        <!-- Sampling targets for iOS 26 Safari's bar tinting — see base.css. -->
+        <div class="bar-tint bar-tint-top" aria-hidden="true"></div>
+        <div class="bar-tint bar-tint-bottom" aria-hidden="true"></div>
+        <slot />
+    </body>
+</html>

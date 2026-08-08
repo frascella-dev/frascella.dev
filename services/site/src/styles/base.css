@@ -1,0 +1,271 @@
+/* Design tokens + the reset. Everything the prototype expressed as inline
+   `style="…"` lives here as real CSS so the markup stays readable and the
+   hover/focus states (which inline styles can't express) work for real. */
+
+:root {
+    --ink: #141414;
+    --ink-soft: #3d3d3d;
+    --dark: #0b0b0b;
+    --paper: #fff;
+    --accent: oklch(0.83 0.062 62);
+    --accent-deep: oklch(0.58 0.1 55);
+
+    --rule: rgba(20, 20, 20, 0.12);
+    --rule-strong: rgba(20, 20, 20, 0.14);
+    --rule-dark: rgba(255, 255, 255, 0.2);
+
+    --gutter: clamp(20px, 3.2vw, 48px);
+
+    --serif: Gloock, "Times New Roman", serif;
+    --sans: "Schibsted Grotesk", Helvetica, Arial, sans-serif;
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    /* Scrolling yes, pinch- and double-tap-zoom no. The page is a composed
+       scene — a zoomed-in viewport tears the fixed layers apart. The meta
+       viewport says the same thing for the browsers that only read that. */
+    touch-action: pan-x pan-y;
+    /* The canvas behind the page is ink, not paper: it's what browsers show
+       in the overscroll glow at either end of the page. */
+    background: var(--dark);
+}
+
+/* No scrollbar anywhere. It was the one piece of browser chrome painted over
+   a page that is otherwise a composed scene, and the corridor in particular
+   reads as a frame rather than a document. Only the indicator goes —
+   scrolling by wheel, keys, touch, scrollbar-drag aside, and every
+   ScrollTrigger below behaves exactly as before.
+
+   It also settles the reflow the scroll lock used to cause: with the bar
+   taking no width, hiding the overflow for the splash or the menu can't
+   shift the layout sideways any more. */
+html,
+body {
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* The scroll lock. `is-locked` is counted on and off by lib/env.ts (the
+   splash and the menu overlap, so it's a counter, not a boolean);
+   `splash-open` is set by the inline head script *before first paint*, which
+   covers the gap before the motion module has even been fetched. `overflow`
+   alone is not enough on iOS Safari — touch panning has to be refused
+   explicitly, and the body has to say it too. */
+html.is-locked,
+html.splash-open,
+html.is-locked body,
+html.splash-open body {
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: none;
+}
+
+/* iOS 26 Safari ignores theme-color entirely and tints its glass bars by
+   sampling the page: first any fixed/sticky element within 4px of the top or
+   3px of the bottom edge that is ≥80% of the viewport wide and ≥3px tall,
+   falling back to the *body* background-color — html's is never read. So the
+   body is ink (the colour we want sampled) and the page's white is painted
+   by <main> instead; nothing looks different, but the fallback sample is
+   dark. The strips below pin the primary sample down explicitly. */
+body {
+    margin: 0;
+    background: var(--dark);
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow-x: hidden;
+}
+
+main {
+    background: var(--paper);
+}
+
+/* The two elements iOS 26 actually samples: pinned just past each viewport
+   edge, solid ink, matching the geometry its sampler looks for. They exist
+   only for Safari's eyedropper — Apple touch devices only, so no other
+   browser ever renders the few pixels that poke on-screen (and on an iPhone
+   those sit beneath the glass bars themselves). */
+.bar-tint {
+    display: none;
+    position: fixed;
+    left: 0;
+    width: 100%;
+    min-height: 12px;
+    z-index: 70;
+    background-color: var(--dark);
+    pointer-events: none;
+}
+
+.bar-tint-top {
+    top: -8px;
+}
+
+.bar-tint-bottom {
+    bottom: -8px;
+}
+
+@supports (-webkit-text-size-adjust: none) and (font: -apple-system-body) and
+    (-webkit-touch-callout: none) {
+    @media (max-width: 900px), (pointer: coarse) {
+        .bar-tint {
+            display: block;
+        }
+    }
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-deep);
+}
+
+input,
+textarea,
+button {
+    font-family: inherit;
+}
+
+::selection {
+    background: var(--accent);
+    color: var(--ink);
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+dl,
+dd {
+    margin: 0;
+}
+
+img,
+svg,
+canvas {
+    display: block;
+}
+
+/* Display type, imagery and the header are surfaces, not text you'd want to
+   lift — a stray drag across the headline shouldn't leave half of it
+   highlighted, and each nav label is doubled in the markup for the roll-over,
+   so selecting it would copy the word twice. Body copy, the meta lines and
+   the email address stay selectable. */
+.nav,
+.nav-drawer,
+h1,
+h2,
+h3,
+.acc-title,
+.work-title,
+.work-intro-line,
+.work-outro-line,
+img,
+svg,
+canvas {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+/* The eyebrow used above every section and on every meta line. */
+.label {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(20, 20, 20, 0.5);
+}
+
+.label--strong {
+    color: var(--ink);
+}
+
+/* Section header rule: "01 — about" on the left, an aside on the right. */
+.section-head {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 16px;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: #fff;
+    transition:
+        background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pill:hover {
+    background: #fff;
+    color: var(--dark);
+    border-color: #fff;
+}
+
+/* The scanning line by the hero coordinates — vertical in the desktop rail,
+   horizontal once the block is stacked. */
+@keyframes efline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+@keyframes efline-x {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Motion is decorative throughout — with reduced motion the page is a
+   plain, fully legible document. The scripts check the same query. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}

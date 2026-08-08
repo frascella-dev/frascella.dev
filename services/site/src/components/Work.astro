@@ -1,0 +1,476 @@
+---
+// Six-and-a-bit viewports of scroll driving one fixed stage. As the section
+// arrives, a dark circle irises open over the paper page; inside it a three.js
+// camera tracks sideways past the project slabs; on the way out the camera
+// pulls back and the GitHub link takes the frame. The tail keeps the black
+// behind the stage once it un-pins, so the hand-off into contact is seamless.
+//
+// This section is the corridor and nothing else. It used to end with a text
+// index of the same projects, and that was one beat too many: the reader had
+// just been walked past them, and reading the same titles again read as the
+// section starting over.
+//
+// **Nothing here is crawlable, and it cannot be made so.** The slab labels
+// are painted into a canvas, and the captions — the one piece of real text —
+// live inside a fixed overlay that is `visibility: hidden` at rest, which is
+// the state a renderer sees. That is a known and accepted trade: the corridor
+// is an experience, not a document, and the rest of the site is where the
+// words are. Anything that reached a crawler from in here would have to be
+// invisible to the reader, which is the one thing not worth doing.
+
+import { getImage } from "astro:assets";
+import { projects, owner } from "../data/site.ts";
+import ArrowUpRight from "./ArrowUpRight.astro";
+import vitrineHero from "../assets/work/vitrine-hero.webp";
+import proximaHero from "../assets/work/proxima-hero.webp";
+
+// Artwork for the slab faces in the corridor. The three.js side paints these
+// into a 2D canvas, so what it needs is a plain URL at exactly the texture's
+// size — hence `getImage` here rather than an <Image> anywhere. Keyed by
+// project title; a project without one keeps the drawn placeholder.
+const slabArt: Record<string, string> = {
+    vitrine: (await getImage({ src: vitrineHero, width: 1024, height: 640, format: "webp" })).src,
+    proxima: (await getImage({ src: proximaHero, width: 1024, height: 640, format: "webp" })).src,
+};
+---
+
+<section id="work" data-work data-slab-art={JSON.stringify(slabArt)} class="work">
+    <div class="work-tail"></div>
+
+    <div data-work-stage class="work-stage">
+        <div data-ripple class="work-ripple" data-cursor-scheme="dark">
+            <canvas data-three class="work-canvas"></canvas>
+
+            <div data-work-copy class="work-eyebrow label">
+                <span style="color:#fff">02 — selected work</span>
+                <span data-work-counter>01 / {String(projects.length).padStart(2, "0")}</span>
+            </div>
+
+            {/* One block per project, stacked and cross-faded, rather than
+                one block whose text lib/scroll.ts rewrites as the camera
+                moves. The scroll layer stops owning copy: it decides which
+                block is up, site.ts decides what it says — and adding a
+                project stops meaning teaching the timeline a third string.
+
+                Anchored from the bottom: each block is absolute at the foot
+                of a zero-height container, so a long description grows
+                upward and every project's first line sits on the same
+                baseline whatever its length. */}
+            <div data-work-copy data-work-shown="" class="work-caption">
+                {
+                    projects.map((p, i) => (
+                        <div data-work-item data-index={i} class="work-caption-item">
+                            <div class="work-title">{p.title}</div>
+                            <p class="work-desc">{p.desc}</p>
+                            <div class="work-meta label">{p.meta}</div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <div data-work-copy class="work-progress">
+                <div class="work-progress-track">
+                    <span data-work-bar></span>
+                </div>
+                <div class="work-progress-hint">still going</div>
+            </div>
+
+            <div data-work-intro class="work-intro">
+                <div class="label work-intro-eyebrow">02 — selected work</div>
+                <div class="work-intro-line">
+                    a few things i built <span class="dim">and still maintain</span>
+                </div>
+                <div class="label work-intro-eyebrow">worth the scroll</div>
+            </div>
+
+            <div data-work-outro class="work-outro">
+                <div class="label work-intro-eyebrow">that's the shortlist</div>
+                <div class="work-outro-line">more projects on</div>
+                <a class="pill work-outro-link" href={owner.github} target="_blank" rel="noopener">
+                    github.com/manuto276 <ArrowUpRight />
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {/* The section with the corridor taken out of it — what a reader gets
+        with JavaScript off or reduced motion on, and nothing else. Without
+        it `#work` is an empty element on that path, since the stage and the
+        tail are both `display: none` there.
+
+        It carries the descriptions because there it is the only place they
+        appear. Under `html.motion` it is hidden — so it is a fallback for
+        those readers and not an indexing device: a renderer has motion on,
+        and never sees it. */}
+    <div class="work-fallback" data-cursor-scheme="dark">
+        <div class="section-head label work-fallback-head">
+            <h2 style="color:#fff">02 — selected work</h2>
+            <span>{String(projects.length).padStart(2, "0")} projects</span>
+        </div>
+        <ol class="work-list">
+            {
+                projects.map((p, i) => (
+                    <li>
+                        <span class="label work-list-index">
+                            {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <div>
+                            <h3 class="work-list-title">{p.title}</h3>
+                            <p class="work-list-desc">{p.desc}</p>
+                            <div class="label work-list-meta">{p.meta}</div>
+                        </div>
+                    </li>
+                ))
+            }
+        </ol>
+        <a class="pill" href={owner.github} target="_blank" rel="noopener">
+            github.com/manuto276 <ArrowUpRight />
+        </a>
+    </div>
+</section>
+
+<style is:global>
+    .work {
+        position: relative;
+        background: transparent;
+    }
+
+    .work-tail,
+    .work-stage {
+        display: none;
+    }
+
+    /* The black band that stays put underneath the stage so the section can
+       hand over to the (also black) contact section without a seam. It has to
+       reach at least as far up as the point the stage starts dissolving —
+       EXIT_VH + EXIT_GAP_VH screens from the bottom — or the paper page shows
+       through the top of the frame as the corridor fades. */
+    .work-tail {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 340vh;
+        background: var(--dark);
+    }
+
+    .work-stage {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        overflow: hidden;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .work-ripple {
+        position: absolute;
+        inset: 0;
+        background: var(--dark);
+        clip-path: circle(0% at 50% 60%);
+        will-change: clip-path;
+    }
+
+    .work-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .work-eyebrow {
+        opacity: 0;
+        position: absolute;
+        left: var(--gutter);
+        top: 14vh;
+        display: flex;
+        gap: 26px;
+        align-items: baseline;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Zero height on purpose: the items inside are absolute and anchored to
+       its bottom edge, so `bottom: 12vh` fixes the baseline of every caption
+       and a longer description grows upward instead of pushing the block
+       down. */
+    .work-caption {
+        opacity: 0;
+        position: absolute;
+        left: var(--gutter);
+        bottom: 12vh;
+        width: min(40vw, 540px);
+    }
+
+    .work-caption-item {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    /* The scroll layer raises the one in frame. Everything starts down, so
+       nothing flashes before the first cross-fade runs. */
+    .work-caption-item > * {
+        opacity: 0;
+    }
+
+    /* Nothing in here is interactive, and the stage above it takes no
+       pointer events either. Stated anyway, because two blocks are stacked
+       and only one is up. */
+    .work-caption-item {
+        pointer-events: none;
+    }
+
+    .work-title {
+        font-family: var(--serif);
+        font-size: clamp(40px, 6vw, 96px);
+        line-height: 0.98;
+        color: #fff;
+    }
+
+    /* Inline-flex so the arrow sits on the word rather than under it, and
+       `pointer-events: none` until lib/scroll.ts says a slab is in frame —
+       the stage above is `none`, and this is the one thing carved out of it. */
+    .work-desc {
+        margin-top: 16px;
+        font-size: 15.5px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.64);
+        text-wrap: pretty;
+    }
+
+    .work-meta {
+        margin-top: 16px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .work-progress {
+        opacity: 0;
+        position: absolute;
+        right: var(--gutter);
+        bottom: 12vh;
+        width: 190px;
+    }
+
+    .work-progress-track {
+        position: relative;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    .work-progress-track span {
+        position: absolute;
+        left: 0;
+        top: -1px;
+        height: 3px;
+        width: 0%;
+        background: #fff;
+    }
+
+    .work-progress-hint {
+        margin-top: 10px;
+        font-weight: 500;
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        color: rgba(255, 255, 255, 0.45);
+        text-align: right;
+    }
+
+    .work-intro,
+    .work-outro {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .work-intro {
+        gap: min(2vw, 26px);
+        padding: 0 8vw;
+    }
+
+    .work-outro {
+        gap: 30px;
+        opacity: 0;
+    }
+
+    .work-intro-eyebrow {
+        letter-spacing: 0.24em;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .work-intro-line {
+        font-family: var(--serif);
+        font-size: clamp(32px, 5vw, 86px);
+        line-height: 1.08;
+        color: #fff;
+        max-width: 24ch;
+    }
+
+    .work-intro-line .dim {
+        opacity: 0.42;
+    }
+
+    .work-outro-line {
+        font-family: var(--serif);
+        font-size: clamp(34px, 4.6vw, 78px);
+        line-height: 1.1;
+        color: #fff;
+    }
+
+    .work-outro-link {
+        padding: 16px 30px;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* --- the section without the corridor: JS off, reduced motion on --- */
+
+    .work-fallback {
+        background: var(--dark);
+        color: #fff;
+        padding: 14vh var(--gutter);
+    }
+
+    .work-fallback-head {
+        border-top-color: var(--rule-dark);
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .work-list {
+        list-style: none;
+        margin: 7vh 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6vh;
+    }
+
+    .work-list li {
+        display: grid;
+        grid-template-columns: 4vw minmax(0, 1fr);
+        gap: 2vw;
+        border-top: 1px solid var(--rule-dark);
+        padding-top: 24px;
+    }
+
+    .work-list-index {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .work-list-title {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(32px, 4.4vw, 68px);
+        line-height: 1;
+        color: #fff;
+    }
+
+    .work-list-desc {
+        margin-top: 14px;
+        max-width: 52ch;
+        font-size: 15.5px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.64);
+        text-wrap: pretty;
+    }
+
+    .work-list-meta {
+        margin-top: 14px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* The corridor takes over, and the plain list steps aside. */
+    html.motion .work-fallback {
+        display: none;
+    }
+
+    /* Nine and a half screens: one to arrive, four and a half to walk the
+       projects and hold on the last one, and the rest to hand over — the last
+       screen of which is plain black, so contact never turns up while the
+       corridor is still dissolving. See DWELL and the *_VH constants in
+       lib/scroll.ts for how it is spent. */
+    html.motion .work {
+        height: 940vh;
+    }
+
+    html.motion .work-tail,
+    html.motion .work-stage {
+        display: block;
+    }
+
+    /* Into the foot of the black tail rather than out of the document.
+       Absolute, so the section's measured 940vh is untouched, and on the
+       tail's own black, so it needs no ground of its own.
+
+       It has a height budget: the stage finishes fading EXIT_GAP_VH screens
+       above the section's bottom (1.45, see lib/scroll.ts), so anything
+       taller than that reaches up into the dissolve and shows through the
+       corridor. Measured at 1.09 screens wide and 1.13 narrow — room for a
+       third project, not for a fourth without spending some of the tail. */
+    /* Four and a bit screens instead of seven. Three cards still get about a
+       screen each to be read; it is the intro and the exit that tighten (see
+       the *_VH constants in lib/scroll.ts). */
+    @media (max-width: 900px), (pointer: coarse) {
+        html.motion .work {
+            height: 700vh;
+        }
+    }
+
+    @media (max-width: 900px) {
+        /* The caption takes the lower third and the card sits above it, so
+           the two stop fighting over the middle of a tall, narrow frame. */
+        .work-caption {
+            width: calc(100% - var(--gutter) * 2);
+            bottom: 9vh;
+        }
+
+        .work-title {
+            font-size: clamp(38px, 13vw, 64px);
+        }
+
+        .work-desc {
+            margin-top: 12px;
+            font-size: 14px;
+            max-width: 34ch;
+        }
+
+        .work-eyebrow {
+            top: 11vh;
+            gap: 16px;
+        }
+
+        /* A progress bar reading "scroll to orbit" is a mouse instruction,
+           and the counter above already says where you are. */
+        .work-progress {
+            display: none;
+        }
+
+        .work-intro {
+            padding: 0 var(--gutter);
+        }
+
+        .work-intro-line {
+            font-size: clamp(30px, 9vw, 52px);
+            max-width: 16ch;
+        }
+
+        .work-outro-line {
+            font-size: clamp(30px, 9vw, 52px);
+        }
+
+        .work-fallback {
+            padding: 12vh var(--gutter);
+        }
+
+        .work-list li {
+            grid-template-columns: 30px minmax(0, 1fr);
+            gap: 12px;
+        }
+    }
+</style>

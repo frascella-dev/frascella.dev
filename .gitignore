@@ -1,0 +1,29 @@
+# Dependencies & build output (per service)
+node_modules/
+dist/
+build/
+.vite/
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/.nova
+/.zed
+/.fleet
+/.cursor/
+/.codex
+
+# Claude Code — track shared agents/commands, ignore local & machine state
+/.claude/settings.local.json
+/.claude/local/

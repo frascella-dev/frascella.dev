@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+
+# The dashboard is behind a password; this only keeps it out of search
+# results. The site itself is open, and every page of it is listed below.
+
+Sitemap: https://frascella.dev/sitemap-index.xml

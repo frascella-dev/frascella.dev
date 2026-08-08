@@ -1,0 +1,30 @@
+{
+    "name": "portfolio/api",
+    "description": "Emanuele Frascella — portfolio API (plain PHP). Contact form email plus first-party analytics.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "suggest": {
+        "ext-pdo_sqlite": "Needed when DB_DRIVER=sqlite (the default).",
+        "ext-pdo_mysql": "Needed when DB_DRIVER=mysql."
+    },
+    "autoload": {
+        "psr-4": {
+            "Api\\": "src/"
+        }
+    },
+    "scripts": {
+        "dev": "php -S 0.0.0.0:3000 public/index.php",
+        "migrate": "php bin/migrate.php",
+        "prune": "php bin/prune.php",
+        "admin-user": "php bin/admin-user.php"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
