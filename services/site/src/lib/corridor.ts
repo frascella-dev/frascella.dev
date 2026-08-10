@@ -130,6 +130,58 @@ export type CorridorOptions = {
     lite?: boolean;
 };
 
+const CARD_W = 6.4;
+const CARD_H = 4;
+
+/** The dark the room is painted in — the sides of a thick card, the columns. */
+const INK = 0x0b0b0b;
+
+function lineMat(opacity: number) {
+    return new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity });
+}
+
+/**
+ * Four corner marks, drawn as eight short segments on a rectangle a little
+ * larger than the card. It is the register the rest of the page already
+ * speaks — the splash draws construction guides, the columns are traced
+ * edges — and it suggests the frame without closing it, which is the whole
+ * complaint about the rectangle it replaces.
+ */
+function cornerTicks(pad: number, run: number, opacity: number) {
+    const x = CARD_W / 2 + pad;
+    const y = CARD_H / 2 + pad;
+    const pts: number[] = [];
+    for (const sx of [-1, 1]) {
+        for (const sy of [-1, 1]) {
+            // One horizontal and one vertical stroke meeting at the corner.
+            pts.push(sx * x, sy * y, 0, sx * (x - run), sy * y, 0);
+            pts.push(sx * x, sy * y, 0, sx * x, sy * (y - run), 0);
+        }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+    return new THREE.LineSegments(geo, lineMat(opacity));
+}
+
+/**
+ * One card: the artwork, and four marks at the corners of a rectangle a
+ * little larger than it.
+ *
+ * There used to be a closed rectangle of white line hung behind the card at
+ * `z = -0.9`. Face on it read as a second border; turned — which is how the
+ * corridor is actually seen — the perspective slid it off the card and it
+ * became a stray rectangle floating in the dark. The marks sit almost
+ * coplanar instead, so they turn *with* the card and stay its marks.
+ */
+function makeCard(tex: THREE.Texture) {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.PlaneGeometry(CARD_W, CARD_H), new THREE.MeshBasicMaterial({ map: tex })));
+    const marks = cornerTicks(0.42, 0.72, 0.4);
+    marks.position.z = -0.02;
+    g.add(marks);
+    return { group: g, marks };
+}
+
 export function initCorridor(
     canvas: HTMLCanvasElement,
     projects: Project[],
@@ -180,49 +232,39 @@ export function initCorridor(
     const cam = new THREE.PerspectiveCamera(FOV, 1, 0.1, 200);
     cam.position.set(0, 0, 12);
 
-    const group = new THREE.Group();
-    // The outlines that hang behind each card. Kept to hand so a narrow frame
-    // can pull them in closer than the desktop proportion.
-    const halos: THREE.LineSegments[] = [];
-    projects.forEach((_, i) => {
-        const g = new THREE.Group();
-        const geo = new THREE.PlaneGeometry(6.4, 4);
-        textures[i] = slabTexture();
-        g.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: textures[i] })));
-        // No outline hugging the image — only the outer one, which reads as a
-        // frame the card hangs in rather than a border drawn on it.
-        const halo = new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.PlaneGeometry(7.6, 5.2)),
-            new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.16 }),
-        );
-        halo.position.z = -0.9;
-        halos.push(halo);
-        g.add(halo);
-        // Alternate the slabs above/below and near/far so the corridor has depth.
-        g.position.set(i * GAP, i % 2 ? -0.5 : 0.5, i % 2 ? -5.2 : 1.2);
-        group.add(g);
-    });
-    scene.add(group);
-
     const solidMat = new THREE.MeshBasicMaterial({
-        color: 0x0b0b0b,
+        color: INK,
         polygonOffset: true,
         polygonOffsetFactor: 1,
         polygonOffsetUnits: 1,
     });
+
+    const group = new THREE.Group();
+    // The corner marks, kept to hand so a narrow frame can pull them in
+    // closer than the desktop proportion.
+    const marks: THREE.Object3D[] = [];
+    projects.forEach((_, i) => {
+        textures[i] = slabTexture();
+        const card = makeCard(textures[i]);
+        marks.push(card.marks);
+        // Alternate the slabs above/below and near/far so the corridor has depth.
+        card.group.position.set(i * GAP, i % 2 ? -0.5 : 0.5, i % 2 ? -5.2 : 1.2);
+        group.add(card.group);
+    });
+    scene.add(group);
 
     const columns = new THREE.Group();
     // x, z, height, line opacity. The second one sits deep on purpose: the
     // camera now parks on the last slab, and at that rest position this
     // column lands square in front of it. Behind the slab it reads as a
     // backdrop instead of an obstruction.
-    const layout: [number, number, number, number][] = [
+    const columnLayout: [number, number, number, number][] = [
         [-6.4, -8.4, 14.5, 0.34],
         [3.2, -7.5, 12.5, 0.32],
         [17.6, -7.8, 15, 0.3],
         [10.4, 3.6, 13, 0.19],
     ];
-    for (const [x, z, h, o] of layout) {
+    for (const [x, z, h, o] of columnLayout) {
         const c = column(h, o, solidMat);
         c.position.set(x, -1.4, z);
         c.rotation.y = Math.random() * 0.8;
@@ -356,10 +398,9 @@ export function initCorridor(
             // caption underneath it on a phone.
             const base = portrait ? 0.81 : 1;
             g.scale.setScalar(base * (1 - Math.min(0.22, Math.abs(d) * 0.12)));
-            // …and the outline sits closer in, so the card doesn't read as
-            // floating inside a frame two sizes too big for it. Tight in
-            // either frame; a touch tighter still on a phone.
-            halos[i]?.scale.setScalar(portrait ? 0.92 : 0.945);
+            // …and the marks pull in with it, a touch tighter on a phone
+            // where the card itself is already smaller.
+            marks[i]?.scale.setScalar(portrait ? 0.92 : 0.945);
         });
 
         // Parallax: the columns and dust drift slower than the slabs.
