@@ -17,9 +17,9 @@ import { readJson } from "./copy.ts";
  * are English and only cover a missing attribute; nothing renders them.
  */
 const FALLBACK: Record<string, string> = {
-    granted: "Analytics is on. Your visits are counted, under the identifiers described above.",
-    denied: "Analytics is off. Nothing is being collected, and the identifiers have been removed.",
-    unset: "You have not been asked yet — nothing is being collected until you choose.",
+    granted: "Analytics is enabled. Visits are counted under the identifiers described above.",
+    denied: "Analytics is disabled. Nothing is being collected, and the identifiers have been removed.",
+    unset: "No answer has been given yet. Nothing is collected until a choice is made.",
 };
 
 export function initPrivacyControls(root: ParentNode = document): void {
