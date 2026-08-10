@@ -19,11 +19,12 @@
 // it properly. Both claims made here are load-bearing and both are true of
 // the code: the cookies are this site's own, and nothing goes anywhere else.
 //
-// The first sentence is a question, not a statement, on purpose. The
-// Garante's June 2021 guidelines require the short banner to say the site
-// *may*, subject to consent, use these cookies — not that it already does —
-// and a question makes that conditional the reader's own choice rather than
-// something to infer from the buttons below.
+// The Garante's June 2021 guidelines require the short banner to say the site
+// *may*, subject to consent, use these cookies — not that it already does.
+// English meets that with a question; Italian meets it with the clause
+// "previo consenso" inside a statement, which is the form an Italian reader
+// expects of a notice. Either satisfies the requirement: what carries it is
+// the conditional, not the punctuation.
 import { getContent, pathFor, toLocale } from "../i18n/index.ts";
 
 const locale = toLocale(Astro.currentLocale);
