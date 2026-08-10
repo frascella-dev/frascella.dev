@@ -45,6 +45,21 @@ export default defineConfig({
     // absolute og: URL from it, and the sitemap below cannot be generated
     // without it — a sitemap of relative paths is not a sitemap.
     site: "https://frascella.dev",
+
+    // English keeps the root and Italian takes a prefix, so no URL that
+    // already exists moves and nothing has to be redirected. `en` is also
+    // x-default: it is the version that serves someone who is neither.
+    //
+    // There is deliberately no Accept-Language redirect. A crawler asking in
+    // one language and being bounced to another may never see the version it
+    // asked for, and a reader who chose the English page has chosen it. The
+    // switcher in the footer is the whole mechanism.
+    i18n: {
+        defaultLocale: "en",
+        locales: ["en", "it"],
+        routing: { prefixDefaultLocale: false },
+    },
+
     integrations: [
         devSettings(),
         sitemap({
@@ -52,6 +67,13 @@ export default defineConfig({
             // listing it in the sitemap would be asking for the one thing
             // the other two are asking against.
             filter: (page) => !page.includes("/admin"),
+            // Emits the `xhtml:link rel="alternate"` pairs. It is the same
+            // claim the <head> makes — search engines read it from both, and
+            // disagreeing with yourself is worse than saying it once.
+            i18n: {
+                defaultLocale: "en",
+                locales: { en: "en-US", it: "it-IT" },
+            },
         }),
     ],
     server: {

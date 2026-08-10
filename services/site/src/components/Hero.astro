@@ -5,6 +5,10 @@
 import { Picture } from "astro:assets";
 import portrait from "../assets/portrait.webp";
 import { owner, heroChips } from "../data/site.ts";
+import { getContent, toLocale } from "../i18n/index.ts";
+
+const t = getContent(toLocale(Astro.currentLocale));
+const who = { ...owner, role: t.owner.role, city: t.owner.city };
 ---
 
 <section id="top" class="hero">
@@ -15,7 +19,7 @@ import { owner, heroChips } from "../data/site.ts";
         pictureAttributes={{ class: "hero-portrait-frame" }}
         data-speed="1.14"
         src={portrait}
-        alt={`Portrait of ${owner.name}`}
+        alt={t.hero.portraitAlt(who)}
         formats={["avif", "webp"]}
         fallbackFormat="webp"
         widths={[640, 960, 1280, 1600]}
@@ -43,15 +47,11 @@ import { owner, heroChips } from "../data/site.ts";
                 and the footer. Lowercased because here it opens a sentence
                 that is set in lower case, not because it is a different name
                 for the job. */}
-            {owner.role.toLowerCase()} <span class="dim">who takes things apart</span> for a living.
+            {t.owner.role.toLowerCase()} <span class="dim">{t.hero.titleDim}</span> {t.hero.titleAfter}
         </h1>
 
         <div class="hero-copy-foot">
-            <p class="hero-lede">
-                Solar panel design, then telemedicine, then — since February — the game engines
-                behind online casino platforms. Three industries, one constant: don't let the
-                system fail.
-            </p>
+            <p class="hero-lede">{t.hero.lede}</p>
             <ul data-hero-chips class="hero-chips">
                 {heroChips.map((chip) => <li>{chip}</li>)}
             </ul>

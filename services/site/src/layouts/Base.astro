@@ -6,6 +6,11 @@ import "../styles/fonts.css";
 import "../styles/base.css";
 import "../styles/cursor.css";
 import { owner } from "../data/site.ts";
+import { alternates, defaultLocale, getContent, pathFor, toLocale } from "../i18n/index.ts";
+
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
+const who = { ...owner, role: t.owner.role, city: t.owner.city };
 
 interface Props {
     title?: string;
@@ -34,12 +39,11 @@ interface Props {
 }
 
 const {
-    title = `${owner.name} — ${owner.role}`,
-    // `owner.role` rather than the words again: this is the fourth place the
+    // `t.owner.role` rather than the words again: this is the fourth place the
     // job title is read, and the only reason they have never disagreed is
-    // that none of them spells it out. The article assumes a role that starts
-    // with a consonant, which every plausible value of the field does.
-    description = `Portfolio of ${owner.name}, a ${owner.role.toLowerCase()} born in ${owner.city}. Backend and the game engines behind online casino platforms — before that, telemedicine and solar panel design.`,
+    // that none of them spells it out.
+    title = `${owner.name} — ${t.owner.role}`,
+    description = t.meta.description(who),
     bare = false,
     noindex = false,
     image = "/og-card.png",
@@ -62,7 +66,25 @@ const BOOT_JS = `
 })();
 `;
 
-const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://frascella.dev");
+const origin = Astro.site ?? new URL("https://frascella.dev");
+
+// Self-referential, and per locale: `/it/privacy/` is its own canonical, not a
+// variant of the English one. Built from `pathFor` rather than from the raw
+// pathname so it carries the same trailing slash the sitemap and the links do.
+const canonical = new URL(pathFor(locale, Astro.url.pathname), origin);
+
+/**
+ * The `hreflang` set — every language version of this page including itself,
+ * plus `x-default` on the one that serves a reader the site has no better
+ * answer for.
+ *
+ * Skipped when `noindex` is set, which today means `/admin`. It has no Italian
+ * twin, and an alternate pointing at a page that does not exist is a worse
+ * signal than saying nothing. The two flags travel together on purpose: a page
+ * worth keeping out of the index is a page not worth cross-linking.
+ */
+const langLinks = noindex ? [] : alternates(Astro.url.pathname);
+const xDefault = langLinks.find((l) => l.locale === defaultLocale);
 
 // og:image has to be absolute. A relative one is legal by the spec and read
 // correctly by roughly nobody: most scrapers fetch the URL as given, get a
@@ -91,7 +113,7 @@ const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !importa
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={t.htmlLang}>
     <head>
         <meta charset="utf-8" />
         {/* No `maximum-scale`, no `user-scalable=no`. They were here to keep
@@ -113,18 +135,31 @@ const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !importa
         <link rel="canonical" href={canonical} />
         {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+        {/* Reciprocal, and including this page itself. Google reads the set as
+            a whole: a version missing from its own set invalidates the set,
+            and a one-way declaration is discarded silently. */}
+        {langLinks.map((l) => (
+            <link rel="alternate" hreflang={l.hreflang} href={new URL(l.path, origin)} />
+        ))}
+        {xDefault && (
+            <link rel="alternate" hreflang="x-default" href={new URL(xDefault.path, origin)} />
+        )}
+
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content={ogType} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content={owner.name} />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content={t.ogLocale} />
+        {langLinks
+            .filter((l) => l.locale !== locale)
+            .map((l) => <meta property="og:locale:alternate" content={getContent(l.locale).ogLocale} />)}
         {/* 1200×630 is what every scraper crops to; stating the size lets a
             preview reserve the space before the image has arrived. */}
         <meta property="og:image" content={socialImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={`${owner.name} — ${owner.role}`} />
+        <meta property="og:image:alt" content={`${owner.name} — ${t.owner.role}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={socialImage} />
 

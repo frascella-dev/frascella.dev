@@ -20,10 +20,14 @@
 // index.astro, from the same site.ts entries this file renders.
 
 import { getImage } from "astro:assets";
-import { projects, owner } from "../data/site.ts";
+import { owner } from "../data/site.ts";
+import { getContent, toLocale } from "../i18n/index.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
 import vitrineHero from "../assets/work/vitrine-hero.webp";
 import proximaHero from "../assets/work/proxima-hero.webp";
+
+const t = getContent(toLocale(Astro.currentLocale));
+const projects = t.work.projects;
 
 // Artwork for the slab faces in the corridor. The three.js side paints these
 // into a 2D canvas, so what it needs is a plain URL at exactly the texture's
@@ -35,7 +39,19 @@ const slabArt: Record<string, string> = {
 };
 ---
 
-<section id="work" data-work data-slab-art={JSON.stringify(slabArt)} class="work">
+{/* `data-work-projects` is how the corridor learns what to paint. It rides on
+    the section the same way `data-slab-art` always has, and for the same
+    reason it now has to: `lib/main.ts` and `lib/scroll.ts` used to import the
+    project list straight from the data module, which on an Italian page would
+    have handed them English. Reading it from the DOM keeps both languages out
+    of the JS bundle entirely and leaves exactly one source for the words. */}
+<section
+    id="work"
+    data-work
+    data-slab-art={JSON.stringify(slabArt)}
+    data-work-projects={JSON.stringify(projects)}
+    class="work"
+>
     <div class="work-tail"></div>
 
     <div data-work-stage class="work-stage">
@@ -43,7 +59,7 @@ const slabArt: Record<string, string> = {
             <canvas data-three class="work-canvas"></canvas>
 
             <div data-work-copy class="work-eyebrow label">
-                <span style="color:#fff">02 — selected work</span>
+                <span style="color:#fff">{t.work.eyebrow}</span>
                 <span data-work-counter>01 / {String(projects.length).padStart(2, "0")}</span>
             </div>
 
@@ -73,20 +89,20 @@ const slabArt: Record<string, string> = {
                 <div class="work-progress-track">
                     <span data-work-bar></span>
                 </div>
-                <div class="work-progress-hint">still going</div>
+                <div class="work-progress-hint">{t.work.progressHint}</div>
             </div>
 
             <div data-work-intro class="work-intro">
-                <div class="label work-intro-eyebrow">02 — selected work</div>
+                <div class="label work-intro-eyebrow">{t.work.eyebrow}</div>
                 <div class="work-intro-line">
-                    a few things i built <span class="dim">and still maintain</span>
+                    {t.work.introLead} <span class="dim">{t.work.introDim}</span>
                 </div>
-                <div class="label work-intro-eyebrow">worth the scroll</div>
+                <div class="label work-intro-eyebrow">{t.work.introAside}</div>
             </div>
 
             <div data-work-outro class="work-outro">
-                <div class="label work-intro-eyebrow">that's the shortlist</div>
-                <div class="work-outro-line">more projects on</div>
+                <div class="label work-intro-eyebrow">{t.work.outroEyebrow}</div>
+                <div class="work-outro-line">{t.work.outroLine}</div>
                 <a class="pill work-outro-link" href={owner.github} target="_blank" rel="noopener">
                     github.com/manuto276 <ArrowUpRight />
                 </a>
@@ -105,8 +121,8 @@ const slabArt: Record<string, string> = {
         and never sees it. */}
     <div class="work-fallback" data-cursor-scheme="dark">
         <div class="section-head label work-fallback-head">
-            <h2 style="color:#fff">02 — selected work</h2>
-            <span>{String(projects.length).padStart(2, "0")} projects</span>
+            <h2 style="color:#fff">{t.work.eyebrow}</h2>
+            <span>{t.work.projectCount(String(projects.length).padStart(2, "0"))}</span>
         </div>
         <ol class="work-list">
             {

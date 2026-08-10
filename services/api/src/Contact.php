@@ -14,12 +14,20 @@ final class Contact
     /** Cooldown window between two submissions from the same email. */
     private const PER_EMAIL_COOLDOWN_SECONDS = 15 * 60;
 
-    /** @return 'ok'|'cooldown'|'mail_not_configured'|'send_failed' */
+    /**
+     * @param string $locale Which language the form was filled in. Carried
+     *                       into the notification only — it changes nothing
+     *                       about what is sent or stored, it just saves the
+     *                       reader of the email a guess about how to reply.
+     *
+     * @return 'ok'|'cooldown'|'mail_not_configured'|'send_failed'
+     */
     public static function submit(
         string $name,
         string $email,
         string $body,
         RateLimiter $limiter,
+        string $locale = 'en',
     ): string {
         if ($limiter->isOnCooldown('email:' . $email, self::PER_EMAIL_COOLDOWN_SECONDS)) {
             return 'cooldown';
@@ -30,7 +38,7 @@ final class Contact
         }
 
         try {
-            Mailer::sendContactMessage($name, $email, $body);
+            Mailer::sendContactMessage($name, $email, $body, $locale);
         } catch (\Throwable $e) {
             error_log('Contact mail failed: ' . $e->getMessage());
             return 'send_failed';

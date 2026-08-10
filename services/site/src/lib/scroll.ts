@@ -1,5 +1,5 @@
 import { gsap, ScrollTrigger, clamp, between } from "./motion.ts";
-import { projects } from "../data/site.ts";
+import { readProjects } from "./copy.ts";
 import { isLite } from "./env.ts";
 import type { CorridorState } from "./corridor.ts";
 
@@ -518,6 +518,11 @@ function workStage(state: CorridorState) {
     const caption = document.querySelector<HTMLElement>("[data-work-shown]");
     if (!work || !ripple || !stage) return;
 
+    // Read from the section rather than imported: the bundle is shared by
+    // both language versions of the page, so the only correct source for the
+    // titles is the page itself. See lib/copy.ts.
+    const projects = readProjects();
+
     let shown = -1;
     const syncCopy = (p: number) => {
         const bar = document.querySelector<HTMLElement>("[data-work-bar]");
@@ -539,7 +544,8 @@ function workStage(state: CorridorState) {
         }
 
         // Cross-fade the blocks. No text is written here any more — this
-        // decides which caption is up, and site.ts decides what it says.
+        // decides which caption is up, and the content tree decides what it
+        // says, in whichever language the page was built in.
         items.forEach((el, k) => {
             el.style.zIndex = k === i ? "1" : "0";
             if (k === i) {

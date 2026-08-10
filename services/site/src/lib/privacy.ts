@@ -9,8 +9,14 @@
  */
 
 import { denyConsent, grantConsent, readConsent, startAnalytics } from "./consent.ts";
+import { readJson } from "./copy.ts";
 
-const STATE_COPY: Record<string, string> = {
+/**
+ * The three sentences describing the current state. They are written onto the
+ * block by the page, in the page's language — see lib/copy.ts. The fallbacks
+ * are English and only cover a missing attribute; nothing renders them.
+ */
+const FALLBACK: Record<string, string> = {
     granted: "Analytics is on. Your visits are counted, under the identifiers described above.",
     denied: "Analytics is off. Nothing is being collected, and the identifiers have been removed.",
     unset: "You have not been asked yet — nothing is being collected until you choose.",
@@ -21,9 +27,11 @@ export function initPrivacyControls(root: ParentNode = document): void {
     const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-consent-choose]")];
     if (!state || buttons.length === 0) return;
 
+    const copy = { ...FALLBACK, ...readJson<Record<string, string>>(state, "data-copy", {}) };
+
     const paint = () => {
         const current = readConsent();
-        state.textContent = STATE_COPY[current ?? "unset"];
+        state.textContent = copy[current ?? "unset"];
         for (const button of buttons) {
             button.setAttribute(
                 "aria-pressed",

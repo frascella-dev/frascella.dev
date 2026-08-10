@@ -26,13 +26,17 @@ final class Mailer
      *
      * @throws \PHPMailer\PHPMailer\Exception on SMTP failure
      */
-    public static function sendContactMessage(string $senderName, string $senderEmail, string $body): void
-    {
+    public static function sendContactMessage(
+        string $senderName,
+        string $senderEmail,
+        string $body,
+        string $locale = 'en',
+    ): void {
         $appName = Env::get('APP_NAME', 'Portfolio');
         $to = Env::get('MAIL_TO_ADDRESS');
 
         if (!self::isConfigured()) {
-            error_log("[dev] Contact message from $senderName <$senderEmail>:\n$body");
+            error_log("[dev] Contact message from $senderName <$senderEmail> [$locale]:\n$body");
             return;
         }
 
@@ -67,8 +71,8 @@ final class Mailer
 
         $when = gmdate('Y-m-d H:i');
         $mail->isHTML(true);
-        $mail->Body = self::renderHtml($senderName, $senderEmail, $body, $appName, $when);
-        $mail->AltBody = self::renderText($senderName, $senderEmail, $body, $appName, $when);
+        $mail->Body = self::renderHtml($senderName, $senderEmail, $body, $appName, $when, $locale);
+        $mail->AltBody = self::renderText($senderName, $senderEmail, $body, $appName, $when, $locale);
 
         $mail->send();
         error_log("Contact message from $senderEmail delivered to $to");
@@ -80,6 +84,7 @@ final class Mailer
         string $body,
         string $appName,
         string $when,
+        string $locale,
     ): string {
         return implode("\n", [
             "New contact message via $appName",
@@ -87,6 +92,10 @@ final class Mailer
             "From:  $name",
             "Email: $email",
             "Received: $when UTC",
+            // The notification itself stays English — it has one reader, who
+            // does not need it translated. This line is what he does need:
+            // which language to write back in.
+            'Language: ' . strtoupper($locale),
             '',
             'Message:',
             $body,
@@ -101,6 +110,7 @@ final class Mailer
         string $body,
         string $appName,
         string $when,
+        string $locale,
     ): string {
         $esc = static fn (string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
         $eName = $esc($name);
@@ -108,6 +118,7 @@ final class Mailer
         $eBody = $esc($body);
         $eApp = $esc($appName);
         $eWhen = $esc($when);
+        $eLocale = $esc(strtoupper($locale));
 
         return <<<HTML
 <!doctype html>
@@ -119,7 +130,8 @@ final class Mailer
       <div style="background:#E6E1D4;border:1px solid rgba(17,17,16,0.14);border-radius:10px;padding:16px 18px;margin-bottom:24px;">
         <p style="margin:0 0 4px;"><strong>From:</strong> {$eName}</p>
         <p style="margin:0 0 4px;"><strong>Email:</strong> <a href="mailto:{$eEmail}" style="color:#FF6B1A;">{$eEmail}</a></p>
-        <p style="margin:0;"><strong>Received:</strong> {$eWhen} UTC</p>
+        <p style="margin:0 0 4px;"><strong>Received:</strong> {$eWhen} UTC</p>
+        <p style="margin:0;"><strong>Language:</strong> {$eLocale}</p>
       </div>
       <h2 style="font-size:15px;text-transform:uppercase;letter-spacing:0.06em;color:#7A7566;margin:0 0 8px;">Message</h2>
       <p style="white-space:pre-wrap;line-height:1.6;margin:0 0 24px;">{$eBody}</p>

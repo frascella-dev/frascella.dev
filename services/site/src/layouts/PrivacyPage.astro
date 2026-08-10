@@ -1,0 +1,342 @@
+---
+// The privacy notice, in whichever language the route asked for.
+//
+// Not a template: it describes what this site actually does, table by table,
+// because the whole argument for asking permission is that the answer is
+// short and checkable. Both `/privacy/` and `/it/privacy/` render this file —
+// the words come from `src/i18n/`, the structure lives here once, and the two
+// language versions therefore cannot describe different software.
+//
+// `bare` — it shares the shell and the tokens with the portfolio and nothing
+// else. No splash to lift, no motion layer, no custom cursor.
+//
+// Several paragraphs arrive as HTML and go out through `set:html`. That is
+// safe here because they are build-time constants in this repository and no
+// visitor input reaches them, and it is necessary because the emphasis is
+// part of the claim — "your IP address is **never** written to the database"
+// is a different sentence without it — and because Italian will not put that
+// emphasis on the same word in the same place.
+import Base from "./Base.astro";
+import Footer from "../components/Footer.astro";
+import { owner } from "../data/site.ts";
+import { getContent, pathFor, toLocale } from "../i18n/index.ts";
+
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
+const p = t.privacy;
+const who = { ...owner, role: t.owner.role, city: t.owner.city };
+
+// The two in-page links in the "who is responsible" paragraph. The contact
+// form lives on the portfolio page, which on an Italian notice is the
+// Italian one — routing an Italian reader's data-protection request through
+// an English form would be the one place this page contradicts itself.
+const contactHref = `${pathFor(locale, "/")}#contact`;
+
+// Everything lib/privacy.ts says out loud, handed over on the element it
+// already queries. See lib/copy.ts.
+const choiceCopy = {
+    granted: p.choice.granted,
+    denied: p.choice.denied,
+    unset: p.choice.unset,
+};
+---
+
+<Base
+    bare
+    title={t.meta.privacyTitle(who)}
+    description={t.meta.privacyDescription}
+>
+    <main class="doc">
+        <div class="doc-inner">
+            <a class="label doc-back" href={pathFor(locale, "/")}>{p.back}</a>
+
+            <h1 class="doc-title">{p.title}</h1>
+            <p class="doc-lede">{p.lede}</p>
+
+            <h2>{p.headings.responsible}</h2>
+            <p>{p.controller(who)}</p>
+            <p>
+                {
+                    owner.email ? (
+                        <Fragment>
+                            {p.contactWithEmail.before}
+                            <a href={`mailto:${owner.email}`}>{owner.email}</a>
+                            {p.contactWithEmail.after}
+                        </Fragment>
+                    ) : (
+                        <Fragment>
+                            {p.contactViaForm.before}
+                            <a href="#rights">{p.contactViaForm.rightsLink}</a>
+                            {p.contactViaForm.mid}
+                            <a href={contactHref}>{p.contactViaForm.formLink}</a>
+                            {p.contactViaForm.after}
+                        </Fragment>
+                    )
+                }
+            </p>
+
+            <h2>{p.headings.collected}</h2>
+            <p>{p.collectedLede}</p>
+            <dl class="doc-list">
+                {p.collected.map(([what, why]) => (
+                    <div class="doc-list-row">
+                        <dt>{what}</dt>
+                        <dd>{why}</dd>
+                    </div>
+                ))}
+            </dl>
+
+            <h2>{p.headings.form}</h2>
+            {p.formBody.map((para) => <p set:html={para} />)}
+
+            <h2>{p.headings.notCollected}</h2>
+            {p.notCollected.map((para) => <p set:html={para} />)}
+
+            <h2>{p.headings.cookies}</h2>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>{p.cookiesTable.name}</th>
+                        <th>{p.cookiesTable.purpose}</th>
+                        <th>{p.cookiesTable.life}</th>
+                        <th>{p.cookiesTable.consent}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {p.cookies.map((c) => (
+                        <tr>
+                            <td><code>{c.name}</code></td>
+                            <td>{c.purpose}</td>
+                            <td>{c.life}</td>
+                            <td>{c.consent}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <p class="doc-note">{p.cookiesNote}</p>
+
+            <h2>{p.headings.leaves}</h2>
+            {p.leaves.map((para) => <p set:html={para} />)}
+
+            <h2>{p.headings.basis}</h2>
+            {p.basis.map((para) => <p set:html={para} />)}
+
+            <h2>{p.headings.account}</h2>
+            {p.account.map((para) => <p set:html={para} />)}
+
+            <h2 id="rights">{p.headings.rights}</h2>
+            {p.rights.map((para) => <p set:html={para} />)}
+
+            <!-- `choice` is where the footer's "cookies" link lands from every
+                 page that has no banner to reopen. -->
+            <div id="choice" class="doc-consent">
+                <p
+                    data-consent-state
+                    data-copy={JSON.stringify(choiceCopy)}
+                    class="doc-consent-state"
+                >
+                    {p.choice.checking}
+                </p>
+                <div class="doc-consent-actions">
+                    <button data-consent-choose="granted" type="button">{p.choice.allow}</button>
+                    <button data-consent-choose="denied" type="button">{p.choice.turnOff}</button>
+                </div>
+            </div>
+
+            <h2>{p.headings.revisions}</h2>
+            {p.revisionsLede.map((para) => <p set:html={para} />)}
+            <ol class="doc-revisions">
+                {
+                    p.revisions.map((r) => (
+                        <li>
+                            <span class="label doc-revision-when">
+                                {p.revisionLabel(r.date, String(r.scope).padStart(2, "0"))}
+                            </span>
+                            <span class="doc-revision-what">{r.what}</span>
+                            <span class="doc-revision-consent">
+                                {r.reasked === null
+                                    ? p.revisionFirst
+                                    : r.reasked
+                                      ? p.revisionReasked
+                                      : p.revisionWordingOnly}
+                            </span>
+                        </li>
+                    ))
+                }
+            </ol>
+
+            <Footer tone="light" />
+        </div>
+    </main>
+
+    <script>
+        import { initPrivacyControls } from "../lib/privacy.ts";
+        initPrivacyControls();
+    </script>
+</Base>
+
+<style is:global>
+    @import "../styles/doc.css";
+
+    .doc-list {
+        margin: 0 0 24px;
+    }
+
+    .doc-list-row {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+        padding: 16px 0;
+        border-top: 1px solid var(--rule);
+    }
+
+    .doc-list dt {
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--ink);
+    }
+
+    .doc-list dd {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(20, 20, 20, 0.55);
+    }
+
+    .doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .doc-table th {
+        text-align: left;
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(20, 20, 20, 0.5);
+        padding: 0 16px 10px 0;
+        border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .doc-table td {
+        vertical-align: top;
+        padding: 14px 16px 14px 0;
+        border-bottom: 1px solid var(--rule);
+        line-height: 1.5;
+        color: var(--ink-soft);
+    }
+
+    .doc-note {
+        font-size: 13px !important;
+        color: rgba(20, 20, 20, 0.45) !important;
+    }
+
+    /* One entry per revision: when, what, and whether it put the question
+       back. Numbered by the list itself — the visible number a reader needs
+       is the request number in the stamp, not the row's ordinal. */
+    .doc-revisions {
+        margin: 3vh 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .doc-revisions li {
+        display: grid;
+        grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+        gap: 4px 32px;
+        border-top: 1px solid var(--rule);
+        padding: 20px 0;
+        margin: 0;
+    }
+
+    .doc-revision-when {
+        grid-row: span 2;
+        padding-top: 3px;
+        color: rgba(20, 20, 20, 0.45);
+    }
+
+    .doc-revision-what {
+        font-size: 15px;
+        color: var(--ink);
+    }
+
+    .doc-revision-consent {
+        font-size: 13.5px;
+        color: rgba(20, 20, 20, 0.5);
+    }
+
+    @media (max-width: 720px) {
+        .doc-revisions li {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .doc-revision-when {
+            grid-row: auto;
+            padding-top: 0;
+        }
+    }
+
+    .doc-consent {
+        margin: 6vh 0 4vh;
+        /* Arriving here from the footer's `#choice`, so it lands with the
+           paragraph above it in view rather than flush at the top edge. */
+        scroll-margin-top: 12vh;
+        padding: 28px;
+        border: 1px solid var(--rule-strong);
+        background: rgba(20, 20, 20, 0.03);
+    }
+
+    .doc-consent-state {
+        margin-bottom: 18px !important;
+        color: var(--ink) !important;
+    }
+
+    .doc-consent-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .doc-consent-actions button {
+        appearance: none;
+        border: 1px solid rgba(20, 20, 20, 0.28);
+        background: transparent;
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        padding: 11px 20px;
+        cursor: pointer;
+        transition:
+            background 0.25s var(--ease),
+            border-color 0.25s var(--ease);
+    }
+
+    .doc-consent-actions button:hover,
+    .doc-consent-actions button:focus-visible {
+        background: rgba(20, 20, 20, 0.06);
+        border-color: var(--ink);
+    }
+
+    .doc-consent-actions button[aria-pressed="true"] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+    }
+
+    @media (max-width: 720px) {
+        .doc-list-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        .doc-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+</style>
