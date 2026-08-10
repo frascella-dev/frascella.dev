@@ -2,7 +2,7 @@ import { initContactForm } from "./contact.ts";
 import { initConsent } from "./consent.ts";
 import { initNav } from "./nav.ts";
 import { isLite } from "./env.ts";
-import { projects } from "../data/site.ts";
+import { readProjects } from "./copy.ts";
 import type { CorridorState } from "./corridor.ts";
 
 // Deliberately not imported from `./motion.ts` — that module pulls in GSAP,
@@ -77,7 +77,7 @@ if (!reducedMotion()) {
 
         if (workCanvas) {
             import("./corridor.ts").then(({ initCorridor }) =>
-                initCorridor(workCanvas, projects, state, { lite }),
+                initCorridor(workCanvas, readProjects(), state, { lite }),
             );
         }
 

@@ -18,6 +18,8 @@
 import { lockScroll, unlockScroll } from "./env.ts";
 
 export function initNav(root: ParentNode = document) {
+    initLangMenu(root);
+
     const toggle = root.querySelector<HTMLButtonElement>("[data-nav-toggle]");
     const drawer = root.querySelector<HTMLElement>("[data-nav-drawer]");
     if (!toggle || !drawer) return;
@@ -39,7 +41,11 @@ export function initNav(root: ParentNode = document) {
         drawer.classList.toggle("is-open", next);
         document.documentElement.classList.toggle("menu-open", next);
         toggle.setAttribute("aria-expanded", String(next));
-        toggle.setAttribute("aria-label", next ? "Close menu" : "Open menu");
+        // Both labels come off the button itself (Nav.astro writes them), so
+        // this module carries no words of its own and cannot say "Close menu"
+        // on an Italian page.
+        const label = next ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
+        if (label) toggle.setAttribute("aria-label", label);
         // The page holds still while the sheet is up — the lock is counted
         // in env.ts, so it composes with the splash's own lock, and it never
         // touches scroll position, so closing puts the reader back exactly
@@ -71,5 +77,63 @@ export function initNav(root: ParentNode = document) {
     // leave the overlay up with nothing to close it.
     matchMedia("(min-width: 901px)").addEventListener("change", (e) => {
         if (e.matches) setOpen(false);
+    });
+}
+
+/**
+ * The language dropdown in the header (LangMenu.astro) — phones only, and
+ * only because a script is here to open it: the component hides itself unless
+ * `html.js` is set, precisely so this never has to draw a button it cannot
+ * operate.
+ *
+ * Much smaller than the drawer above, and deliberately so. It is a menu of
+ * two links, not a modal: nothing is locked, nothing goes `inert`, and the
+ * page behind stays live. What it does owe a reader is the three ways out of
+ * an open menu — pick something, press Escape, or click away from it.
+ */
+function initLangMenu(root: ParentNode = document): void {
+    const toggle = root.querySelector<HTMLButtonElement>("[data-lang-toggle]");
+    const panel = root.querySelector<HTMLElement>("[data-lang-panel]");
+    if (!toggle || !panel) return;
+
+    // The two are siblings rather than parent and child — the button is in the
+    // blended header, the panel is outside it (see Nav.astro) — so "inside the
+    // control" is a question about either of them, not about one wrapper.
+    const inside = (node: Node | null) =>
+        Boolean(node && (toggle.contains(node) || panel.contains(node)));
+
+    let open = false;
+
+    const setOpen = (next: boolean, restoreFocus = true) => {
+        if (next === open) return;
+        open = next;
+        panel.classList.toggle("is-open", next);
+        toggle.setAttribute("aria-expanded", String(next));
+        if (next) panel.querySelector("a")?.focus({ preventScroll: true });
+        else if (restoreFocus) toggle.focus({ preventScroll: true });
+    };
+
+    toggle.addEventListener("click", () => setOpen(!open));
+
+    // Anywhere outside closes it — including the menu button beside it, which
+    // is what makes opening one close the other.
+    addEventListener("pointerdown", (e) => {
+        if (open && !inside(e.target as Node)) setOpen(false, false);
+    });
+
+    addEventListener("keydown", (e) => {
+        if (open && e.key === "Escape") setOpen(false);
+    });
+
+    // Tabbing past the last link closes it rather than leaving an open menu
+    // behind the reader.
+    panel.addEventListener("focusout", (e) => {
+        if (open && !inside(e.relatedTarget as Node)) setOpen(false, false);
+    });
+
+    // The control is not rendered at all above 900px; leaving it open through
+    // a rotation would strand a panel with no button under it.
+    matchMedia("(min-width: 901px)").addEventListener("change", (e) => {
+        if (e.matches) setOpen(false, false);
     });
 }

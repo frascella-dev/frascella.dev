@@ -100,23 +100,32 @@ if ($path === '/api/contact' && $method === 'POST') {
         Http::json(422, ['message' => $first, 'errors' => $errors]);
     }
 
+    // Which language the form was filled in — used for the two messages below
+    // that the visitor reads, and carried into the notification so a reply
+    // goes out in the language the message arrived in.
+    $locale = Validator::locale($input['locale'] ?? null);
+
     $result = Contact::submit(
         name: trim((string) $input['name']),
         email: strtolower(trim((string) $input['email'])),
         body: trim((string) $input['message']),
         limiter: $limiter,
+        locale: $locale,
     );
 
     if ($result !== 'ok') {
         if ($result === 'mail_not_configured') {
+            // Never rendered — the site turns any non-422 into its own
+            // sentence — so this one stays English, for a log or a curl.
             Http::json(503, [
                 'status' => 'error',
                 'message' => 'Mail is not configured on the server.',
             ]);
         }
-        $message = $result === 'cooldown'
-            ? 'You sent a message recently — please wait a bit before sending another.'
-            : 'Could not deliver your message right now.';
+        $message = Validator::say(
+            $locale,
+            $result === 'cooldown' ? 'contact.cooldown' : 'contact.undelivered',
+        );
         Http::json(422, ['message' => $message, 'errors' => ['message' => [$message]]]);
     }
 

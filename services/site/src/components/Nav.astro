@@ -4,23 +4,42 @@
 // ever swapping colours — which is also why the menu button lives inside it
 // and the drawer does not.
 //
+// The language control is split the same way, and it was worth learning why.
+// The blend was briefly moved off `.nav` and onto its three children, so that
+// a dropdown with a solid background could live inside the header. It looked
+// like it should work and it did not: `.nav` is `position: fixed` with a
+// `z-index`, so it is its own stacking context, and a child that blends
+// blends against *that* — which is empty. White bars over nothing stayed
+// white, and the menu button disappeared against the paper hero. The blend
+// belongs on the element that actually sits over the page.
+//
+// So: the button is in the header and blends with everything else up there;
+// the panel is a sibling, outside, where it can be paper. Exactly the
+// arrangement the drawer already uses.
+//
 // Wide: the four labels sit inline, each with a duplicate that rolls up from
 // below on hover (wired in `lib/scroll.ts`).
 // Narrow: two lines that cross into an X, and a sheet that comes up from the
 // bottom edge (wired in `lib/nav.ts`).
-import { owner, navLinks } from "../data/site.ts";
+import { owner } from "../data/site.ts";
+import { alternates, getContent, toLocale } from "../i18n/index.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
 import Mark from "./Mark.astro";
+
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
+const who = { ...owner, role: t.owner.role, city: t.owner.city };
+const languages = alternates(Astro.url.pathname);
 ---
 
 <header class="nav">
-    <a class="nav-mark" href="#top" aria-label={`${owner.name} — back to top`}>
+    <a class="nav-mark" href="#top" aria-label={t.nav.markLabel(who)}>
         <Mark />
     </a>
 
-    <nav class="nav-links" aria-label="Sections">
+    <nav class="nav-links" aria-label={t.nav.sections}>
         {
-            navLinks.map((link) => (
+            t.nav.links.map((link) => (
                 <a data-navlink href={link.href}>
                     <span data-nav-a>{link.label}</span>
                     <span data-nav-b aria-hidden="true">
@@ -31,18 +50,77 @@ import Mark from "./Mark.astro";
         }
     </nav>
 
+    {/* Phones only, and only under `html.js`: it is a dropdown that needs a
+        script to open, and drawing a button nobody can press would be worse
+        than drawing nothing. Nothing is lost by hiding it — the footer names
+        both languages as plain links, on every page, with no script at all.
+        This is a shortcut to that, not the only road there. */}
+    <button
+        data-lang-toggle
+        class="nav-lang"
+        type="button"
+        aria-expanded="false"
+        aria-controls="lang-panel"
+        aria-label={t.footer.language}
+    >
+        <span>{locale.toUpperCase()}</span>
+        <svg class="nav-lang-caret" viewBox="0 0 10 6" aria-hidden="true">
+            <path
+                d="M1 1l4 4 4-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.3"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+        </svg>
+    </button>
+
+    {/* The two labels ride on the element lib/nav.ts already queries, so the
+        script swaps them without knowing which language it is on — the same
+        arrangement the corridor uses for its slab art. */}
     <button
         data-nav-toggle
         class="nav-toggle"
         type="button"
         aria-expanded="false"
         aria-controls="nav-drawer"
-        aria-label="Open menu"
+        aria-label={t.nav.openMenu}
+        data-label-open={t.nav.openMenu}
+        data-label-close={t.nav.closeMenu}
     >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
     </button>
 </header>
+
+<!-- Outside the header so it can be paper rather than an inverted smear —
+     see the note at the top. It is right-aligned to the same gutter the menu
+     button sits in, so it lands under the pair without either of them having
+     to know the other's width. -->
+<div data-lang-panel id="lang-panel" class="nav-lang-panel">
+    <ul aria-label={t.footer.language}>
+        {
+            languages.map((option) =>
+                option.locale === locale ? (
+                    <li>
+                        {/* `lang` on the item so a screen reader says
+                            "Italiano" in Italian rather than mangling it in
+                            the voice of the surrounding page. */}
+                        <span lang={option.hreflang} aria-current="true">
+                            {option.endonym}
+                        </span>
+                    </li>
+                ) : (
+                    <li>
+                        <a lang={option.hreflang} hreflang={option.hreflang} href={option.path}>
+                            {option.endonym}
+                        </a>
+                    </li>
+                ),
+            )
+        }
+    </ul>
+</div>
 
 <!-- Not a <dialog>: a modal dialog goes into the top layer, which would put
      it over the header and leave the close control blurred and inert. This
@@ -55,11 +133,11 @@ import Mark from "./Mark.astro";
     class="nav-drawer"
     role="dialog"
     aria-modal="true"
-    aria-label="Menu"
+    aria-label={t.nav.menu}
 >
-    <nav class="nav-menu" aria-label="Sections">
+    <nav class="nav-menu" aria-label={t.nav.sections}>
         {
-            navLinks.map((link, i) => (
+            t.nav.links.map((link, i) => (
                 <a href={link.href} style={`--i:${i}`}>
                     <span class="label nav-menu-index">{String(i + 1).padStart(2, "0")}</span>
                     <span>{link.label}</span>
@@ -132,6 +210,119 @@ import Mark from "./Mark.astro";
         display: block;
         line-height: 1.3em;
         visibility: hidden;
+    }
+
+    /* --- the language control --- */
+
+    .nav-lang {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        /* `auto` on the left pushes it off the labels and over to the toggle,
+           so the two read as one cluster on the right rather than as two
+           controls at opposite ends of an empty bar. */
+        margin: 0 6px 0 auto;
+        padding: 0 11px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 999px;
+        background: transparent;
+        color: #fff;
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        cursor: pointer;
+        transition: border-color 0.3s var(--ease);
+    }
+
+    .nav-lang:hover,
+    .nav-lang:focus-visible {
+        border-color: rgba(255, 255, 255, 0.62);
+    }
+
+    .nav-lang-caret {
+        width: 9px;
+        height: 6px;
+        transition: transform 0.32s var(--ease);
+    }
+
+    .nav-lang[aria-expanded="true"] .nav-lang-caret {
+        transform: rotate(180deg);
+    }
+
+    .nav-lang-panel {
+        display: none;
+        position: fixed;
+        /* Clear of the 64px header, right-aligned to its gutter. */
+        top: 58px;
+        right: var(--gutter);
+        z-index: 59;
+        min-width: 150px;
+        padding: 6px;
+        border: 1px solid rgba(20, 20, 20, 0.12);
+        border-radius: 12px;
+        background: var(--paper);
+        box-shadow: 0 18px 44px rgba(20, 20, 20, 0.18);
+        /* Closed is `visibility: hidden`, not just transparent — opacity
+           alone would leave two invisible links in the tab order. */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition:
+            opacity 0.26s var(--ease),
+            transform 0.26s var(--ease),
+            visibility 0s linear 0.26s;
+    }
+
+    .nav-lang-panel.is-open {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition:
+            opacity 0.26s var(--ease),
+            transform 0.26s var(--ease),
+            visibility 0s;
+    }
+
+    .nav-lang-panel ul {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .nav-lang-panel a,
+    .nav-lang-panel span[aria-current] {
+        display: block;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1;
+        color: var(--ink);
+    }
+
+    .nav-lang-panel a {
+        opacity: 0.6;
+        transition:
+            opacity 0.24s var(--ease),
+            background 0.24s var(--ease);
+    }
+
+    .nav-lang-panel a:hover,
+    .nav-lang-panel a:focus-visible {
+        opacity: 1;
+        background: rgba(20, 20, 20, 0.06);
+        color: var(--ink);
+    }
+
+    /* The one you are on, stated rather than implied. */
+    .nav-lang-panel span[aria-current] {
+        background: rgba(20, 20, 20, 0.07);
+        font-weight: 500;
     }
 
     /* --- the button --- */
@@ -296,6 +487,14 @@ import Mark from "./Mark.astro";
         }
 
         .nav-toggle {
+            display: block;
+        }
+
+        html.js .nav-lang {
+            display: flex;
+        }
+
+        html.js .nav-lang-panel {
             display: block;
         }
     }

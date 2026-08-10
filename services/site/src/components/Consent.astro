@@ -24,18 +24,21 @@
 // *may*, subject to consent, use these cookies — not that it already does —
 // and a question makes that conditional the reader's own choice rather than
 // something to infer from the buttons below.
+import { getContent, pathFor, toLocale } from "../i18n/index.ts";
+
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
 ---
 
-<aside data-consent class="consent" hidden aria-label="Cookies">
+<aside data-consent class="consent" hidden aria-label={t.consent.label}>
     <p class="consent-copy">
-        Can this site use its own cookies to count visits and see how the page is used?
-        Nothing is shared with third parties and nothing is used for advertising.
-        Details on the <a href="/privacy">privacy page</a>.
+        {t.consent.copyBefore}{" "}
+        <a href={pathFor(locale, "/privacy")}>{t.consent.privacyLink}</a>{t.consent.copyAfter}
     </p>
 
     <div class="consent-actions">
-        <button data-consent-deny type="button">decline</button>
-        <button data-consent-accept type="button">accept</button>
+        <button data-consent-deny type="button">{t.consent.decline}</button>
+        <button data-consent-accept type="button">{t.consent.accept}</button>
     </div>
 </aside>
 

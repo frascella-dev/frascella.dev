@@ -5,47 +5,57 @@
 // — it has to reach the request body, so it is hidden from sight and from
 // assistive tech rather than removed.
 import { owner } from "../data/site.ts";
+import { getContent, toLocale } from "../i18n/index.ts";
 import Footer from "./Footer.astro";
 
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
+
 const fields = [
-    { key: "name", index: "01", label: "name", placeholder: "Mario Rossi", type: "text" },
-    { key: "email", index: "02", label: "email", placeholder: "mario@studio.it", type: "email" },
-    { key: "message", index: "03", label: "message", placeholder: "What are you building?", type: "textarea" },
+    { key: "name", index: "01", type: "text" },
+    { key: "email", index: "02", type: "email" },
+    { key: "message", index: "03", type: "textarea" },
 ] as const;
+
+// Everything lib/contact.ts says out loud, handed over on the element it
+// already queries. The script holds no copy of its own — which is the only
+// way a status line can be right in a language the bundle has never seen.
+// `locale` rides along too: the API validates server-side and returns the
+// messages it wants printed, so it has to be told which language to print in.
+const formCopy = { locale, ...t.contact.status, errors: t.contact.errors };
 ---
 
 <section id="contact" class="contact" data-cursor-scheme="dark">
     <div class="section-head label contact-head">
-        <span style="color:#fff">03 — contact</span>
-        <span>{owner.city} · {owner.timezone}</span>
+        <span style="color:#fff">{t.contact.eyebrow}</span>
+        <span>{t.owner.city} · {owner.timezone}</span>
     </div>
 
     <div class="contact-grid">
         <div class="contact-intro">
-            <h2 data-reveal class="contact-title">say <span class="dim">hello.</span></h2>
-            <p class="contact-lede">
-                Freelance work, mostly. If you just want to talk about something on this
-                page, that works too — I reply within two working days.
-            </p>
+            <h2 data-reveal class="contact-title">
+                {t.contact.titleLead} <span class="dim">{t.contact.titleDim}</span>
+            </h2>
+            <p class="contact-lede">{t.contact.lede}</p>
             {/* github and linkedin used to sit here as two pills. The footer
                 below lists them, a few hundred pixels down and on every page
                 rather than just this one — two sets of the same two links on
                 one screen was the reader being asked the same question twice. */}
         </div>
 
-        <form data-contact-form class="contact-form" novalidate>
+        <form data-contact-form data-copy={JSON.stringify(formCopy)} class="contact-form" novalidate>
             {
                 fields.map((f) => (
                     <label data-field class="cfield">
                         <span class="label cfield-label">
-                            {f.index} / {f.label}
+                            {f.index} / {t.contact.fields[f.key]}
                         </span>
                         {f.type === "textarea" ? (
                             <textarea
                                 name={f.key}
                                 rows="4"
                                 required
-                                placeholder={f.placeholder}
+                                placeholder={t.contact.placeholders[f.key]}
                                 aria-describedby={`err-${f.key}`}
                             />
                         ) : (
@@ -53,7 +63,7 @@ const fields = [
                                 name={f.key}
                                 type={f.type}
                                 required
-                                placeholder={f.placeholder}
+                                placeholder={t.contact.placeholders[f.key]}
                                 aria-describedby={`err-${f.key}`}
                             />
                         )}
@@ -64,13 +74,13 @@ const fields = [
 
             <div class="cfield-honeypot" aria-hidden="true">
                 <label>
-                    Leave this field empty
+                    {t.contact.honeypot}
                     <input name="website" type="text" tabindex="-1" autocomplete="off" />
                 </label>
             </div>
 
             <div class="contact-actions">
-                <button data-submit type="submit">send message</button>
+                <button data-submit type="submit">{t.contact.submit}</button>
                 <span data-form-status class="contact-status" role="status" aria-live="polite"></span>
             </div>
         </form>

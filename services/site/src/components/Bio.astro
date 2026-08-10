@@ -7,7 +7,8 @@
 // to fade out for as long as the pointer is in here — the image is the
 // pointer, and two of them is one too many.
 import { Picture } from "astro:assets";
-import { bioRows, footerFacts } from "../data/site.ts";
+import { bioFacts } from "../data/site.ts";
+import { getContent, toLocale } from "../i18n/index.ts";
 
 import swingBridge from "../assets/taranto/swing-bridge.webp";
 import marinaiMonument from "../assets/taranto/marinai-monument.webp";
@@ -17,27 +18,22 @@ import phoneTeardown from "../assets/repair/phone-teardown.webp";
 import laptopEditor from "../assets/coding/laptop-editor.webp";
 import portStacks from "../assets/containers/port-stacks.webp";
 
+const t = getContent(toLocale(Astro.currentLocale));
+
 // Keyed by the `gallery` field on a row. Every frame of every gallery is
 // rendered up front and hidden — they are small, and a tile that has to wait
 // for a network round trip to fill in has already missed the hover.
-const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
-    taranto: [
-        { src: swingBridge, alt: "The swing bridge and the Aragonese castle in Taranto at sunset" },
-        { src: marinaiMonument, alt: "The Marinai d'Italia monument in Taranto against an evening sky" },
-        { src: oldTownAlley, alt: "An alley in Taranto's old town opening onto the sea" },
-    ],
-    drawing: [
-        { src: procreateKoi, alt: "A koi tattoo design drawn in Procreate on an iPad, Apple Pencil alongside" },
-    ],
-    repair: [
-        { src: phoneTeardown, alt: "An old phone opened up under a desk lamp, its back cover and screws set aside next to a screwdriver" },
-    ],
-    coding: [
-        { src: laptopEditor, alt: "A laptop on a wooden desk with a Python file open in the editor" },
-    ],
-    containers: [
-        { src: portStacks, alt: "Stacked shipping containers and gantry cranes at a port at sunset" },
-    ],
+//
+// The images are the same in both languages; only their descriptions change,
+// so the alt text is looked up by `<gallery>.<index>` in the content tree
+// rather than typed beside the import. A photograph shown to a screen reader
+// in the wrong language is the one kind of alt text that is worse than none.
+const galleries: Record<string, ImageMetadata[]> = {
+    taranto: [swingBridge, marinaiMonument, oldTownAlley],
+    drawing: [procreateKoi],
+    repair: [phoneTeardown],
+    coding: [laptopEditor],
+    containers: [portStacks],
 };
 ---
 
@@ -50,8 +46,8 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
                         class="cursor-tile-photo"
                         data-gallery={key}
                         data-frame={i}
-                        src={frame.src}
-                        alt={frame.alt}
+                        src={frame}
+                        alt={t.bio.alt[`${key}.${i}`]}
                         formats={["avif", "webp"]}
                         fallbackFormat="webp"
                         widths={[420, 640]}
@@ -61,7 +57,7 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
                 )),
             )
         }
-        <span data-cursor-label>taranto, italy</span>
+        <span data-cursor-label>{t.bio.tileDefault}</span>
     </div>
 </div>
 
@@ -72,13 +68,13 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
         is the point. The outline is for the machine; the page is for the
         reader, and neither has to lose. */}
     <div class="section-head label">
-        <h2 class="label--strong">01 — bio</h2>
-        <span>open any line</span>
+        <h2 class="label--strong">{t.bio.eyebrow}</h2>
+        <span>{t.bio.hint}</span>
     </div>
 
     <div class="acc">
         {
-            bioRows.map((row, i) => {
+            t.bio.rows.map((row, i) => {
                 const n = String(i + 1).padStart(2, "0");
                 return (
                     <div data-acc class="acc-row">
@@ -124,7 +120,7 @@ const galleries: Record<string, { src: ImageMetadata; alt: string }[]> = {
 
     <div class="bio-facts label">
         {
-            footerFacts.map((fact, i) => (
+            bioFacts.map((fact, i) => (
                 <span class={i === 0 ? "label--strong" : undefined}>{fact}</span>
             ))
         }

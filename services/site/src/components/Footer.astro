@@ -24,7 +24,8 @@
 // the same bar that asked in the first place, which is the plainest possible
 // reading of "withdrawing must be as easy as consenting". Elsewhere it lands
 // on `#choice`, the controls at the foot of /privacy.
-import { owner, navLinks } from "../data/site.ts";
+import { owner } from "../data/site.ts";
+import { alternates, getContent, pathFor, stripLocale, toLocale } from "../i18n/index.ts";
 import ArrowUpRight from "./ArrowUpRight.astro";
 import Mark from "./Mark.astro";
 
@@ -35,22 +36,41 @@ interface Props {
 
 const { tone = "dark" } = Astro.props;
 
-const here = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const locale = toLocale(Astro.currentLocale);
+const t = getContent(locale);
+const who = { ...owner, role: t.owner.role, city: t.owner.city };
+
+// Compared with the locale stripped off, so `/it/` is the home page and
+// `/it/privacy/` is the privacy page — the same two questions the English
+// side has always asked, and the same two answers.
+const here = stripLocale(Astro.url.pathname);
 const onHome = here === "/";
 const onPrivacy = here === "/privacy";
 
 // `#top` needs no element to point at: with nothing carrying that id, the
 // spec sends the browser to the top of the document — which is what /privacy
 // and /admin want, and what the portfolio's own `#top` anchor gives anyway.
-const sections = navLinks.map((link) => ({
+// Off the home page the hash needs a page in front of it, and on an Italian
+// page that page is `/it/` — otherwise every section link quietly crosses
+// back into English.
+const home = pathFor(locale, "/");
+const sections = t.nav.links.map((link) => ({
     label: link.label,
-    href: onHome ? link.href : `/${link.href}`,
+    href: onHome ? link.href : `${home}${link.href}`,
 }));
 
 const elsewhere = [
     { label: "github", href: owner.github },
     { label: "linkedin", href: owner.linkedin },
 ];
+
+// A column of its own rather than a control tacked under `legal`. It reads
+// the way the three beside it read — a heading and a short list of links —
+// which is the only thing that ever made it look like part of the footer
+// instead of a widget somebody bolted on. Each language is named in itself:
+// "Italiano", not a flag and not a two-letter code, because a flag is a
+// country and a code is a thing you have to already know.
+const languages = alternates(Astro.url.pathname);
 
 const year = new Date().getFullYear();
 ---
@@ -69,30 +89,27 @@ const year = new Date().getFullYear();
                 The role is read, never typed: it is also the <title> and the
                 JSON-LD jobTitle, and a second copy here is a second copy to
                 forget. */}
-            <p class="site-footer-tagline">
-                {owner.role} in {owner.city}. This page, the counting behind it,
-                and the occasional thing built for no reason at all.
-            </p>
+            <p class="site-footer-tagline">{t.footer.tagline(who)}</p>
             <a class="site-footer-top" href="#top">
                 <span class="site-footer-top-arrow" aria-hidden="true"></span>
-                back to top
+                {t.footer.backToTop}
             </a>
 
         </div>
 
-        <nav class="site-footer-cols" aria-label="Footer">
+        <nav class="site-footer-cols" aria-label={t.footer.label}>
             <div class="site-footer-col">
                 {/* "index", not "sections" — the same register as the two
                     headings beside it, which are a colophon's own vocabulary
                     rather than a UI's. */}
-                <p class="label site-footer-col-title" id="ft-sections">index</p>
+                <p class="label site-footer-col-title" id="ft-sections">{t.footer.columns.index}</p>
                 <ul aria-labelledby="ft-sections">
                     {sections.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
                 </ul>
             </div>
 
             <div class="site-footer-col">
-                <p class="label site-footer-col-title" id="ft-elsewhere">elsewhere</p>
+                <p class="label site-footer-col-title" id="ft-elsewhere">{t.footer.columns.elsewhere}</p>
                 <ul aria-labelledby="ft-elsewhere">
                     {
                         elsewhere.map((l) => (
@@ -108,13 +125,54 @@ const year = new Date().getFullYear();
             </div>
 
             <div class="site-footer-col">
-                <p class="label site-footer-col-title" id="ft-legal">legal</p>
+                <p class="label site-footer-col-title" id="ft-legal">{t.footer.columns.legal}</p>
                 <ul aria-labelledby="ft-legal">
                     <li>
                         {/* Linking a page to itself is a dead link with extra steps. */}
-                        {onPrivacy ? <span>privacy</span> : <a href="/privacy">privacy</a>}
+                        {
+                            onPrivacy ? (
+                                <span>{t.footer.privacy}</span>
+                            ) : (
+                                <a href={pathFor(locale, "/privacy")}>{t.footer.privacy}</a>
+                            )
+                        }
                     </li>
-                    <li><a data-consent-reopen href="/privacy#choice">cookies</a></li>
+                    <li>
+                        <a data-consent-reopen href={`${pathFor(locale, "/privacy")}#choice`}>
+                            {t.footer.cookies}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="site-footer-col">
+                <p class="label site-footer-col-title" id="ft-lang">{t.footer.columns.language}</p>
+                <ul class="site-footer-langs" aria-labelledby="ft-lang">
+                    {
+                        languages.map((option) => (
+                            <li>
+                                {/* The one you are on is a <span>, not a link
+                                    to itself — the same rule `privacy` follows
+                                    one column to the left. `lang` on each item
+                                    so a screen reader says "Italiano" in
+                                    Italian rather than mangling it in the
+                                    voice of the surrounding page. */}
+                                {option.locale === locale ? (
+                                    <span lang={option.hreflang} aria-current="true">
+                                        {option.endonym}
+                                    </span>
+                                ) : (
+                                    <a
+                                        lang={option.hreflang}
+                                        hreflang={option.hreflang}
+                                        href={option.path}
+                                    >
+                                        {option.endonym}
+                                    </a>
+                                )}
+                            </li>
+                        ))
+                    }
                 </ul>
             </div>
         </nav>
@@ -243,8 +301,8 @@ const year = new Date().getFullYear();
 
     .site-footer-cols {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: clamp(24px, 3vw, 48px);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: clamp(20px, 2.4vw, 40px);
     }
 
     .site-footer .site-footer-col-title {
@@ -264,6 +322,15 @@ const year = new Date().getFullYear();
         flex-direction: column;
         gap: 11px;
         font-size: 14px;
+    }
+
+    /* The current language, stated rather than implied. `privacy` linking to
+       itself can afford to look like its neighbours — there is a page title
+       above saying where you are. Which language you are reading has no such
+       heading, so it has to be legible from the list alone. */
+    .site-footer .site-footer-langs span[aria-current] {
+        color: var(--f-strong);
+        font-weight: 500;
     }
 
     .site-footer .site-footer-col li {
@@ -346,8 +413,8 @@ const year = new Date().getFullYear();
         }
 
         .site-footer-cols {
-            /* Three columns do not survive a phone; two do, and "legal" wraps
-               under the first rather than being squeezed beside it. */
+            /* Four columns do not survive a phone; two do, and the four fall
+               into a tidy 2×2 rather than being squeezed onto one line. */
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 30px clamp(20px, 6vw, 48px);
         }
