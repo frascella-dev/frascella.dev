@@ -52,11 +52,6 @@ const BOOT_JS = `
 (function () {
     var d = document.documentElement;
     d.classList.add("js");
-    // iOS Safari ignores \`user-scalable=no\`; refusing its proprietary
-    // gesture events is what actually stops the pinch.
-    document.addEventListener("gesturestart", function (e) {
-        e.preventDefault();
-    });
     ${bare ? "" : `if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         // \`splash-open\` is dropped by lib/splash.ts once the panel has
         // irised away; it keeps the custom cursor off the intro, which is
@@ -99,10 +94,13 @@ const DEV_SKIP_SPLASH_CSS = `html.dev-no-splash .splash { display: none !importa
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
+        {/* No `maximum-scale`, no `user-scalable=no`. They were here to keep
+            the composed scene from being pulled apart by a pinch, and that is
+            not a trade that is ours to make: refusing zoom fails WCAG 1.4.4,
+            and the people it stops are the ones who cannot read the page
+            without it. A zoomed viewport looking odd is a worse layout; a
+            locked one is an unreadable page. */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* One fixed colour, deliberately not media-queried: the browser bars
             stay ink-dark whatever the page behind them is showing. iOS 26

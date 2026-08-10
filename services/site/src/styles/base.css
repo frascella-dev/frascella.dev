@@ -30,10 +30,10 @@
 
 html {
     scroll-behavior: smooth;
-    /* Scrolling yes, pinch- and double-tap-zoom no. The page is a composed
-       scene — a zoomed-in viewport tears the fixed layers apart. The meta
-       viewport says the same thing for the browsers that only read that. */
-    touch-action: pan-x pan-y;
+    /* No `touch-action` here on purpose. It used to read `pan-x pan-y`, which
+       is the CSS half of the same refusal the meta viewport used to make: it
+       leaves scrolling alone and takes away pinch- *and* double-tap-zoom. The
+       default is `auto`, and `auto` is the accessible answer. */
     /* The canvas behind the page is ink, not paper: it's what browsers show
        in the overscroll glow at either end of the page. */
     background: var(--dark);
@@ -63,13 +63,20 @@ body::-webkit-scrollbar {
    `splash-open` is set by the inline head script *before first paint*, which
    covers the gap before the motion module has even been fetched. `overflow`
    alone is not enough on iOS Safari — touch panning has to be refused
-   explicitly, and the body has to say it too. */
+   explicitly, and the body has to say it too.
+
+   `pinch-zoom` rather than `none`: the two differ only in whether the pinch
+   survives, and the lock has no interest in the pinch. It is there to stop a
+   swipe scrolling the page behind a panel, not to stop someone enlarging the
+   panel — and `none` would put the one moment the reader most needs to zoom,
+   an intro card and a menu, behind the same refusal we just took off the
+   viewport. `overflow: hidden` is the lock; this is the belt. */
 html.is-locked,
 html.splash-open,
 html.is-locked body,
 html.splash-open body {
     overflow: hidden;
-    touch-action: none;
+    touch-action: pinch-zoom;
     overscroll-behavior: none;
 }
 
