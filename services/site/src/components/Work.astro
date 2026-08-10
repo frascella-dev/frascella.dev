@@ -10,13 +10,14 @@
 // just been walked past them, and reading the same titles again read as the
 // section starting over.
 //
-// **Nothing here is crawlable, and it cannot be made so.** The slab labels
+// **No markup here is crawlable, and it cannot be made so.** The slab labels
 // are painted into a canvas, and the captions — the one piece of real text —
 // live inside a fixed overlay that is `visibility: hidden` at rest, which is
 // the state a renderer sees. That is a known and accepted trade: the corridor
-// is an experience, not a document, and the rest of the site is where the
-// words are. Anything that reached a crawler from in here would have to be
-// invisible to the reader, which is the one thing not worth doing.
+// is an experience, not a document. Anything that reached a crawler from in
+// here as *markup* would have to be invisible to the reader, which is the one
+// thing not worth doing — so the projects are declared instead, as JSON-LD in
+// index.astro, from the same site.ts entries this file renders.
 
 import { getImage } from "astro:assets";
 import { projects, owner } from "../data/site.ts";
