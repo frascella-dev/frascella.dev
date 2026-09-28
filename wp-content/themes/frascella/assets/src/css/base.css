@@ -1,0 +1,179 @@
+/* The reset, the two type voices, the page's furniture, and the reveal.
+ *
+ * Colours and fonts are custom properties from tokens.generated.css (tokens.json); this
+ * file never names a hex value. */
+
+@import "./tokens.generated.css";
+
+@layer base, components;
+
+@layer base {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    :root {
+        /* The page's side margin, once: the sheets, the header and the footer all use it,
+           so their content lines up. */
+        --gutter: clamp(1.25rem, 5vw, 4rem);
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        scroll-padding-top: 5rem;
+    }
+
+    body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--text);
+        font: 400 1.0625rem/1.65 var(--font-body);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    img,
+    svg,
+    video {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    a {
+        color: inherit;
+        text-underline-offset: 0.2em;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+        margin: 0;
+    }
+}
+
+/* --- the two voices ------------------------------------------------------ */
+
+/* Every headline. A native Heading with this class is dressed by it: the plugin's
+   elementor.css makes the `<h2>` inside inherit from the widget's wrapper. */
+.display {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+}
+
+.display em {
+    font-style: italic;
+}
+
+/* Labels and meta lines, spaced so they read as annotation.
+ *
+ * Every margin a class sets, it also says in `--frascella-margin`: Elementor zeroes a widget's
+ * margins at a weight no class reaches, and the plugin's elementor.css hands the variable
+ * back to it. One declaration for the theme's own markup, one for a native widget with
+ * the same class. */
+.eyebrow {
+    margin-bottom: 1rem;
+    --frascella-margin: 0 0 1rem;
+    color: var(--meta);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* Reading measure. `--frascella-max` says the same measure to Elementor, which otherwise holds
+   every widget to `max-width: 100%` at a weight no class of the theme reaches (see the
+   plugin's assets/elementor.css). The same goes for margins and `--frascella-margin`. */
+.prose,
+.prose-each > p {
+    max-width: 62ch;
+    --frascella-max: 62ch;
+    text-wrap: pretty;
+}
+
+.prose > * + *,
+.prose-each > p + p {
+    margin-top: 1em;
+}
+
+/* --- furniture ------------------------------------------------------------ */
+
+.sheet {
+    padding: clamp(3.5rem, 9vw, 7rem) var(--gutter);
+}
+
+.sheet--dark {
+    background: var(--dark);
+    color: var(--on-dark);
+}
+
+.measure {
+    max-width: 72rem;
+    margin-inline: auto;
+}
+
+.skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -10rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.skip-link:focus {
+    top: 1rem;
+}
+
+.link-cue {
+    font-size: 0.875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* --- the reveal ------------------------------------------------------------
+ *
+ * Held back only under `html.motion`, which the boot script sets when there is JavaScript
+ * and the reader has not asked for reduced motion: with neither, nothing is ever hidden.
+ * lib/reveal.ts adds `.is-in`. The theme's markup opts in with `data-reveal`; a native
+ * Elementor container with the class `frascella-reveal` brings in each of its widgets, one after
+ * the other. In Elementor's preview (`html.editing`) there is no `motion`, so everything is
+ * visible while it is being edited. */
+
+html.motion [data-reveal],
+html.motion .frascella-reveal > .elementor-element,
+html.motion .frascella-reveal > .e-con-inner > .elementor-element {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+        opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0s);
+}
+
+html.motion [data-reveal].is-in,
+html.motion .frascella-reveal > .elementor-element.is-in,
+html.motion .frascella-reveal > .e-con-inner > .elementor-element.is-in {
+    opacity: 1;
+    transform: none;
+}

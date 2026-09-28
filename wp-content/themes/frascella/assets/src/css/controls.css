@@ -1,0 +1,100 @@
+/* The controls, once: a button, a field, a box you tick.
+ *
+ * A control has to work on both surfaces the site has, light and dark. Rather than a
+ * variant per surface, the values a control needs are variables, set here for the light
+ * surface and set again by `.on-dark`: put that class on any dark container and every
+ * control inside it flips. Inside `@layer components`, so a component's own rule can still
+ * overrule a primitive. */
+
+:root {
+    --ctl-text: var(--text);
+    --ctl-muted: var(--soft);
+    --ctl-rule: var(--rule);
+    --ctl-fill: var(--accent);
+    --ctl-fill-text: var(--accent-text);
+}
+
+.on-dark {
+    --ctl-text: var(--on-dark);
+    --ctl-muted: color-mix(in srgb, var(--on-dark) 75%, transparent);
+    --ctl-rule: color-mix(in srgb, var(--on-dark) 30%, transparent);
+    --ctl-fill: var(--on-dark);
+    --ctl-fill-text: var(--dark);
+}
+
+@layer components {
+    /* Two weights, one shape: `--solid` is the way forward (one on screen), `--quiet` an
+       alternative. Hierarchy by fill, never by size. An `<a>` drawn as a button wears the
+       same classes as a `<button>`. */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6em;
+        min-height: 2.875rem;
+        padding: 0.75rem 1.4rem;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--ctl-text);
+        font: inherit;
+        font-size: 0.9375rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+    }
+
+    .btn--solid {
+        background: var(--ctl-fill);
+        border-color: var(--ctl-fill);
+        color: var(--ctl-fill-text);
+    }
+
+    .btn--solid:hover {
+        opacity: 0.88;
+    }
+
+    .btn--quiet {
+        border-color: var(--ctl-rule);
+    }
+
+    .btn--quiet:hover {
+        border-color: var(--ctl-text);
+    }
+
+    .field-name {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--ctl-muted);
+        font-size: 0.875rem;
+    }
+
+    .input,
+    .textarea {
+        width: 100%;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid var(--ctl-rule);
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--ctl-text);
+        font: inherit;
+    }
+
+    .input:focus,
+    .textarea:focus {
+        outline: none;
+        border-color: var(--ctl-text);
+    }
+
+    /* A refusal under a field: empty until the server says otherwise. */
+    .field-error:empty {
+        display: none;
+    }
+
+    .field-error {
+        display: block;
+        margin-top: 0.4rem;
+        color: var(--alert);
+        font-size: 0.875rem;
+    }
+}

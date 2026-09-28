@@ -1,0 +1,26 @@
+/* The demo home's own classes (tools/demo.php). Delete this file, and its import in
+   site.css, when the real pages exist. */
+
+.demo-lede {
+    margin-top: 1.5rem;
+    --frascella-margin: 1.5rem 0 0;
+    color: var(--soft);
+    font-size: 1.2rem;
+}
+
+.demo-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 2.5rem;
+}
+
+.demo-column-title {
+    margin-bottom: 0.75rem;
+    --frascella-margin: 0 0 0.75rem;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+}
+
+.on-dark .prose {
+    color: color-mix(in srgb, var(--on-dark) 85%, transparent);
+}

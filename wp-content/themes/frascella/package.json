@@ -1,0 +1,16 @@
+{
+    "name": "@frascella/theme",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "description": "frascella.dev — the WordPress theme's client layer (Vite).",
+    "scripts": {
+        "dev": "vite build --watch --mode development",
+        "build": "vite build",
+        "typecheck": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "typescript": "^5.6.3",
+        "vite": "^6.0.7"
+    }
+}

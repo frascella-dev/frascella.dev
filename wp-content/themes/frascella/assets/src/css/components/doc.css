@@ -1,0 +1,25 @@
+/* Documents: a page of prose, the 404. */
+
+.page-title {
+    margin-bottom: 2rem;
+}
+
+.prose h2,
+.prose h3 {
+    margin-top: 2em;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.prose h2 {
+    font-size: 1.6rem;
+}
+
+.prose a {
+    text-decoration-thickness: 1px;
+}
+
+.not-found {
+    min-height: 60vh;
+}

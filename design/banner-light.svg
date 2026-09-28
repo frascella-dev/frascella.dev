@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="640" viewBox="0 0 2560 640">
+  <!-- Bottega's banner (light): the family's layout, the quincunx floor on the right. docs/icon.md -->
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e39a3b"/><stop offset="1" stop-color="#9a3412"/></linearGradient><radialGradient id="light" cx="0.25" cy="0.15" r="0.9"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf8f3"/><stop offset="1" stop-color="#f6efe6"/></linearGradient>
+    <clipPath id="floor"><rect x="1700" y="0" width="860" height="640"/></clipPath></defs>
+  <rect width="2560" height="640" fill="url(#bg)"/>
+  <g transform="translate(192 192) scale(0.5)">
+    <rect width="512" height="512" rx="112.6" fill="url(#g)"/>
+    <rect width="512" height="512" rx="112.6" fill="url(#light)"/>
+    <rect x="128.0" y="128.0" width="256" height="256" fill="none" stroke="#ffffff" stroke-opacity="0.51" stroke-width="16"/>
+    <path d="M128.0 128.0L384.0 384.0M384.0 128.0L128.0 384.0" stroke="#ffffff" stroke-opacity="0.32" stroke-width="9.6"/>
+    <circle cx="128.0" cy="128.0" r="26.88" fill="#ffffff" fill-opacity="0.92"/>
+    <circle cx="384.0" cy="128.0" r="26.88" fill="#ffffff" fill-opacity="0.92"/>
+    <circle cx="384.0" cy="384.0" r="26.88" fill="#ffffff" fill-opacity="0.92"/>
+    <circle cx="128.0" cy="384.0" r="26.88" fill="#ffffff" fill-opacity="0.92"/>
+    <circle cx="256" cy="256" r="58.88" fill="#ffffff"/>
+    <path d="M256 213.6064L298.3936 256L256 298.3936L213.6064 256Z" fill="url(#g)"/>
+    <circle cx="256" cy="256" r="9.4" fill="#ffffff"/>
+  </g>
+  <text x="532" y="304" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="150" letter-spacing="-4" fill="#171311">bottega</text>
+  <rect x="536" y="344" width="112" height="10" rx="5" fill="url(#g)"/>
+  <text x="532" y="428" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="46" fill="#4b4038">Elementor themes and plugins, made the same way.</text>
+  <text x="532" y="498" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="31" fill="#7a6a5c">guidelines · Claude Code skills · a working skeleton · one command to start</text>
+  <g clip-path="url(#floor)">
+    <rect x="1840" y="64" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="1877.5" y="101.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M1877.5 101.5L1952.5 176.5M1952.5 101.5L1877.5 176.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="1877.5" cy="101.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1952.5" cy="101.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1952.5" cy="176.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1877.5" cy="176.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1915.0" cy="139.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M1915.0 126.58L1927.42 139.0L1915.0 151.42L1902.58 139.0Z" fill="#f1e3d0"/>
+    <circle cx="1915.0" cy="139.0" r="2.8" fill="#e2c7a3"/>
+<rect x="2012" y="64" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<path d="M2087.0 94.0L2132.0 139.0L2087.0 184.0L2042.0 139.0Z" fill="none" stroke="#e2c7a3" stroke-width="6"/>
+<path d="M2064.5 116.5L2109.5 116.5L2109.5 161.5L2064.5 161.5Z" fill="#e2c7a3" fill-opacity="0.6"/>
+<rect x="2184" y="64" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="2221.5" y="101.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M2221.5 101.5L2296.5 176.5M2296.5 101.5L2221.5 176.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="2221.5" cy="101.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2296.5" cy="101.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2296.5" cy="176.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2221.5" cy="176.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2259.0" cy="139.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M2259.0 126.58L2271.42 139.0L2259.0 151.42L2246.58 139.0Z" fill="#f1e3d0"/>
+    <circle cx="2259.0" cy="139.0" r="2.8" fill="#e2c7a3"/>
+<rect x="2356" y="64" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<path d="M2431.0 94.0L2476.0 139.0L2431.0 184.0L2386.0 139.0Z" fill="none" stroke="#e2c7a3" stroke-width="6"/>
+<path d="M2408.5 116.5L2453.5 116.5L2453.5 161.5L2408.5 161.5Z" fill="#e2c7a3" fill-opacity="0.6"/>
+<rect x="1754" y="236" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<path d="M1829.0 266.0L1874.0 311.0L1829.0 356.0L1784.0 311.0Z" fill="none" stroke="#e2c7a3" stroke-width="6"/>
+<path d="M1806.5 288.5L1851.5 288.5L1851.5 333.5L1806.5 333.5Z" fill="#e2c7a3" fill-opacity="0.6"/>
+<rect x="1926" y="236" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="1963.5" y="273.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M1963.5 273.5L2038.5 348.5M2038.5 273.5L1963.5 348.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="1963.5" cy="273.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2038.5" cy="273.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2038.5" cy="348.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1963.5" cy="348.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2001.0" cy="311.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M2001.0 298.58L2013.42 311.0L2001.0 323.42L1988.58 311.0Z" fill="#f1e3d0"/>
+    <circle cx="2001.0" cy="311.0" r="2.8" fill="#e2c7a3"/>
+<rect x="2098" y="236" width="150" height="150" rx="33.0" fill="url(#g)"/>
+<rect x="2135.5" y="273.5" width="75.0" height="75.0" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="5"/>
+    <path d="M2135.5 273.5L2210.5 348.5M2210.5 273.5L2135.5 348.5" stroke="#ffffff" stroke-opacity="0.35" stroke-width="3.0"/>
+    <circle cx="2135.5" cy="273.5" r="7.875" fill="#ffffff" fill-opacity="1"/>
+    <circle cx="2210.5" cy="273.5" r="7.875" fill="#ffffff" fill-opacity="1"/>
+    <circle cx="2210.5" cy="348.5" r="7.875" fill="#ffffff" fill-opacity="1"/>
+    <circle cx="2135.5" cy="348.5" r="7.875" fill="#ffffff" fill-opacity="1"/>
+    <circle cx="2173.0" cy="311.0" r="17.25" fill="#ffffff"/>
+    <path d="M2173.0 298.58L2185.42 311.0L2173.0 323.42L2160.58 311.0Z" fill="url(#g)"/>
+    <circle cx="2173.0" cy="311.0" r="2.8" fill="#ffffff"/>
+<rect x="2270" y="236" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="2307.5" y="273.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M2307.5 273.5L2382.5 348.5M2382.5 273.5L2307.5 348.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="2307.5" cy="273.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2382.5" cy="273.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2382.5" cy="348.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2307.5" cy="348.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2345.0" cy="311.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M2345.0 298.58L2357.42 311.0L2345.0 323.42L2332.58 311.0Z" fill="#f1e3d0"/>
+    <circle cx="2345.0" cy="311.0" r="2.8" fill="#e2c7a3"/>
+<rect x="1840" y="408" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="1877.5" y="445.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M1877.5 445.5L1952.5 520.5M1952.5 445.5L1877.5 520.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="1877.5" cy="445.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1952.5" cy="445.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1952.5" cy="520.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1877.5" cy="520.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="1915.0" cy="483.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M1915.0 470.58L1927.42 483.0L1915.0 495.42L1902.58 483.0Z" fill="#f1e3d0"/>
+    <circle cx="1915.0" cy="483.0" r="2.8" fill="#e2c7a3"/>
+<rect x="2012" y="408" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<path d="M2087.0 438.0L2132.0 483.0L2087.0 528.0L2042.0 483.0Z" fill="none" stroke="#e2c7a3" stroke-width="6"/>
+<path d="M2064.5 460.5L2109.5 460.5L2109.5 505.5L2064.5 505.5Z" fill="#e2c7a3" fill-opacity="0.6"/>
+<rect x="2184" y="408" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<rect x="2221.5" y="445.5" width="75.0" height="75.0" fill="none" stroke="#e2c7a3" stroke-opacity="0.50" stroke-width="5"/>
+    <path d="M2221.5 445.5L2296.5 520.5M2296.5 445.5L2221.5 520.5" stroke="#e2c7a3" stroke-opacity="0.32" stroke-width="3.0"/>
+    <circle cx="2221.5" cy="445.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2296.5" cy="445.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2296.5" cy="520.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2221.5" cy="520.5" r="7.875" fill="#e2c7a3" fill-opacity="0.9"/>
+    <circle cx="2259.0" cy="483.0" r="17.25" fill="#e2c7a3"/>
+    <path d="M2259.0 470.58L2271.42 483.0L2259.0 495.42L2246.58 483.0Z" fill="#f1e3d0"/>
+    <circle cx="2259.0" cy="483.0" r="2.8" fill="#e2c7a3"/>
+<rect x="2356" y="408" width="150" height="150" rx="33.0" fill="#f1e3d0"/>
+<path d="M2431.0 438.0L2476.0 483.0L2431.0 528.0L2386.0 483.0Z" fill="none" stroke="#e2c7a3" stroke-width="6"/>
+<path d="M2408.5 460.5L2453.5 460.5L2453.5 505.5L2408.5 505.5Z" fill="#e2c7a3" fill-opacity="0.6"/>
+  </g>
+</svg>

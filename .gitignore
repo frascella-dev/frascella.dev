@@ -1,29 +1,11 @@
-# Dependencies & build output (per service)
+# Dependencies and builds: reproducible, not source.
 node_modules/
+wp-content/themes/*/assets/dist/
+wp-content/themes/*/assets/src/css/tokens.generated.css
 dist/
-build/
-.vite/
 
-# Environment / secrets
-.env
-.env.local
-.env.*.local
+# Packages: releases are built by bin/build-zips, and a commercial plugin's zip carries a licence.
+*.zip
 
-# Logs
-*.log
-npm-debug.log*
-
-# OS / editor cruft
 .DS_Store
-Thumbs.db
-/.idea
-/.vscode
-/.nova
-/.zed
-/.fleet
-/.cursor/
-/.codex
-
-# Claude Code — track shared agents/commands, ignore local & machine state
-/.claude/settings.local.json
-/.claude/local/
+*.log

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# First run on this machine: WordPress, Elementor, Polylang (Italian and English), the
+# plugin and the theme, and a demo home page to look at and test against.
+#
+#   bin/setup                  admin / admin on http://localhost:8110
+#   ELEMENTOR_PRO_ZIP=/path/to/elementor-pro.zip bin/setup
+#                              also installs Elementor Pro from a zip you are licensed
+#                              for (it is never committed: *.zip is ignored)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+URL="${SITE_URL:-http://localhost:8110}"
+
+docker compose up -d
+until bin/wp core is-installed >/dev/null 2>&1 || \
+      bin/wp core install --url="$URL" --title="frascella.dev" \
+        --admin_user="${WP_USER:-admin}" --admin_password="${WP_PASS:-admin}" \
+        --admin_email=admin@example.com --skip-email >/dev/null 2>&1; do
+    sleep 3
+done
+
+bin/wp language core install it_IT >/dev/null
+bin/wp site switch-language it_IT >/dev/null
+bin/wp plugin install elementor polylang --activate >/dev/null
+if [ -n "${ELEMENTOR_PRO_ZIP:-}" ]; then
+    cp "$ELEMENTOR_PRO_ZIP" wp-content/plugins/frascella/.elementor-pro.zip
+    bin/wp plugin install /var/www/html/wp-content/plugins/frascella/.elementor-pro.zip --activate >/dev/null
+    rm -f wp-content/plugins/frascella/.elementor-pro.zip
+fi
+
+# The build the theme reads its stylesheets from, and the panel's.
+(cd wp-content/themes/frascella && npm install --silent && npm run build --silent)
+
+bin/wp theme activate frascella >/dev/null
+bin/wp plugin activate frascella >/dev/null
+bin/wp eval-file /var/www/html/tools/setup-languages.php
+bin/wp eval-file /var/www/html/tools/demo.php
+
+echo
+echo "Ready: $URL/wp-admin (${WP_USER:-admin} / ${WP_PASS:-admin}) · mail: http://localhost:8135"

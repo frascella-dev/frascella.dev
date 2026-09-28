@@ -1,0 +1,27 @@
+.site-footer {
+    padding-inline: var(--gutter);
+    background: var(--dark);
+    color: var(--on-dark);
+}
+
+.site-footer-inner {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-block: 3rem;
+    font-size: 0.9375rem;
+}
+
+.site-footer-name {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+}
+
+.site-footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1rem;
+    color: color-mix(in srgb, var(--on-dark) 78%, transparent);
+}

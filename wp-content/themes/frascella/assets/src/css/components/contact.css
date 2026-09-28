@@ -1,0 +1,24 @@
+/* The contact card (template-parts/contact.php): the example widget's look. */
+
+.contact-heading {
+    max-width: 20ch;
+}
+
+.contact-lede {
+    max-width: 48ch;
+    margin-top: 1.25rem;
+    color: var(--soft);
+    --frascella-max: 48ch;
+    --frascella-margin: 1.25rem 0 0;
+}
+
+.contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.contact-value {
+    opacity: 0.8;
+}
