@@ -1,0 +1,153 @@
+/* The controls, once: a button, a field.
+ *
+ * The site has one surface, Ink, so the controls are drawn for it; the values a control
+ * reads are still variables (`--ctl-*`), so a light surface later is one rule that sets
+ * them again, not a variant per control. Inside `@layer components`, so a component's own
+ * rule can still overrule a primitive. */
+
+:root {
+    --ctl-text: var(--text);
+    --ctl-muted: var(--meta);
+    --ctl-rule: color-mix(in srgb, var(--text) 40%, transparent);
+    --ctl-rule-hover: color-mix(in srgb, var(--text) 70%, transparent);
+    --ctl-fill: var(--accent);
+    --ctl-fill-hover: color-mix(in srgb, var(--accent) 82%, var(--text));
+    --ctl-fill-text: var(--accent-text);
+}
+
+@layer components {
+    /* The button: square, vermilion, one weight. `.btn--big` is the band's call to action.
+       An `<a>` drawn as a button wears the same classes as a `<button>`; a native Elementor
+       Button gets them through `.cta` on its widget (below). */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65em;
+        padding: 0.85em 1.25em;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--ctl-fill);
+        color: var(--ctl-fill-text);
+        font-family: var(--font-body);
+        font-size: var(--t-1);
+        line-height: 1;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+        background: var(--ctl-fill-hover);
+        color: var(--ctl-fill-text);
+    }
+
+    .btn--big {
+        font-size: var(--t0);
+        padding: 1.05em 1.4em;
+    }
+
+    .btn .arr {
+        transition: transform 0.3s var(--ease);
+    }
+
+    .btn:hover .arr {
+        transform: translateX(4px);
+    }
+
+    /* A field: a line to write on. The label above it is small and Stone. */
+    .field-name {
+        display: block;
+        color: var(--ctl-muted);
+        font-size: var(--t-1);
+        line-height: var(--lh-1);
+        letter-spacing: 0.02em;
+    }
+
+    .input {
+        display: block;
+        width: 100%;
+        margin-top: var(--s-2);
+        padding: var(--s-3) 0 0.55em;
+        border: 0;
+        border-bottom: 1px solid var(--ctl-rule);
+        border-radius: 0;
+        background: transparent;
+        color: var(--ctl-text);
+        font-family: var(--font-body);
+        font-size: var(--t0);
+        line-height: 1.4;
+        transition: border-color 0.2s;
+    }
+
+    .input:hover {
+        border-bottom-color: var(--ctl-rule-hover);
+    }
+
+    .input:focus {
+        outline: none;
+        border-bottom: 2px solid var(--ctl-fill);
+        padding-bottom: calc(0.55em - 1px);
+        padding-top: var(--s-3);
+    }
+
+    textarea.input {
+        min-height: 5.5em;
+        resize: vertical;
+    }
+
+    .input[aria-invalid="true"] {
+        border-bottom-color: var(--alert);
+    }
+
+    /* A refusal under a field: empty until the server says otherwise. */
+    .field-error {
+        display: block;
+        margin-top: var(--s-2);
+        color: var(--alert);
+        font-size: var(--t-1);
+        line-height: var(--lh-1);
+    }
+
+    .field-error:empty {
+        display: none;
+    }
+}
+
+/* A native Elementor Button dressed as the site's: `cta` (and `cta--big`) on the widget.
+   Elementor's own button rules are scoped under `.elementor-button`, two classes deep; these
+   are three, and they say only what the site's button says. */
+.cta .elementor-button.elementor-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65em;
+    padding: 0.85em 1.25em;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--ctl-fill);
+    color: var(--ctl-fill-text);
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: 1;
+    font-weight: 700;
+    text-decoration: none;
+    fill: currentColor;
+    transition: background-color 0.2s;
+}
+
+.cta--big .elementor-button.elementor-button {
+    font-size: var(--t0);
+    padding: 1.05em 1.4em;
+}
+
+.cta .elementor-button.elementor-button:hover,
+.cta .elementor-button.elementor-button:focus-visible {
+    background: var(--ctl-fill-hover);
+    color: var(--ctl-fill-text);
+}
+
+.cta .elementor-button-content-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65em;
+}

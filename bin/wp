@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# WP-CLI, inside the container that holds this site's filesystem.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+exec docker compose run --rm -T cli "$@"

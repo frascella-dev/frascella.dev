@@ -1,0 +1,166 @@
+/* The colophon (template-parts/footer.php), as in Sketch (Web → footer): a tall band on the
+ * page's grid. The brand and the small print in columns 1–4; four lists, each two columns
+ * wide (5–6, 7–8, 9–10, 11–12), with a small heading in spaced small caps. On a phone: the
+ * brand, the lists two by two, the small print last. */
+
+.colophon {
+    padding: clamp(5rem, 9vw, 8.25rem) var(--page-margin) clamp(6rem, 13vw, 12rem);
+}
+
+.colophon-band {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    column-gap: var(--gutter);
+    row-gap: 0;
+    padding-top: var(--s-9);
+    border-top: 1px solid var(--line);
+}
+
+.colophon-brand {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    display: grid;
+    gap: var(--s-8);
+    align-content: start;
+}
+
+.colophon-brand .logo {
+    font-size: var(--t1);
+}
+
+.colophon-role {
+    color: var(--soft);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.colophon-legal {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    margin-top: var(--s-10);
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    font-variant-numeric: lining-nums;
+}
+
+.colophon-list {
+    grid-row: 1 / span 2;
+}
+
+.colophon-list:nth-of-type(1) {
+    grid-column: 5 / span 2;
+}
+
+.colophon-list:nth-of-type(2) {
+    grid-column: 7 / span 2;
+}
+
+.colophon-list:nth-of-type(3) {
+    grid-column: 9 / span 2;
+}
+
+.colophon-list:nth-of-type(4) {
+    grid-column: 11 / span 2;
+}
+
+/* Sketch: 10.5 px capitals on a 16 px line, spaced. */
+.colophon-h {
+    margin: 0 0 var(--s-5);
+    color: var(--meta);
+    font-family: var(--font-body);
+    font-size: calc(var(--t-1) * 0.75);
+    line-height: 1.52;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.colophon ul {
+    display: grid;
+    gap: var(--s-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--t-1);
+    line-height: var(--lh0);
+}
+
+.colophon ul a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.colophon ul a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.colophon ul a svg {
+    width: 0.7em;
+    height: 0.7em;
+    flex: none;
+    color: var(--meta);
+    transition:
+        transform 0.25s var(--ease),
+        color 0.2s;
+}
+
+.colophon ul a:hover svg {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+}
+
+.colophon [aria-current] {
+    color: var(--meta);
+}
+
+.colophon ul a[aria-current]:hover {
+    color: var(--meta);
+    text-decoration: none;
+}
+
+@media (max-width: 900px) {
+    .colophon-band {
+        grid-template-rows: none;
+        row-gap: var(--s-10);
+    }
+
+    .colophon-brand,
+    .colophon-legal {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    /* Sketch: the brand and the small print stand 64 px off the lists, the lists 32 px apart. */
+    .colophon-brand {
+        margin-bottom: calc(var(--s-11) - var(--s-10));
+    }
+
+    .colophon-legal {
+        order: 5;
+        margin-top: calc(var(--s-11) - var(--s-10));
+    }
+
+    .colophon-list {
+        grid-row: auto;
+    }
+
+    .colophon-list:nth-of-type(odd) {
+        grid-column: 1 / span 2;
+    }
+
+    .colophon-list:nth-of-type(even) {
+        grid-column: 3 / span 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .colophon ul a svg {
+        transition: none;
+    }
+}
