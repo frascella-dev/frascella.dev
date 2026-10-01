@@ -100,6 +100,8 @@ $it = [
     ],
     'menu' => [['servizi', '#servizi'], ['lavori', '#lavori'], ['chi sono', '#chi-sono']],
     'privacy' => 'Informativa privacy',
+    // The notice's own description (search results), instead of its first lines.
+    'privacyExcerpt' => 'Cosa fa questo sito con i dati di chi lo visita: il modulo di contatto, un solo cookie tecnico, nessuna statistica e nessun servizio di terze parti.',
     'projects' => [
         ['seveninktattoo-it', 'seveninktattoo.it', 'cliente', 'Il sito di uno studio di tatuaggi, in italiano e in inglese. WordPress ed Elementor Pro, con i miei plugin per richieste di appuntamento, recensioni con consenso, newsletter e FAQ. Nessun servizio esterno.', 'WordPress · Elementor Pro', 'online', 'https://seveninktattoo.it', 'sevenink-home.webp', 'La home page di seveninktattoo.it'],
         ['skeda-fit', 'skeda.fit', 'cofondatore', 'Un’app per personal trainer freelance: schede, registrazione delle serie durante l’allenamento, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita; la lista d’attesa è aperta.', 'Flutter · Nuxt · Symfony', 'in sviluppo', 'https://skeda.fit', 'skeda-home.webp', 'La home page di skeda.fit'],
@@ -354,7 +356,7 @@ foreach ($words as $lang => $w) {
         $say("✓ home ($lang)");
     }
     if ($rebuild || get_post_meta($privacies[$lang], '_frascella_built', true) !== '1') {
-        wp_update_post(['ID' => $privacies[$lang], 'post_title' => $w['privacy'], 'post_content' => $privacy[$lang]]);
+        wp_update_post(['ID' => $privacies[$lang], 'post_title' => $w['privacy'], 'post_content' => $privacy[$lang], 'post_excerpt' => $w['privacyExcerpt']]);
         update_post_meta($privacies[$lang], '_frascella_built', '1');
         $say("✓ privacy ($lang)");
     }
