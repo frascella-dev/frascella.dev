@@ -183,15 +183,15 @@ $privacy = [
 <h2>Le statistiche</h2>
 <p>Il sito misura le visite con Analytics, il servizio di statistiche del titolare, all’indirizzo <code>analytics.frascella.dev</code>: un servizio installato e gestito dal titolare sul proprio server, non di terzi. Lo script che misura le visite si scarica da quell’indirizzo; chi è collegato al pannello del sito come autore o amministratore non viene contato.</p>
 <!--consent--><h3>Senza consenso</h3><!--/consent-->
-<p>Per ogni pagina vista il browser invia al servizio: l’indirizzo della pagina (senza parametri diversi da <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> e <code>ref</code>, e ripulito da indirizzi email e numeri lunghi), il sito di provenienza (solo il nome del dominio), il tempo passato sulla pagina e quanto è stata scorsa, i clic sui link verso altri siti (l’indirizzo del link), i download di file (l’indirizzo del file) e l’invio del modulo di contatto (solo che è avvenuto: mai il contenuto dei campi).</p>
+<p>Per ogni pagina vista il browser invia al servizio: l’indirizzo della pagina (senza parametri diversi da <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> e <code>ref</code>, e ripulito da indirizzi email e numeri lunghi), il sito di provenienza (solo il nome del dominio), il tempo passato sulla pagina e quanto è stata scorsa, i clic sui link verso altri siti (l’indirizzo del link), i download di file (l’indirizzo del file) e l’invio del modulo di contatto (solo quale modulo e che è stato inviato: mai il contenuto dei campi).</p>
 <p>Il servizio ricava dalla richiesta il tipo di dispositivo, il sistema operativo e il browser (famiglia e versione principale) e il paese (due lettere). L’indirizzo IP viene accorciato prima di ogni uso e non viene mai salvato; per contare i visitatori di un giorno il servizio usa un codice (un hash) calcolato con una chiave che cambia ogni giorno e poi viene distrutta, quindi non è possibile riconoscere la stessa persona in giorni diversi. <!--consent-->A questo livello il sito<!--else-->Il sito<!--/consent--> non scrive nulla nel browser: nessun cookie, nessuna memoria locale.</p>
 <p>Base giuridica: il legittimo interesse del titolare a sapere come viene letto il sito (art. 6, par. 1, lett. f) GDPR), con dati che non identificano chi visita.</p>
 <!--consent--><h3>Con il consenso</h3>
-<p>Alla prima visita un riquadro chiede se accettare i cookie di statistica. Solo se si accetta, il sito scrive due cookie (<code>an_vid</code> e <code>an_sid</code>, nella tabella sotto) che permettono di riconoscere una visita successiva e di raggruppare le pagine di una stessa visita. Rifiutare, o chiudere il riquadro, equivale a non accettare: i cookie di statistica non vengono scritti, o vengono cancellati se c’erano. Il sito ricorda la scelta per 180 giorni, poi la chiede di nuovo.</p>
+<p>Alla prima visita un riquadro chiede se accettare i cookie di statistica. Solo se si accetta, il sito scrive due cookie (<code>an_vid</code> e <code>an_sid</code>, nella tabella sotto) che permettono di riconoscere una visita successiva e di raggruppare le pagine di una stessa visita. Rifiutare, o chiudere il riquadro, equivale a non accettare: i cookie di statistica non vengono scritti, o vengono cancellati se c’erano. Il sito ricorda la scelta per 180 giorni, poi la chiede di nuovo. Revocare il consenso vale da quel momento: le visite già registrate restano fino alla cancellazione descritta sotto.</p>
 <p>Se il browser invia il segnale Global Privacy Control, il riquadro non compare e i cookie di statistica non vengono mai scritti.</p>
 <p>Base giuridica: il consenso (art. 6, par. 1, lett. a) GDPR e art. 122 Codice Privacy). La scelta si cambia in ogni momento con il link «cookie» in fondo a ogni pagina, che riapre il riquadro.</p>
 <!--/consent--><h3>Conservazione e destinatari</h3>
-<p>I dati delle statistiche sono conservati per <strong>13 mesi</strong> e poi cancellati. Li legge solo il titolare, in forma aggregata: il servizio non mostra le visite di una singola persona. Non sono usati per profilazione né per pubblicità, non vengono incrociati con altri dati e non vengono ceduti a nessuno.</p>
+<p>I dati delle statistiche sono conservati per <strong>13 mesi</strong> e poi cancellati. Restano solo i totali (per esempio le visite di un giorno a una pagina), che non riguardano nessuna persona. Li legge solo il titolare, in forma aggregata: il servizio non mostra le visite di una singola persona. Non sono usati per profilazione né per pubblicità, non vengono incrociati con altri dati e non vengono ceduti a nessuno.</p>
 <h2 id="cookie">Cookie</h2>
 <!--consent--><p>Il sito usa questi cookie, tutti propri (di <code>frascella.dev</code>), nessuno di terzi. Senza consenso solo il primo e, per chi invia il modulo, l’ultimo, entrambi tecnici (art. 122 Codice Privacy; Garante, linee guida cookie del 10 giugno 2021).</p><!--else--><p>Il sito usa un solo cookie, proprio (di <code>frascella.dev</code>) e tecnico, e solo per chi invia il modulo; per questo non chiede consensi e non mostra un banner (art. 122 Codice Privacy; Garante, linee guida cookie del 10 giugno 2021). Le statistiche non usano cookie.</p><!--/consent-->
 <table>
@@ -237,15 +237,15 @@ $privacy['en'] = <<<'HTML'
 <h2>Statistics</h2>
 <p>The site measures visits with Analytics, the controller’s own statistics service, at <code>analytics.frascella.dev</code>: a service installed and run by the controller on their own server, not a third party’s. The script that measures visits is downloaded from that address; people signed in to the site’s panel as authors or administrators are not counted.</p>
 <!--consent--><h3>Without consent</h3><!--/consent-->
-<p>For every page viewed the browser sends the service: the page’s address (without parameters other than <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> and <code>ref</code>, and cleaned of email addresses and long numbers), the referring site (its domain name only), the time spent on the page and how far it was scrolled, clicks on links to other sites (the link’s address), file downloads (the file’s address) and the sending of the contact form (only that it happened: never what the fields contain).</p>
+<p>For every page viewed the browser sends the service: the page’s address (without parameters other than <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> and <code>ref</code>, and cleaned of email addresses and long numbers), the referring site (its domain name only), the time spent on the page and how far it was scrolled, clicks on links to other sites (the link’s address), file downloads (the file’s address) and the sending of the contact form (only which form, and that it was sent: never what the fields contain).</p>
 <p>From the request the service derives the type of device, the operating system and the browser (family and major version) and the country (two letters). The IP address is shortened before any use and never stored; to count a day’s visitors the service uses a code (a hash) computed with a key that changes every day and is then destroyed, so the same person cannot be recognised on different days. <!--consent-->At this level the site<!--else-->The site<!--/consent--> writes nothing in the browser: no cookies, no local storage.</p>
 <p>Legal basis: the controller’s legitimate interest in knowing how the site is read (Art. 6(1)(f) GDPR), with data that does not identify visitors.</p>
 <!--consent--><h3>With consent</h3>
-<p>On a first visit a box asks whether to accept statistics cookies. Only if they are accepted does the site set two cookies (<code>an_vid</code> and <code>an_sid</code>, in the table below), which recognise a later visit and group the pages of one visit. Rejecting, or closing the box, means not accepting: the statistics cookies are not set, or are deleted if they were there. The site remembers the choice for 180 days, then asks again.</p>
+<p>On a first visit a box asks whether to accept statistics cookies. Only if they are accepted does the site set two cookies (<code>an_vid</code> and <code>an_sid</code>, in the table below), which recognise a later visit and group the pages of one visit. Rejecting, or closing the box, means not accepting: the statistics cookies are not set, or are deleted if they were there. The site remembers the choice for 180 days, then asks again. Withdrawing consent applies from that moment: visits already recorded stay until they are deleted as described below.</p>
 <p>If the browser sends the Global Privacy Control signal, the box does not appear and the statistics cookies are never set.</p>
 <p>Legal basis: consent (Art. 6(1)(a) GDPR and Art. 122 of the Italian Privacy Code). The choice can be changed at any time with the «cookies» link at the foot of every page, which reopens the box.</p>
 <!--/consent--><h3>Retention and recipients</h3>
-<p>Statistics data is kept for <strong>13 months</strong> and then deleted. Only the controller reads it, in aggregate: the service does not show the visits of any single person. It is not used for profiling or advertising, not combined with other data and not passed on to anyone.</p>
+<p>Statistics data is kept for <strong>13 months</strong> and then deleted. Only the totals remain (a page’s visits on a given day, for example), which concern no one in particular. Only the controller reads it, in aggregate: the service does not show the visits of any single person. It is not used for profiling or advertising, not combined with other data and not passed on to anyone.</p>
 <h2 id="cookies">Cookies</h2>
 <!--consent--><p>The site uses these cookies, all its own (<code>frascella.dev</code>’s), none of a third party. Without consent only the first and, for someone who sends the form, the last, both technical (Art. 122 of the Italian Privacy Code; Garante, cookie guidelines of 10 June 2021).</p><!--else--><p>The site uses a single cookie, its own (<code>frascella.dev</code>’s) and technical, and only for someone who sends the form; so it asks for no consent and shows no banner (Art. 122 of the Italian Privacy Code; Garante, cookie guidelines of 10 June 2021). The statistics use no cookies.</p><!--/consent-->
 <table>
@@ -273,12 +273,19 @@ HTML;
 
 /*
  * The statistics' consent banner: published on the service or not (tools/analytics/site.json).
- * The service's site has the cookie level on, but no banner is published yet (its script says
- * `"consent":null`): the tracker then stays at the level without cookies, and the notice says
- * only that. Publish the banner, set this to true and run `tools/site.php rebuild`: the notice
- * gains its consent sections (marked <!--consent-->…<!--else-->…<!--/consent--> above).
+ * Read from the live tracker script, the same configuration visitors receive: with no banner
+ * published it says `"consent":null`, the tracker stays at the level without cookies, and the
+ * notice says only that. Once the banner is published, run `tools/site.php rebuild`: the notice
+ * gains its consent sections (marked <!--consent-->…<!--else-->…<!--/consent--> above). An
+ * unreadable script stops here, rather than writing a notice that guesses.
  */
-$bannerPublished = false;
+$tracker = wp_remote_get('https://analytics.frascella.dev/t/pk_f7Ez7q8BKaSxS1pC8Jpec.js', ['timeout' => 15]);
+$script = is_wp_error($tracker) || wp_remote_retrieve_response_code($tracker) !== 200 ? '' : (string) wp_remote_retrieve_body($tracker);
+if (!preg_match('/"consent":(null|\{)/', $script, $consent)) {
+    WP_CLI::error('The tracker script on analytics.frascella.dev could not be read: the notice needs to know whether its consent banner is published.');
+}
+$bannerPublished = $consent[1] === '{';
+$say($bannerPublished ? '✓ consent banner published: the notice describes the cookies' : '✓ no consent banner published: the notice describes statistics without cookies');
 $pick = static fn (string $html): string => (string) preg_replace_callback(
     '#<!--consent-->(.*?)(?:<!--else-->(.*?))?<!--/consent-->#s',
     static fn (array $m): string => $bannerPublished ? $m[1] : ($m[2] ?? ''),

@@ -7,6 +7,7 @@
  * Hook priorities, so the order is readable in one place:
  *   0  referrer policy (before anything that makes a request)
  *   2  description, canonical, hreflang, Open Graph
+ *   3  the icons
  *   6  modulepreload (inc/assets.php)
  *   8  JSON-LD (inc/schema.php)
  *   99 the boot script
@@ -222,6 +223,25 @@ function frascella_og_image(): ?array
         'height' => (int) $src[2],
     ];
 }
+
+/**
+ * The site's icons, shipped with the theme (assets/icons, from design/ by
+ * bin/export-assets.mjs), so they travel with a release instead of living in the media
+ * library. WordPress's own Site Icon stays unset: two sets would be two tags disagreeing.
+ *
+ * Browsers and crawlers also ask for /favicon.ico and /apple-touch-icon.png without
+ * reading the page, and the web server answers those from the web root, never from
+ * WordPress: the deploy copies the two files there (docs/guidelines/10-release-and-deploy.md).
+ */
+add_action('wp_head', static function (): void {
+    $icons = FRASCELLA_THEME_URI . '/assets/icons/';
+    $v = '?v=' . rawurlencode((string) wp_get_theme()->get('Version'));
+    printf('<link rel="icon" href="%s" sizes="32x32" />' . "\n", esc_url($icons . 'favicon.ico' . $v));
+    printf('<link rel="icon" href="%s" type="image/svg+xml" />' . "\n", esc_url($icons . 'favicon.svg' . $v));
+    printf('<link rel="apple-touch-icon" href="%s" />' . "\n", esc_url($icons . 'apple-touch-icon.png' . $v));
+    printf('<link rel="manifest" href="%s" />' . "\n", esc_url($icons . 'site.webmanifest'));
+    echo '<meta name="theme-color" content="#0E0E11" />' . "\n";
+}, 3);
 
 /**
  * The two Latin font files, preloaded: the stylesheet names them only once it has arrived

@@ -3,6 +3,19 @@
 What changed for the people who run frascella.dev. The theme and the plugin are released
 together and carry the same version.
 
+## [1.0.2] — 2026-10-01
+
+- **The site's icons.** The EF monogram as favicon (`.ico` and SVG), Apple touch icon and web
+  app manifest (192, 512 and maskable), shipped with the theme. On deploy, `favicon.ico` and
+  `apple-touch-icon.png` are also copied to the web root, which browsers ask for directly.
+- **Privacy notice, ready for the statistics banner.** The notice now reads from the live
+  tracker whether the consent banner is published, and describes the cookies only then. Checked
+  against the Analytics code: it now says that only the totals remain after the 13 months, that
+  withdrawing consent applies from then on, and that a form event records which form was sent.
+
+**Install:** `frascella-plugin-1.0.2.zip` and `frascella-theme-1.0.2.zip` (no data changes),
+then `tools/site.php rebuild` for the notice. **Tested with** the same versions as 1.0.0.
+
 ## [1.0.1] — 2026-10-01
 
 - **Privacy notice: the logs as the server keeps them.** The site's access and error logs are

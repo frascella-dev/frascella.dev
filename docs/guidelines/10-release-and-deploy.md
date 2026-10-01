@@ -80,8 +80,13 @@ ssh -i ~/.ssh/<key> <user>@<host> "cd ~/htdocs/<site> && wp $*"
    - `wp frascella kit` when tokens.json changed;
    - a migration command when data changed;
    - `wp rewrite flush` when routes changed.
-4. `wp cache flush`. Purge the page cache (Varnish, a CDN) too if there is one.
-5. Delete the uploaded files from the server.
+4. When the icons changed (and on a first deploy), copy the two that are asked for without
+   reading the page into the web root, where nginx answers them:
+   ```sh
+   cp wp-content/themes/frascella/assets/icons/{favicon.ico,apple-touch-icon.png} .
+   ```
+5. `wp cache flush`. Purge the page cache (Varnish, a CDN) too if there is one.
+6. Delete the uploaded files from the server.
 
 ## Checking production (read-only)
 
