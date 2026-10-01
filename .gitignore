@@ -9,3 +9,6 @@ dist/
 
 .DS_Store
 *.log
+
+# The desk's test pages: generated from the build (assets/src/desk/test/page.mjs), hashes change every build.
+wp-content/themes/frascella/assets/src/desk/test/index*.html
