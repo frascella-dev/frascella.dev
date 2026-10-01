@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       frascella.dev
  * Description:       The frascella.dev site's content and composition: the business's facts, the Elementor widgets for the parts of the site that have data or behaviour, the dynamic tags and the Kit. The theme draws; this plugin remembers and composes.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Requires Plugins:  elementor
@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('FRASCELLA_VERSION', '0.1.0');
+define('FRASCELLA_VERSION', '1.0.0');
 define('FRASCELLA_FILE', __FILE__);
 define('FRASCELLA_DIR', plugin_dir_path(__FILE__));
 define('FRASCELLA_URL', plugin_dir_url(__FILE__));
