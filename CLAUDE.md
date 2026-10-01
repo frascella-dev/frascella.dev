@@ -18,7 +18,6 @@ A WordPress site built from [Bottega](https://github.com/frascella-dev/bottega):
 - **Laws that apply:** GDPR + Italian Codice Privacy, Garante cookie guidelines 2021
 - **Register of the words:** first person, plain, precise; English and Italian written separately, not translated word for word
 - **Design:** palette and mark in the Sketch file `frascella.dev` (Ink #0E0E11, Graphite #1C1C21, Paper #F3EFE7, Stone #8A857C, Vermilion #FF4A1C); fonts Gloock + Schibsted Grotesk, unchanged from the previous site
-- **The previous site** (Astro + PHP API) is in `_old/`, for reference only. It is deleted before the first release.
 
 ## How to work here
 

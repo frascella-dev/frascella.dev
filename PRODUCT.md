@@ -35,7 +35,6 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
   pages, Polylang for Italian (default, on `/`) and English (`/en/`).
 - Requests arrive through **Agenda** (frascella-dev/agenda), replacing the old site's contact API.
 - Statistics through **Analytics Connector** (frascella-dev/analytics), with its consent banner.
-- The previous site (Astro + PHP API) is in `_old/` for reference, deleted before release.
 
 ## Capabilities and Constraints
 
@@ -43,8 +42,8 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
   three.js work corridor is not carried over.
 - Motion only as an enhancement, off under reduced motion; the page is complete without it.
 - Two languages, written separately rather than translated word for word.
-- **Open decision: the services.** The owner chose "portfolio + services" but has not yet named the
-  services, their scope or any pricing. Nothing about them is to be invented; placeholders are marked.
+- **Services:** websites and web platforms, mobile and web apps, integrations and AI (see
+  `COPY.md`). No prices or packages are published.
 
 ## Brand Commitments
 
@@ -53,24 +52,18 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
 - Palette (from Sketch): Ink #0E0E11, Graphite #1C1C21, Paper #F3EFE7, Stone #8A857C, Vermilion
   #FF4A1C, Sand.
 - Fonts unchanged from the previous site: **Gloock** and **Schibsted Grotesk** (woff2 in
-  `_old/services/site/public/fonts`).
-- Voice: first person, plain and precise, lowercase in UI labels on the old site; no inflated claims.
-  "I reply within two working days."
+  `wp-content/themes/frascella/assets/fonts`).
+- Voice: see the register at the top of `COPY.md` — senior-technical, facts instead of adjectives,
+  no inflated claims.
 
 ## Evidence on Hand
 
-- Bio facts and copy: `_old/services/site/src/i18n/{en,it}.ts`, interview in
-  `_old/briefs/copy-interview.md` (born in Taranto, coding since 2013, telemedicine → gaming,
-  microservices & containers, Procreate tattoo designs, freelance only, remote since 2026).
-- Bio photographs referenced by the old site (Taranto, repair, coding, drawing, containers) and the
-  portrait, in `_old/services/site`.
-- Work to show:
-  - **vitrine** — Windows desktop overlay, C# · WPF · WebView2, public, used daily.
-  - **proxima** — gym programs PWA with an MCP server for Claude, Flutter · Python · MySQL, used daily.
-  - **Sevenink Tattoo** — client site, seveninktattoo.it, WordPress + Elementor Pro, it/en.
-  - **WordPress plugins** — Agenda (requests & appointments), Voci (reviews with consent), Voci
-    Google, Postino (double opt-in newsletter), Chiaro (FAQ), Bottega (site template).
-  - **Analytics** — self-hosted, privacy-first, multi-site web analytics (analytics.frascella.dev).
+- **The site's words:** `COPY.md` (Italian) and `COPY.en.md` (English), approved by the owner,
+  with the register rules at the top. They are the source for every visible sentence.
+- **Work shown:** seveninktattoo.it (client), skeda.fit (co-founded, not launched), vitrine
+  (own, public on GitHub). Kept in the plugin's Portfolio → Progetti.
+- **The owner's other products** (not shown as work): Agenda, Voci, Voci Google, Postino,
+  Chiaro, Bottega, Analytics (analytics.frascella.dev, used by this site).
 - Absent, never to be fabricated: testimonials, client logos, numbers of clients or projects,
   prices, service packages.
 

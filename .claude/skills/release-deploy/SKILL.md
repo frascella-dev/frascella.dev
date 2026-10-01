@@ -16,10 +16,10 @@ server, and whenever a step changes data on production.
    this release (`privacy-notice`).
 3. `git status` is clean, apart from the release changes.
 4. **The server keeps what the notice says.** On a first deploy to a server (or a new one),
-   set the web server's access-log rotation to the retention the notice states (14 days:
-   logrotate `daily`, `rotate 14`, `maxage 14`; see the guideline's "The server"), check it,
-   and tell the user it is done. Never write a retention into the notice that the server is
-   not set to.
+   read the log rotation (`grep -A8 logs /etc/logrotate.d/*`) and check it matches the
+   retention the notice states (frascella.dev: the site's logs 7 days, the web server's error
+   log 14 days; see the guideline's "The server"). Never write a retention into the notice
+   that the server is not set to.
 
 ## 2. Version and changelog
 

@@ -212,7 +212,7 @@ $privacy = [
 </ul>
 <h2>Il server</h2>
 <p>Il sito è ospitato su un server virtuale (VPS) di OVHcloud nella regione SBG6, a Strasburgo, in Francia, quindi nell’Unione europea. OVHcloud fornisce il server; i dati sul server li gestisce il titolare.</p>
-<p>Come ogni server web, registra le richieste che riceve nei propri log di accesso: indirizzo IP, pagina richiesta, data e ora, browser. Servono alla sicurezza del sito (legittimo interesse, art. 6, par. 1, lett. f) GDPR), non sono usati per altro e sono cancellati dopo <strong>14 giorni</strong>.</p>
+<p>Come ogni server web, registra le richieste che riceve nei propri log di accesso: indirizzo IP, pagina richiesta, data e ora, browser. Servono alla sicurezza del sito (legittimo interesse, art. 6, par. 1, lett. f) GDPR), non sono usati per altro e sono cancellati dopo <strong>7 giorni</strong>. Gli errori del server web, che possono contenere l’indirizzo IP di una richiesta, sono conservati fino a <strong>14 giorni</strong>.</p>
 <h2>Diritti dell’interessato</h2>
 <p>Ai sensi degli articoli da 15 a 22 del GDPR l’interessato può chiedere l’accesso ai dati che lo riguardano, la loro rettifica o cancellazione, la limitazione del trattamento o una copia in formato portabile, e può opporsi al trattamento. Le richieste possono essere inviate a <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> oppure tramite il <a href="/#contatti">modulo di contatto</a>. Ai sensi dell’art. 77 è possibile proporre reclamo al Garante per la protezione dei dati personali, <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
 HTML,
@@ -266,7 +266,7 @@ $privacy['en'] = <<<'HTML'
 </ul>
 <h2>The server</h2>
 <p>The site is hosted on an OVHcloud virtual private server (VPS) in the SBG6 region, in Strasbourg, France, and therefore in the European Union. OVHcloud provides the server; the data on it is managed by the controller.</p>
-<p>Like every web server, it records the requests it receives in its access logs: IP address, page requested, date and time, browser. They are used for the site’s security (legitimate interest, Art. 6(1)(f) GDPR), for nothing else, and are deleted after <strong>14 days</strong>.</p>
+<p>Like every web server, it records the requests it receives in its access logs: IP address, page requested, date and time, browser. They are used for the site’s security (legitimate interest, Art. 6(1)(f) GDPR), for nothing else, and are deleted after <strong>7 days</strong>. The web server’s error messages, which can contain the IP address of a request, are kept for up to <strong>14 days</strong>.</p>
 <h2>Rights of the data subject</h2>
 <p>Under Articles 15 to 22 GDPR the data subject can request access to the data concerning them, their rectification or erasure, the restriction of processing or a copy in a portable format, and can object to the processing. Requests can be sent to <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> or through the <a href="/en/#contact">contact form</a>. Under Art. 77 a complaint can be lodged with the Italian data protection authority (Garante per la protezione dei dati personali), <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
 HTML;

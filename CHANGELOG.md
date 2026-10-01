@@ -3,6 +3,16 @@
 What changed for the people who run frascella.dev. The theme and the plugin are released
 together and carry the same version.
 
+## [1.0.1] — 2026-10-01
+
+- **Privacy notice: the logs as the server keeps them.** The site's access and error logs are
+  kept 7 days, as the OVHcloud server (CloudPanel) is set; the web server's own error log, which
+  can contain an IP address, up to 14 days. The notice said 14 days for everything.
+- **Repository.** The previous site's code is gone, and the project is worked on `main` only.
+
+**Install:** `frascella-plugin-1.0.1.zip` and `frascella-theme-1.0.1.zip` (no data changes from
+1.0.0). **Tested with** the same versions as 1.0.0.
+
 ## [1.0.0] — 2026-10-01
 
 The site, rebuilt on WordPress: the first release of the `frascella` theme and plugin.
@@ -39,5 +49,5 @@ The site, rebuilt on WordPress: the first release of the `frascella` theme and p
 **Tested with:** WordPress 7.1.2, Elementor 4.3.2, Elementor Pro 4.2.3, Polylang 3.8.10,
 Agenda 1.2.0, Analytics for WordPress 1.0.0.
 
-**Before deploying:** set the server's access-log rotation to 14 days (see
+**Before deploying:** check the server's log rotation against the privacy notice (see
 `docs/guidelines/10-release-and-deploy.md`, "The server").

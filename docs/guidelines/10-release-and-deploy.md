@@ -40,32 +40,19 @@ the release was tested with.
 
 ## The server: what the privacy notice promises about it
 
-The notice states how long the web server keeps its access logs (frascella.dev: **14 days**,
-on an OVHcloud VPS, SBG6, Strasbourg). A figure in the notice is only true if the server is
-set to it, so the first deploy to a server, and any move to a new one, includes:
+The notice states how long the web server keeps its logs. On frascella.dev (an OVHcloud VPS,
+SBG6, Strasbourg, managed with CloudPanel) that is what the panel already does:
 
-- **access logs rotated daily and kept 14 days**, nothing older — with logrotate, for the
-  web server's access logs (nginx or Apache, and the panel's own copy if it keeps one, as
-  CloudPanel does per site):
+- **the site's access and error logs** (`~/logs/nginx/*.log`): rotated daily, **kept 7 days**
+  (`/etc/logrotate.d` entry of CloudPanel, `rotate 7`);
+- **the web server's own error log** (`/var/log/nginx/error.log`, which can contain a
+  client's IP): kept **14 days** (`rotate 14`); its access log stays empty because each
+  site logs into its own folder.
 
-  ```
-  /var/log/nginx/*access.log /home/*/logs/nginx/*access.log {
-      daily
-      rotate 14
-      maxage 14
-      missingok
-      notifempty
-      compress
-      delaycompress
-      sharedscripts
-      postrotate
-          [ -s /run/nginx.pid ] && kill -USR1 "$(cat /run/nginx.pid)"
-      endscript
-  }
-  ```
+A figure in the notice is only true while the server is set to it, so:
 
-  then `logrotate -d <file>` to check it, and, a day later, that no file older than 14 days
-  is left (`find <log dirs> -name '*access*' -mtime +14`);
+- on a first deploy, and on any move to a new server, read those `logrotate` entries
+  (`grep -A8 logs /etc/logrotate.d/*`) and check they still say what the notice says;
 - if the retention changes, the notice changes in the same release, in every language.
 
 ## Deploying (WordPress over SSH)
