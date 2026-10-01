@@ -128,29 +128,97 @@
     display: none;
 }
 
+/* The two words share one cell, right-aligned, and swap by visibility: the button keeps
+   one width, so nothing in the header moves when "menu" becomes "chiudi". */
+.menu-btn:not([hidden]) {
+    display: grid;
+}
+
+.menu-btn span {
+    grid-area: 1 / 1;
+    text-align: right;
+}
+
 .menu-btn .close,
 .menu-btn[aria-expanded="true"] .open {
-    display: none;
+    visibility: hidden;
 }
 
 .menu-btn[aria-expanded="true"] .close {
-    display: inline;
+    visibility: visible;
 }
 
-/* --- the drawer: the menu on a phone --------------------------------------- */
+/* --- the drawer: the menu on a phone ---------------------------------------
+ *
+ * An overlay over the whole screen, inside the header's stacking context (z-index 10, above
+ * the canvas, the sheet and the page) and under the header's own bar (z-index -1 in that
+ * context), so the logo and "chiudi" stay where they were. It is never in the page's flow:
+ * opening it moves nothing. lib/header.ts adds `.is-open` one frame after showing it, so the
+ * panel wipes down from the header and the links rise in one after the other; closing
+ * reverses, faster. With reduced motion (no `html.motion`) it simply appears. */
 
 .drawer {
     position: fixed;
-    inset: var(--hh) 0 0;
-    z-index: 9;
+    inset: 0;
+    z-index: -1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 2.5em;
-    padding: 3.5em var(--page-margin) max(2.5em, env(safe-area-inset-bottom));
+    padding: calc(var(--hh) + 3.5em) var(--page-margin) max(2.5em, env(safe-area-inset-bottom));
     overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--ground);
 }
+
+/* The header's hairline, drawn again over the panel. */
+.drawer::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--hh) - 1px);
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+}
+
+html.motion .drawer {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.22s cubic-bezier(0.4, 0, 1, 1);
+}
+
+html.motion .drawer.is-open {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.35s var(--ease);
+}
+
+html.motion .drawer-list li,
+html.motion .drawer-row,
+html.motion .drawer-legal {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+        opacity 0.15s ease-in,
+        transform 0.15s ease-in;
+}
+
+html.motion .drawer.is-open .drawer-list li,
+html.motion .drawer.is-open .drawer-row,
+html.motion .drawer.is-open .drawer-legal {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 0.4s var(--ease),
+        transform 0.4s var(--ease);
+}
+
+/* The stagger: after the panel has mostly opened, 50 ms a link, then the bottom row. */
+html.motion .drawer.is-open .drawer-list li:nth-child(1) { transition-delay: 0.15s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(2) { transition-delay: 0.2s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(3) { transition-delay: 0.25s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(4) { transition-delay: 0.3s; }
+html.motion .drawer.is-open .drawer-row { transition-delay: 0.36s; }
+html.motion .drawer.is-open .drawer-legal { transition-delay: 0.4s; }
 
 .drawer[hidden] {
     display: none;
@@ -220,10 +288,15 @@
     color: var(--soft);
 }
 
-/* While the drawer is open the page behind it does not scroll. */
+/* While the drawer is open the page behind it does not scroll. The scrollbar's width, if
+   the system draws one, is given back as padding, so the page does not move sideways. */
 html.drawer-open,
 html.drawer-open body {
     overflow: hidden;
+}
+
+html.drawer-open body {
+    padding-right: var(--scrollbar, 0px);
 }
 
 @media (max-width: 900px) {
