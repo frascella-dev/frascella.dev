@@ -172,11 +172,16 @@ uses, with the laptop's window on the projects (`fallback.ts`).
 
 ## 3. Remaining bottlenecks
 
-1. **The record turning at the first station** keeps both pages drawing a full frame on every
-   vsync while nobody moves (AO, PCSS, depth of field off): ~22 ms of GPU per frame at 1440×900
-   on an M1, i.e. the GPU never rests, and a phone gets warm. Identical frames cannot be had for
-   less; the choices (the owner's): draw the platter at 30 Hz when it is the only thing moving,
-   stop the record after some seconds without input, or drop to DPR 1 at rest.
+1. **The record turning at the first station** (owner's choice, applied): when the platter and
+   the arm's groove motion are the only things moving, the desk draws at ~30 fps instead of
+   every vsync; the record's pose still advances every frame, and any other request (camera,
+   scroll, touch, another animation) draws the next vsync. Measured on the WordPress home at
+   rest, 390 × 844 (where the GPU can draw at 60 fps; `?spin60` restores the old rate to
+   compare): 60 → 30 renders/s, GPU ~0.94–1.23 → 0.51–0.58 s per second, JS 163–168 → 118
+   ms per second, GPU process CPU 22–23 % → 16 %; scrolling stays at 60 renders/s. At
+   1440 × 900 on a busy machine the GPU only managed ~24 fps either way, so nothing changed
+   there. Still a full frame 30 times a second: stopping the record after some idle seconds
+   would bring it to zero.
 2. **Bytes on a slow phone.** The first frame on Fast 3G is mostly transfer: 265 KB of JS
    (three.js 187 KB, a third of it the rect lights' LTC table), the two prints (171 KB), after
    the page's own fonts and CSS. A half-float LTC table, or no rect lights, would change the

@@ -194,6 +194,13 @@ await tick();
 
 /* ---------- render on demand ---------- */
 let want = 3, shadowWant = 3;
+// the record turning (and the arm riding its grooves) with nothing else moving: drawn at ~30 fps
+// instead of every vsync. Its pose is still advanced every frame, so each drawn frame shows it
+// where it is at that moment; any other request (the camera, a scroll, a touch, another
+// animation) draws the very next frame as before.
+let spinOnly = false, lastDraw = -1e9;
+// a little under 33.3 ms, so a 60 Hz display draws every 2nd vsync (?spin60: every vsync, to compare)
+const SPIN_MS = /[?&]spin60/.test(location.search) ? 0 : 1000 / 30 - 4;
 const request = (n = 2) => { want = Math.max(want, n); };
 const requestShadow = (n = 2) => { shadowWant = Math.max(shadowWant, n); request(n); };
 ctx.onLoad = () => request(3);
@@ -645,7 +652,7 @@ function frame() {
   // the turntable is on at load: a turning platter alone needs a frame (not a shadow pass), and only in view
   const tu = TTB.update(RM.matches ? 0 : dt);
   if (tu > 1) requestShadow(1);
-  else if (tu) { pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); frustum.setFromProjectionMatrix(pm); if (frustum.intersectsSphere(ttSphere)) request(1); }
+  else if (tu) { pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); frustum.setFromProjectionMatrix(pm); if (frustum.intersectsSphere(ttSphere)) spinOnly = true; }
   if (plant.tick(RM.matches || SHOT ? 0 : dt)) request(1);
   if (PH.screen.tick(RM.matches || SHOT ? 0 : dt)) request(1);
   // the coffee's idle ripple: a few frames a second, only if the mug is in view
@@ -653,7 +660,9 @@ function frame() {
     pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); frustum.setFromProjectionMatrix(pm);
     if (frustum.intersectsSphere(mugSphere)) { request(1); lastRipple = time; }
   }
-  if (want <= 0 && !SHOT) return;
+  const now = performance.now(), spin = spinOnly; spinOnly = false;
+  if (want <= 0 && !SHOT && !(spin && now - lastDraw >= SPIN_MS)) return;
+  lastDraw = now;
   want = Math.max(0, want - 1);
   if (shadowWant > 0) { renderer.shadowMap.needsUpdate = true; shadowWant--; }
 
