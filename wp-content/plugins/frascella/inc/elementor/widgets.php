@@ -68,6 +68,13 @@ abstract class Frascella_Section extends \Elementor\Widget_Base
 
         if ($controls !== []) {
             $this->start_controls_section('frascella_content', ['label' => __('Content', 'frascella')]);
+            // A widget with no Texts section says what it is here instead.
+            if ($texts === [] && !empty($spec['note'])) {
+                $this->add_control('frascella_content_note', [
+                    'type' => \Elementor\Controls_Manager::RAW_HTML,
+                    'raw' => '<p class="elementor-descriptor">' . esc_html((string) $spec['note']) . '</p>',
+                ]);
+            }
             foreach ($controls as $name => $control) {
                 // A select's options can be a list that exists only at runtime (the posts of
                 // a type, say), so they may arrive as a callable.
@@ -115,7 +122,8 @@ abstract class Frascella_Section extends \Elementor\Widget_Base
         if ($push) {
             frascella_text_push($words);
         }
-        get_template_part('template-parts/' . (string) ($this->spec()['part'] ?? static::SECTION), null, $settings);
+        $args = array_merge($settings, (array) ($this->spec()['args'] ?? []));
+        get_template_part('template-parts/' . (string) ($this->spec()['part'] ?? static::SECTION), null, $args);
         if ($push) {
             frascella_text_pop();
         }
@@ -131,7 +139,27 @@ abstract class Frascella_Section extends \Elementor\Widget_Base
     }
 }
 
-class Frascella_Section_Contact extends Frascella_Section
+class Frascella_Section_Cut extends Frascella_Section
 {
-    protected const SECTION = 'contact';
+    protected const SECTION = 'cut';
+}
+
+class Frascella_Section_Desk extends Frascella_Section
+{
+    protected const SECTION = 'desk';
+}
+
+class Frascella_Section_Works extends Frascella_Section
+{
+    protected const SECTION = 'works';
+}
+
+class Frascella_Section_Header extends Frascella_Section
+{
+    protected const SECTION = 'header';
+}
+
+class Frascella_Section_Footer extends Frascella_Section
+{
+    protected const SECTION = 'footer';
 }

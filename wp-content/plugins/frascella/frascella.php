@@ -31,7 +31,20 @@ define('FRASCELLA_FILE', __FILE__);
 define('FRASCELLA_DIR', plugin_dir_path(__FILE__));
 define('FRASCELLA_URL', plugin_dir_url(__FILE__));
 
+/*
+ * No language cookie. Polylang remembers a visitor's language in `pll_language`, but here
+ * the language is always in the address (`/` and `/en/`), so the cookie would remember
+ * nothing the address does not say — and it is one more thing the privacy notice would
+ * have to list. Defined here, before Polylang loads (plugins load in alphabetical order),
+ * unless the server's configuration already says otherwise.
+ */
+if (!defined('PLL_COOKIE')) {
+    define('PLL_COOKIE', false);
+}
+
 require FRASCELLA_DIR . 'inc/facts.php';      // the business's facts, in one option
+require FRASCELLA_DIR . 'inc/projects.php';   // the projects the home page shows
+require FRASCELLA_DIR . 'inc/agenda.php';     // Agenda: where a request's email goes
 require FRASCELLA_DIR . 'inc/media.php';      // a photograph's alt text in every language
 require FRASCELLA_DIR . 'inc/polylang.php';   // the languages: what is translatable, and its addresses
 require FRASCELLA_DIR . 'inc/elementor.php';  // the widgets, the dynamic tags, the Kit

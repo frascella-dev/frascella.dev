@@ -14,6 +14,7 @@ defined('ABSPATH') || exit;
 
 require FRASCELLA_DIR . 'inc/elementor/sections.php';   // what each widget offers: the spec
 require FRASCELLA_DIR . 'inc/elementor/languages.php';  // Theme Builder documents, one per language
+require FRASCELLA_DIR . 'inc/elementor/stations.php';   // the desk's camera stations, on containers
 
 add_action('elementor/init', static function (): void {
     require_once FRASCELLA_DIR . 'inc/elementor/widgets.php';

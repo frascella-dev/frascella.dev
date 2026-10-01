@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The business's facts: name, address, telephone, email, VAT number.
+ * The business's facts: name, address, telephone, email, VAT number, the profiles elsewhere.
  *
  * One option, one screen (Settings → frascella.dev), read on every request. They are what the
  * dynamic tags print inside native widgets, what `{name}` and the other placeholders stand
@@ -34,8 +34,13 @@ function frascella_fact_fields(): array
         'phone' => __('Telephone', 'frascella'),
         'email' => __('Email', 'frascella'),
         'vat' => __('VAT number', 'frascella'),
+        'github' => __('GitHub profile (address)', 'frascella'),
+        'linkedin' => __('LinkedIn profile (address)', 'frascella'),
     ];
 }
+
+/** The facts that are addresses: saved only when they are one, and typed as one. */
+const FRASCELLA_FACT_URLS = ['github', 'linkedin'];
 
 /** @return array<string, string> the facts, every key present (empty when unknown) */
 function frascella_facts(): array
@@ -60,9 +65,11 @@ add_action('admin_init', static function (): void {
             $out = [];
             foreach (frascella_fact_fields() as $key => $label) {
                 $value = sanitize_text_field((string) ($input[$key] ?? ''));
-                $out[$key] = match ($key) {
-                    'email' => is_email($value) ? $value : '',
-                    'country' => strtoupper(substr($value, 0, 2)),
+                $out[$key] = match (true) {
+                    $key === 'email' => is_email($value) ? $value : '',
+                    $key === 'country' => strtoupper(substr($value, 0, 2)),
+                    // An address that is not an https one is saved as empty, never "fixed".
+                    in_array($key, FRASCELLA_FACT_URLS, true) => str_starts_with($value, 'https://') ? esc_url_raw($value, ['https']) : '',
                     default => $value,
                 };
             }
@@ -75,7 +82,7 @@ add_action('admin_init', static function (): void {
         add_settings_field($key, $label, static function () use ($key): void {
             printf(
                 '<input type="%1$s" class="regular-text" id="frascella-fact-%2$s" name="%3$s[%2$s]" value="%4$s" />',
-                $key === 'email' ? 'email' : 'text',
+                $key === 'email' ? 'email' : (in_array($key, FRASCELLA_FACT_URLS, true) ? 'url' : 'text'),
                 esc_attr($key),
                 esc_attr(FRASCELLA_OPTION_FACTS),
                 esc_attr(frascella_facts()[$key] ?? ''),

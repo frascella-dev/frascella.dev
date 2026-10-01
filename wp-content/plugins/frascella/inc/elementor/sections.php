@@ -17,6 +17,7 @@
  *   'controls' Elementor controls, name => definition; `options` may be a callable. Control
  *              types as strings ('switcher', 'select', 'media'…), not Controls_Manager
  *              constants: the theme reads the spec on every page, Elementor loaded or not
+ *   'args'     fixed arguments for the part, over the controls (the element it opens with)
  *   'texts'    tree path => [label, type]: every sentence the part prints, as a field
  *              t = one line, no markup · h = one line, <em>/<strong>/<br> allowed
  *              a = a few lines · p = paragraphs, a blank line between them
@@ -31,32 +32,119 @@
 function frascella_elementor_sections(): array
 {
     return [
-        'contact' => [
-            'title' => __('Contact card', 'frascella'),
-            'icon' => 'eicon-call-to-action',
-            'part' => 'contact',
+        'cut' => [
+            'title' => __('Cut-out word', 'frascella'),
+            'icon' => 'eicon-t-letter',
+            'part' => 'cut',
             'entry' => 'site',
-            'keywords' => ['contact', 'phone', 'email'],
+            'keywords' => ['cut', 'word', 'poster', 'heading'],
             'controls' => [
-                'show_phone' => [
-                    'label' => __('Show the telephone', 'frascella'),
-                    'type' => 'switcher',
-                    'return_value' => 'yes',
-                    'default' => 'yes',
+                'word' => [
+                    'label' => __('The word (one to three, lowercase)', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
                 ],
-                'show_email' => [
-                    'label' => __('Show the email', 'frascella'),
-                    'type' => 'switcher',
-                    'return_value' => 'yes',
-                    'default' => 'yes',
+                'tag' => [
+                    'label' => __('Is it the section’s heading?', 'frascella'),
+                    'type' => 'select',
+                    'options' => ['' => __('No: the band says it', 'frascella'), 'h1' => __('Yes, the page’s (h1)', 'frascella'), 'h2' => __('Yes, the section’s (h2)', 'frascella')],
+                    'default' => '',
+                ],
+                'label' => [
+                    'label' => __('What a screen reader hears (the word, if empty)', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
+                    'condition' => ['tag!' => ''],
+                ],
+                'lines' => [
+                    'label' => __('Fixed lines on a desktop (optional): «siti, app|e microservizi»', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
+                ],
+                'lines_n' => [
+                    'label' => __('Fixed lines on a phone (optional): «micro|servizi»', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
                 ],
             ],
+            'note' => __('The word is cut out of the sheet over the desk and fitted to its column. Its size and side are the classes of the widget (Advanced → CSS Classes): cut-l for the opening’s smaller step, cut-r to set it right.', 'frascella'),
+        ],
+        'desk' => [
+            'title' => __('Desk (intermezzo)', 'frascella'),
+            'icon' => 'eicon-device-desktop',
+            'part' => 'desk',
+            'entry' => 'site',
+            'keywords' => ['desk', 'scene', '3d', 'intermezzo'],
+            'note' => __('Two screens of bare desk, with a dot on each object. Its presence puts the 3D desk on the page; once per page. The words are what a screen reader and a keyboard meet.', 'frascella'),
             'texts' => [
-                'contact.eyebrow' => [__('Eyebrow', 'frascella'), 't'],
-                'contact.heading' => [__('Heading', 'frascella'), 'h'],
-                'contact.lede' => [__('Sentence under it', 'frascella'), 'a'],
-                'contact.call' => [__('Telephone button', 'frascella'), 't'],
-                'contact.write' => [__('Email button', 'frascella'), 't'],
+                'desk.label' => [__('The section’s name', 'frascella'), 't'],
+                'desk.group' => [__('The objects, as a group', 'frascella'), 't'],
+                'desk.cue' => [__('The scroll cue', 'frascella'), 't'],
+                'desk.hs.lamp' => [__('Lamp', 'frascella'), 't'],
+                'desk.hs.turntable' => [__('Turntable', 'frascella'), 't'],
+                'desk.hs.mug' => [__('Mug', 'frascella'), 't'],
+                'desk.hs.ipad' => [__('Tablet', 'frascella'), 't'],
+                'desk.hs.phone' => [__('Phone', 'frascella'), 't'],
+                'desk.hs.plant' => [__('Plant', 'frascella'), 't'],
+                'desk.padHint' => [__('The hint while drawing on the tablet', 'frascella'), 't'],
+            ],
+        ],
+        'works' => [
+            'title' => __('Works', 'frascella'),
+            'icon' => 'eicon-gallery-grid',
+            'part' => 'works',
+            'entry' => 'site',
+            'keywords' => ['works', 'projects', 'portfolio', 'lavori'],
+            'controls' => [
+                'count' => [
+                    'label' => __('How many (0 = all)', 'frascella'),
+                    'type' => 'number',
+                    'min' => 0,
+                    'max' => 12,
+                    'default' => 0,
+                ],
+            ],
+            'note' => __('One card per project, from Projects in the dashboard, in this page’s language and in their order. On the desk each one is shown on the laptop’s screen.', 'frascella'),
+        ],
+        'header' => [
+            'title' => __('Header', 'frascella'),
+            'icon' => 'eicon-header',
+            'part' => 'header',
+            'entry' => 'site',
+            'args' => ['tag' => 'div'],
+            'keywords' => ['header', 'menu', 'navigation'],
+            'note' => __('The mark, the menu (Appearance → Menus, «Primary», one per language), the other language and «scrivimi»; on a phone, the drawer. For a Theme Builder header. Each field starts from the site’s words in this language; empty, it says them.', 'frascella'),
+            'texts' => [
+                'nav.logo' => [__('The mark’s name for screen readers', 'frascella'), 't'],
+                'nav.cta' => [__('The button', 'frascella'), 't'],
+                'nav.menu' => [__('The menu’s name for screen readers', 'frascella'), 't'],
+                'nav.open' => [__('Phone: open the menu', 'frascella'), 't'],
+                'nav.close' => [__('Phone: close the menu', 'frascella'), 't'],
+                'nav.sound' => [__('The record’s switch', 'frascella'), 't'],
+                'nav.soundOn' => [__('…when it plays', 'frascella'), 't'],
+                'nav.soundOff' => [__('…when it is off', 'frascella'), 't'],
+            ],
+        ],
+        'footer' => [
+            'title' => __('Footer', 'frascella'),
+            'icon' => 'eicon-footer',
+            'part' => 'footer',
+            'entry' => 'site',
+            'args' => ['tag' => 'div'],
+            'keywords' => ['footer', 'colophon'],
+            'note' => __('The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Settings → frascella.dev), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts.', 'frascella'),
+            'texts' => [
+                'footer.role' => [__('Under the mark', 'frascella'), 't'],
+                'footer.legal' => [__('The small print', 'frascella'), 't'],
+                'footer.index' => [__('Heading: the index', 'frascella'), 't'],
+                'footer.elsewhere' => [__('Heading: the profiles', 'frascella'), 't'],
+                'footer.legalHeading' => [__('Heading: legal', 'frascella'), 't'],
+                'footer.privacy' => [__('The privacy notice', 'frascella'), 't'],
+                'footer.cookie' => [__('The cookies', 'frascella'), 't'],
             ],
         ],
     ];
