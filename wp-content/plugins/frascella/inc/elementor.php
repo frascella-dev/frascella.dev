@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Elementor: the panel category, the widgets, their stylesheet, the dynamic tags, the Kit.
+ * Elementor: the panel category, the widgets, their stylesheet, the Kit.
  *
  * The widget classes load on `elementor/init`, because `\Elementor\Widget_Base` is declared
  * by Elementor itself: a file extending it at load time is a fatal wherever Elementor is
@@ -59,13 +59,6 @@ add_action('elementor/editor/after_enqueue_styles', static function (): void {
     wp_enqueue_style('frascella-elementor-editor', FRASCELLA_URL . 'assets/elementor.css', [], FRASCELLA_VERSION);
 });
 
-/** The facts as dynamic tags, in a group of their own. */
-add_action('elementor/dynamic_tags/register', static function ($tags): void {
-    require_once FRASCELLA_DIR . 'inc/elementor/tags.php';
-    $tags->register_group('frascella', ['title' => __('frascella.dev', 'frascella')]);
-    $tags->register(new Frascella_Tag_Fact());
-    $tags->register(new Frascella_Tag_Link());
-});
 
 /**
  * The Kit: the theme's palette and type (tokens.json) as Elementor's global colours and

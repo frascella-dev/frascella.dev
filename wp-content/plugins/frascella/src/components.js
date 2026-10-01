@@ -9,7 +9,6 @@ import { config, pageUrl } from './api';
 
 const tabList = () => [
 	[ 'projects', __( 'Projects', 'frascella' ) ],
-	[ 'settings', __( 'Settings', 'frascella' ) ],
 ];
 
 /** The header: icon, name, and the views as tabs. */
@@ -35,7 +34,7 @@ export function Header( { view, title, actions } ) {
 				</div>
 				{ actions && <div className="frascella-header__actions">{ actions }</div> }
 			</div>
-			<nav className="frascella-tabs" aria-label={ __( 'Portfolio sections', 'frascella' ) }>
+			{ tabs.length > 1 && <nav className="frascella-tabs" aria-label={ __( 'Portfolio sections', 'frascella' ) }>
 				{ tabs.map( ( [ key, label ] ) => (
 					<a
 						key={ key }
@@ -46,7 +45,7 @@ export function Header( { view, title, actions } ) {
 						{ label }
 					</a>
 				) ) }
-			</nav>
+			</nav> }
 		</header>
 	);
 }

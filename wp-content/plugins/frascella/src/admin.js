@@ -6,10 +6,9 @@ import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 
 import Projects from './views/Projects';
-import Settings from './views/Settings';
 import './admin.scss';
 
-const VIEWS = { projects: Projects, settings: Settings };
+const VIEWS = { projects: Projects };
 
 domReady( () => {
 	const mount = document.getElementById( 'frascella-app' );

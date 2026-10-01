@@ -72,7 +72,8 @@ Each test prints a line per check and ends with `all passed`.
 
 1. **`CLAUDE.md` → Project:** the business, languages, production host, plugins, who
    receives email. Only facts the owner gave.
-2. **Settings → Studio Rossi:** the same facts, on the local site.
+2. **The theme's `inc/content/who.php`:** the same facts, typed once for titles, the
+   structured data and the placeholders.
 3. **`tokens.json`:** the palette and the fonts, when there is a design. Then:
    `npm run build` in the theme, and `bin/wp rossi kit`.
 4. **The demo.**

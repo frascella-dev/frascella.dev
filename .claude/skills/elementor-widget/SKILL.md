@@ -1,6 +1,6 @@
 ---
 name: elementor-widget
-description: Add a custom Elementor widget to the plugin for a part of the site that has data or behaviour (a query, settings facts, a script, another plugin's output) — spec, class, template part, words in every language, bundle entry and tests. Use when a native section is not enough, or when changing an existing plugin widget's fields.
+description: Add a custom Elementor widget to the plugin for a part of the site that has data or behaviour (a query, a script, another plugin's output) — spec, class, template part, words in every language, bundle entry and tests. Use when a native section is not enough, or when changing an existing plugin widget's fields.
 ---
 
 # A widget with data or behaviour

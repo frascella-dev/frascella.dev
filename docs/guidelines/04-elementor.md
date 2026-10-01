@@ -7,7 +7,7 @@ Before building anything, ask **what the section is made of**:
 | It is… | Build it with |
 |---|---|
 | headings, paragraphs, images, buttons, links | **native widgets** in a container with the theme's classes |
-| a fact that lives in the settings (address, phone, hours) | a native widget with a **dynamic tag** (`frascella.dev → Fact`, `Contact link`) |
+| a fact shown on a page (address, phone, email) | a **native widget**, the fact typed in it |
 | a query (latest posts, services, a gallery of a post type) | a **plugin widget** |
 | behaviour a script drives (slider, map, form, counter) | a **plugin widget** |
 | another plugin's output (booking form, reviews) | a **plugin widget** that prints the theme's override of it |
@@ -55,7 +55,7 @@ All the behaviour is in one base class, `Frascella_Section`; each widget is data
 - **Every sentence the part prints is a field** (`texts` in the spec):
   - its default is the site's words in the language of the document being edited;
   - an empty field says the site's words;
-  - `{name}` and the other placeholders become the facts.
+  - `{name}` and the other placeholders become the facts in the theme's `inc/content/who.php`.
 - **`content_template()` is empty.** The editor always asks the server, so the part has
   one implementation. It is slower to drag, and correct.
 - **`get_style_depends()` returns `[]`.** The part's CSS is in the page's bundle.
@@ -65,13 +65,15 @@ All the behaviour is in one base class, `Frascella_Section`; each widget is data
 
 The `.claude/skills/elementor-widget` skill walks through adding one.
 
-## Dynamic tags
+## Facts on a page
 
-- **The facts are dynamic tags** in the plugin's group: a text fact, and a link (call,
-  write, map).
-- **Use them in native widgets** wherever the page shows a fact, so the fact changes in one
-  place.
-- **Add a fact** to `frascella_fact_fields()` and it becomes a choice in both tags.
+- **A fact a visitor reads is typed in the page**: an address, a phone number or an email in
+  a section is a native widget (a Text Editor, a Button with a `tel:` or `mailto:` link).
+- **The footer is the plugin's footer widget.** Its fields start from the theme's words; the
+  `github` and `linkedin` fields take the profile addresses, and an empty one prints no link.
+- **What machines read** (titles, the sharing card, the structured data, the placeholders)
+  comes from the theme's `inc/content/who.php`, typed once. A fact that changes is changed
+  there and where the pages show it.
 
 ## The Kit
 

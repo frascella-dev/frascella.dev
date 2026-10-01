@@ -5,7 +5,7 @@
  *
  *   bin/wp eval-file /var/www/html/tools/site.php [rebuild]
  *
- * - the facts (Settings → frascella.dev): the business's own, never invented;
+ * - the site's name; who it belongs to is the theme's inc/content/who.php, never invented;
  * - the projects (Portfolio → Projects), each in Italian and in English, with its screenshot;
  * - the home page in Elementor: native containers and widgets with the theme's classes for
  *   the words, the plugin's widgets where there is data or behaviour (the cut-out words,
@@ -293,26 +293,11 @@ $pick = static fn (string $html): string => (string) preg_replace_callback(
 );
 $privacy = array_map($pick, $privacy);
 
-/* The facts: the business's own --------------------------------------------------------------- */
+/* The site's name ---------------------------------------------------------------------------- */
 
-update_option('frascella_facts', [
-    'name' => 'Emanuele Frascella',
-    'street' => '',
-    'postcode' => '',
-    'city' => 'Taranto',
-    'region' => '',
-    'country' => 'IT',
-    'phone' => '',
-    // Who receives the requests (inc/agenda.php). On this machine local-mail.php sends it
-    // to Mailpit, whatever the address.
-    'email' => 'emanuele@frascella.dev',
-    'vat' => '03462650734',
-    'github' => 'https://github.com/manuto276',
-    'linkedin' => 'https://www.linkedin.com/in/efrascella256/',
-]);
 update_option('blogname', 'frascella.dev');
 update_option('blogdescription', '');
-$say('✓ facts');
+$say('✓ site name');
 
 /* Pages ---------------------------------------------------------------------------------------- */
 
@@ -544,6 +529,9 @@ if (function_exists('PLL')) {
 /* The header and the footer: Theme Builder documents, one copy per language ------------------- */
 
 if (defined('ELEMENTOR_PRO_VERSION')) {
+    // The footer's profiles are its own fields: typed once here, then edited in Elementor.
+    $who = frascella_who();
+    $fields = ['header' => [], 'footer' => ['github' => $who['github'] ?? '', 'linkedin' => $who['linkedin'] ?? '']];
     foreach (['header' => 'frascella-header', 'footer' => 'frascella-footer'] as $type => $widgetType) {
         $found = get_posts(['post_type' => 'elementor_library', 'meta_key' => '_frascella_seed', 'meta_value' => $type, 'fields' => 'ids', 'numberposts' => 1, 'post_status' => 'any', 'lang' => '']);
         $doc = (int) ($found[0] ?? 0);
@@ -557,7 +545,7 @@ if (defined('ELEMENTOR_PRO_VERSION')) {
             $say("  + $type document");
         }
         if ($rebuild || get_post_meta($doc, '_elementor_data', true) === '') {
-            update_post_meta($doc, '_elementor_data', wp_slash((string) wp_json_encode([$widget($widgetType, [])])));
+            update_post_meta($doc, '_elementor_data', wp_slash((string) wp_json_encode([$widget($widgetType, $fields[$type])])));
             update_post_meta($doc, '_elementor_version', defined('ELEMENTOR_VERSION') ? ELEMENTOR_VERSION : '3.0.0');
         }
         // Shown on the whole site; only the default language's document carries conditions.
@@ -569,7 +557,36 @@ if (defined('ELEMENTOR_PRO_VERSION')) {
         if (function_exists('frascella_translate_template')) {
             $copy = frascella_translate_template($doc, 'en');
             if (!is_wp_error($copy) && $rebuild) {
-                update_post_meta((int) $copy, '_elementor_data', wp_slash((string) wp_json_encode([$widget($widgetType, [])])));
+                update_post_meta((int) $copy, '_elementor_data', wp_slash((string) wp_json_encode([$widget($widgetType, $fields[$type])])));
+            }
+        }
+        // A footer from before its profiles were fields (1.0.x read them from the settings):
+        // they are typed in, once, in each language's copy.
+        $copies = function_exists('frascella_template_translation') ? [frascella_template_translation($doc, 'en')] : [];
+        foreach (array_filter(array_unique([$doc, ...$copies])) as $id) {
+            $data = json_decode((string) get_post_meta($id, '_elementor_data', true), true);
+            $changed = false;
+            $walk = static function (array &$els) use (&$walk, $widgetType, $fields, $type, &$changed): void {
+                foreach ($els as &$el) {
+                    if (($el['widgetType'] ?? '') === $widgetType) {
+                        foreach ($fields[$type] as $key => $value) {
+                            if (!array_key_exists($key, (array) ($el['settings'] ?? []))) {
+                                $el['settings'][$key] = $value;
+                                $changed = true;
+                            }
+                        }
+                    }
+                    if (!empty($el['elements'])) {
+                        $walk($el['elements']);
+                    }
+                }
+            };
+            if (is_array($data)) {
+                $walk($data);
+                if ($changed) {
+                    update_post_meta($id, '_elementor_data', wp_slash((string) wp_json_encode($data)));
+                    $say("  + $type #$id: profiles typed in");
+                }
             }
         }
         $say("✓ $type (Theme Builder)");

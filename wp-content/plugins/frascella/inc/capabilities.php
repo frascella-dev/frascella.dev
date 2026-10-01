@@ -3,10 +3,9 @@
 /**
  * Who may do what in the Portfolio.
  *
- *   frascella_manage   the settings: the business's facts
  *   frascella_edit     write, translate, order and publish projects
  *
- * Administrators get both, editors the second, as in the owner's other plugins; the
+ * Administrators and editors get it, as in the owner's other plugins; the
  * `frascella_default_capabilities` filter changes that before the upgrade applies it.
  */
 
@@ -18,7 +17,7 @@ defined('ABSPATH') || exit;
 function frascella_default_capabilities(): array
 {
     return (array) apply_filters('frascella_default_capabilities', [
-        'administrator' => ['frascella_manage', 'frascella_edit'],
+        'administrator' => ['frascella_edit'],
         'editor' => ['frascella_edit'],
     ]);
 }

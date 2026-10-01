@@ -14,7 +14,7 @@ Answer in the user's language. The rules are in `docs/guidelines/05-words-and-la
 | typed by the people who run the site, on one page | a native Elementor widget |
 | said by a plugin widget | the tree, and it is also a field of the widget that starts from it |
 | said by the theme (header, footer, 404, a plugin page the theme draws) | the tree |
-| a fact (name, address, phone) | Settings → <Name>, **never** the tree |
+| a fact (name, address, phone) | the theme's `inc/content/who.php` for titles, structured data and placeholders, and typed in the page where visitors read it; **never** the tree |
 | recorded verbatim by a plugin (a consent sentence) | the plugin. Do not reword it |
 
 ## Changing or adding words

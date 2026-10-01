@@ -78,17 +78,18 @@ if ( php( "echo defined('ELEMENTOR_PRO_VERSION') ? 'pro' : 'free';" ) === 'pro' 
 	const copy = Number( php( `echo frascella_template_translation(${ footer }, 'en');` ) );
 	const restoreCopy = snapshot( copy );
 	try {
-		setWidget( copy, 'frascella-footer', { t__footer__role: 'Engineer {name}, test' } );
+		setWidget( copy, 'frascella-footer', { t__footer__role: 'Engineer {name}, test', github: '' } );
 		const enPage = await text( '/en/' );
 		check( 'footer: the English copy speaks English', ( await text( '/en/' ) ).includes( 'VAT no. 03462650734' ) && ( await text( '/' ) ).includes( 'P. IVA 03462650734' ) );
 	check( 'footer: a word typed in the English copy shows under /en/, {name} filled', enPage.includes( 'Engineer Emanuele Frascella, test' ) );
+		check( 'footer: a profile emptied in the English copy is gone from /en/ only', ! enPage.includes( 'href="https://github.com/manuto276"' ) && ( await text( '/' ) ).includes( 'href="https://github.com/manuto276"' ) );
 		check( 'footer: … and not on the Italian pages', ! ( await text( '/' ) ).includes( 'Engineer Emanuele Frascella, test' ) );
 	} finally {
 		restoreCopy();
 	}
 	const home = await text( '/' );
 	check( 'header and footer: one landmark each, the Theme Builder’s', count( home, '<header' ) === 1 && count( home, '<footer' ) === 1 && home.includes( 'elementor-location-header' ) && home.includes( 'elementor-location-footer' ) );
-	check( 'footer: the facts — VAT number and profiles from the settings', home.includes( 'P. IVA 03462650734' ) && home.includes( 'href="https://github.com/manuto276"' ) && home.includes( 'href="https://www.linkedin.com/in/efrascella256/"' ) );
+	check( 'footer: the VAT number, and the profiles from the widget’s fields', home.includes( 'P. IVA 03462650734' ) && home.includes( 'href="https://github.com/manuto276"' ) && home.includes( 'href="https://www.linkedin.com/in/efrascella256/"' ) );
 }
 check( 'restored', ( await text( '/' ) ).includes( 'id="cue" type="button" aria-label="scorri"' ) );
 

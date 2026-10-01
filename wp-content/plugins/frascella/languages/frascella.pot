@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: frascella.dev 0.1.0\n"
+"Project-Id-Version: frascella.dev 1.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/frascella\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-01T11:00:20+00:00\n"
+"POT-Creation-Date: 2026-10-01T17:22:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: frascella\n"
@@ -17,13 +17,12 @@ msgstr ""
 #. Plugin Name of the plugin
 #: frascella.php
 #: inc/elementor.php:25
-#: inc/elementor.php:65
 msgid "frascella.dev"
 msgstr ""
 
 #. Description of the plugin
 #: frascella.php
-msgid "The frascella.dev site's content and composition: the business's facts, the Elementor widgets for the parts of the site that have data or behaviour, the dynamic tags and the Kit. The theme draws; this plugin remembers and composes."
+msgid "The frascella.dev site's content and composition: the projects (Portfolio), the Elementor widgets for the parts of the site that have data or behaviour, and the Kit. The theme draws; this plugin remembers and composes."
 msgstr ""
 
 #: inc/admin-app.php:39
@@ -32,14 +31,7 @@ msgstr ""
 msgid "Projects"
 msgstr ""
 
-#: inc/admin-app.php:40
-#: inc/admin-app.php:94
-#: build/admin.js:1
-#: build/admin.js:2
-msgid "Settings"
-msgstr ""
-
-#: inc/admin-app.php:44
+#: inc/admin-app.php:43
 msgid "Portfolio"
 msgstr ""
 
@@ -163,39 +155,47 @@ msgstr ""
 msgid "Footer"
 msgstr ""
 
-#: inc/elementor/sections.php:132
-msgid "The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Portfolio → Settings), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts."
-msgstr ""
-
 #: inc/elementor/sections.php:134
-msgid "Under the mark"
-msgstr ""
-
-#: inc/elementor/sections.php:135
-msgid "The small print"
-msgstr ""
-
-#: inc/elementor/sections.php:136
-msgid "Heading: the index"
-msgstr ""
-
-#: inc/elementor/sections.php:137
-msgid "Heading: the profiles"
-msgstr ""
-
-#: inc/elementor/sections.php:138
-msgid "Heading: legal"
-msgstr ""
-
-#: inc/elementor/sections.php:139
-msgid "The privacy notice"
+msgid "GitHub profile (address; empty, no link)"
 msgstr ""
 
 #: inc/elementor/sections.php:140
+msgid "LinkedIn profile (address; empty, no link)"
+msgstr ""
+
+#: inc/elementor/sections.php:146
+msgid "The mark, who and where, the index (the «Primary» menu), the profiles, the privacy notice, the languages. For a Theme Builder footer. Each field starts from the site’s words in this language; {year} becomes the current year."
+msgstr ""
+
+#: inc/elementor/sections.php:148
+msgid "Under the mark"
+msgstr ""
+
+#: inc/elementor/sections.php:149
+msgid "The small print"
+msgstr ""
+
+#: inc/elementor/sections.php:150
+msgid "Heading: the index"
+msgstr ""
+
+#: inc/elementor/sections.php:151
+msgid "Heading: the profiles"
+msgstr ""
+
+#: inc/elementor/sections.php:152
+msgid "Heading: legal"
+msgstr ""
+
+#: inc/elementor/sections.php:153
+msgid "The privacy notice"
+msgstr ""
+
+#: inc/elementor/sections.php:154
 msgid "The cookies"
 msgstr ""
 
-#: inc/elementor/sections.php:224
+#: inc/elementor/sections.php:238
 msgid "A blank line between one paragraph and the next."
 msgstr ""
 
@@ -243,38 +243,6 @@ msgstr ""
 msgid "Where the desk’s camera stands while this container is in the middle of the screen. The intermezzo and the projects have their own; the rest, once each, in page order."
 msgstr ""
 
-#: inc/elementor/tags.php:40
-msgid "Fact"
-msgstr ""
-
-#: inc/elementor/tags.php:56
-msgid "Which"
-msgstr ""
-
-#: inc/elementor/tags.php:58
-msgid "Full address"
-msgstr ""
-
-#: inc/elementor/tags.php:78
-msgid "Contact link"
-msgstr ""
-
-#: inc/elementor/tags.php:94
-msgid "Where it leads"
-msgstr ""
-
-#: inc/elementor/tags.php:96
-msgid "Call"
-msgstr ""
-
-#: inc/elementor/tags.php:96
-msgid "Write"
-msgstr ""
-
-#: inc/elementor/tags.php:96
-msgid "The map"
-msgstr ""
-
 #: inc/elementor/widgets.php:70
 msgid "Content"
 msgstr ""
@@ -284,7 +252,7 @@ msgid "Texts"
 msgstr ""
 
 #: inc/elementor/widgets.php:93
-msgid "Each field starts from the site’s words in this language; empty, it says them. {name}, {city}, {street}, {phone} and {email} become the facts in Portfolio → Settings."
+msgid "Each field starts from the site’s words in this language; empty, it says them. {name}, {city}, {email}, {vat} and {year} become the business’s facts (the theme’s inc/content/who.php)."
 msgstr ""
 
 #: inc/elementor/widgets.php:104
@@ -293,51 +261,6 @@ msgstr ""
 
 #: inc/elementor/widgets.php:107
 msgid "Nothing to set here: the content comes from the site."
-msgstr ""
-
-#: inc/facts.php:26
-#: build/admin.js:2
-msgid "Name"
-msgstr ""
-
-#: inc/facts.php:27
-msgid "Street and number"
-msgstr ""
-
-#: inc/facts.php:28
-msgid "Postcode"
-msgstr ""
-
-#: inc/facts.php:29
-msgid "City"
-msgstr ""
-
-#: inc/facts.php:30
-msgid "Province or region"
-msgstr ""
-
-#: inc/facts.php:31
-msgid "Country (two letters)"
-msgstr ""
-
-#: inc/facts.php:32
-msgid "Telephone"
-msgstr ""
-
-#: inc/facts.php:33
-msgid "Email"
-msgstr ""
-
-#: inc/facts.php:34
-msgid "VAT number"
-msgstr ""
-
-#: inc/facts.php:35
-msgid "GitHub profile (address)"
-msgstr ""
-
-#: inc/facts.php:36
-msgid "LinkedIn profile (address)"
 msgstr ""
 
 #. translators: %s: language code, e.g. EN.
@@ -369,8 +292,8 @@ msgstr ""
 
 #: inc/projects.php:198
 #: inc/projects.php:232
-#: inc/rest-admin.php:41
-#: inc/rest-admin.php:122
+#: inc/rest-admin.php:39
+#: inc/rest-admin.php:112
 msgid "That project does not exist."
 msgstr ""
 
@@ -553,6 +476,10 @@ msgid "Translating from %s:"
 msgstr ""
 
 #: build/admin.js:2
+msgid "Name"
+msgstr ""
+
+#: build/admin.js:2
 msgid "Role"
 msgstr ""
 
@@ -636,52 +563,4 @@ msgstr ""
 
 #: build/admin.js:2
 msgid "Delete"
-msgstr ""
-
-#: build/admin.js:2
-msgid "The business"
-msgstr ""
-
-#: build/admin.js:2
-msgid "Who the site belongs to. The footer, the privacy notice and the search engines’ data read them from here."
-msgstr ""
-
-#: build/admin.js:2
-msgid "Where"
-msgstr ""
-
-#: build/admin.js:2
-msgid "Only what you want on the site: an empty field is left out everywhere."
-msgstr ""
-
-#: build/admin.js:2
-msgid "Contact"
-msgstr ""
-
-#: build/admin.js:2
-msgid "The email receives the contact form’s requests."
-msgstr ""
-
-#: build/admin.js:2
-msgid "Elsewhere"
-msgstr ""
-
-#: build/admin.js:2
-msgid "The profiles the footer links to. https addresses only."
-msgstr ""
-
-#: build/admin.js:2
-msgid "Settings saved."
-msgstr ""
-
-#: build/admin.js:2
-msgid "Save changes"
-msgstr ""
-
-#: build/admin.js:2
-msgid "Saved"
-msgstr ""
-
-#: build/admin.js:2
-msgid "Settings sections"
 msgstr ""

@@ -55,7 +55,7 @@ agrees with its pages, and eventually punish one where it does not.
 
 - **One JSON-LD `@graph` per page:** the business (the most specific schema.org type it
   is), the WebSite and the WebPage.
-- **Built from the facts.** An empty fact is an absent key.
+- **Built from the facts** in the theme's `inc/content/who.php`. An empty fact is an absent key.
 - **Stable `@id`s**, derived from `get_option('home')` and never from `home_url()` (see
   [05](05-words-and-languages.md#pitfalls-met-in-real-projects)).
 - **`JSON_HEX_TAG` is load-bearing.** It turns `<` into `<`, so a string containing

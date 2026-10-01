@@ -1,26 +1,16 @@
 <?php
 
 /**
- * Agenda (requests): where a request's email goes.
+ * Agenda (requests): the form's addresses on the front page.
  *
  * The contact form is Agenda's form `contatti` (tools/agenda/contatti.json), hosted by the
- * home page; the theme draws it. What the plugin decides is the destination: the
- * business's own address in Portfolio → Settings, the one fact every part of the site
- * reads. Agenda's own setting, then the site admin's address, answer only while that fact
- * is empty.
- *
- * Without Agenda the filter is never applied.
+ * home page; the theme draws it. Where a request's email goes is Agenda's own business:
+ * its setting, then the site admin's address.
  */
 
 declare(strict_types=1);
 
 defined('ABSPATH') || exit;
-
-add_filter('agenda_notify_to', static function (string $to): string {
-    $own = function_exists('frascella_facts') ? frascella_facts()['email'] : '';
-
-    return $own !== '' ? $own : $to;
-});
 
 /**
  * The form's addresses on the front page: `/?agenda_step=inviato`, `/en/?agenda_step=inviato`.

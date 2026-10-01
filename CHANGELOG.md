@@ -3,6 +3,22 @@
 What changed for the people who run frascella.dev. The theme and the plugin are released
 together and carry the same version.
 
+## [1.1.0] — 2026-10-01
+
+- **Portfolio is only the projects.** The "Impostazioni" tab is gone: the name, the VAT
+  number, the place, the contacts and the profiles were settings nobody needed. What visitors
+  read is typed where they read it, in Elementor: the footer's lines are its fields, and so
+  are the GitHub and LinkedIn addresses (empty, no link). The page titles and the search
+  engines' data read who the site belongs to from the theme (`inc/content/who.php`).
+- **Footer fields take `{year}`**, so a typed "© {year} …" stays current.
+- **Contact requests** are emailed to the address set in Agenda, or to the site's admin email.
+- The Elementor dynamic tags ("Fact", "Contact link") are gone with the settings.
+
+**Install:** `frascella-plugin-1.1.0.zip` and `frascella-theme-1.1.0.zip`. **Data:** on first
+load the plugin deletes the old settings (`frascella_facts`) and the `frascella_manage`
+capability; then `tools/site.php` types the profiles into the footer, in each language.
+**Tested with** the same versions as 1.0.0.
+
 ## [1.0.2] — 2026-10-01
 
 - **The site's icons.** The EF monogram as favicon (`.ico` and SVG), Apple touch icon and web

@@ -3,21 +3,23 @@
  * The colophon: the mark, who and where, four short lists, the small print.
  *
  * Printed by footer.php when there is no Theme Builder footer, and by the plugin's «Footer»
- * widget inside one. The facts (name, city, VAT number, the profiles) are Settings →
- * frascella.dev: an empty one leaves its line or its link out. The index is the «Primary»
- * menu, the same as the header's.
+ * widget inside one. The lines and the profiles are the widget's fields, typed in
+ * Elementor; an empty profile leaves its link out. Without the widget, the site's words and
+ * inc/content/who.php. The index is the «Primary» menu, the same as the header's.
  *
- * @var array $args tag: the element it opens with (footer, or div inside a Theme Builder footer)
+ * @var array $args tag: the element it opens with (footer, or div inside a Theme Builder footer);
+ *                  github, linkedin: the profiles, from the widget
  */
 
 defined('ABSPATH') || exit;
 
 $tag = frascella_part_tag($args ?? [], 'footer');
-$facts = function_exists('frascella_facts') ? frascella_facts() : [];
+// The widget's fields, when it is the widget printing; who.php's otherwise.
+$profiles = array_key_exists('github', $args ?? []) ? (array) $args : frascella_who();
 $elsewhere = array_filter([
-    'github' => (string) ($facts['github'] ?? ''),
-    'linkedin' => (string) ($facts['linkedin'] ?? ''),
-]);
+    'github' => trim((string) ($profiles['github'] ?? '')),
+    'linkedin' => trim((string) ($profiles['linkedin'] ?? '')),
+], static fn (string $url): bool => str_starts_with($url, 'https://'));
 $privacy = frascella_privacy_url();
 $languages = frascella_alternates();
 $arrow = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg>';

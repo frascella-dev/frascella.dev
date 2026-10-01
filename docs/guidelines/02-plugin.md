@@ -13,18 +13,16 @@
 
 ```
 frascella.php
-inc/facts.php               the business's facts, one option, Portfolio → Settings
 inc/schema.php              the plugin's tables (projects) and their upgrades
-inc/capabilities.php        frascella_edit (projects), frascella_manage (settings)
+inc/capabilities.php        frascella_edit (projects): administrators and editors
 inc/projects.php            the projects: one row per language, a tgroup per project
 inc/admin-app.php           Portfolio: the menu and the React app (src/ → build/)
 inc/rest-admin.php          the app's API, frascella/v1/admin/…
 inc/media.php               alt text per language
 inc/polylang.php            what is translatable; same slug in every language; addresses by language
-inc/elementor.php           category, widgets, stylesheet, dynamic tags, Kit
+inc/elementor.php           category, widgets, stylesheet, Kit
 inc/elementor/sections.php  the widgets as data (the spec)
 inc/elementor/widgets.php   the base class, and one line per widget
-inc/elementor/tags.php      the facts as dynamic tags
 inc/elementor/languages.php Theme Builder documents per language
 inc/cli.php                 wp frascella …
 assets/elementor.css        Elementor's layout taken back off
@@ -34,7 +32,7 @@ tests/e2e/                  Playwright + axe against the local site
 ## Options
 
 - **One option per screen, not one per field.** They are read together on every request.
-- **Name each option once, in a constant**: `FRASCELLA_OPTION_FACTS`.
+- **Name each option once, in a constant** (`FRASCELLA_OPTION_…`).
 - **Sanitise in `register_setting`'s callback**, by type: an email that is not valid is saved as empty, never "fixed".
 
 ## Custom post types and data
@@ -57,8 +55,9 @@ A richer panel (React on `@wordpress/scripts`, on an API under `frascella/v1/adm
 - lists are paginated on the server;
 - writes to an ordered set touch only the range that moved.
 
-frascella.dev has grown into one: Portfolio (Projects, Settings), built like the owner's other
-plugins (Agenda, Voci, Postino, Chiaro) — same menu shape, header with tabs, cards, tables and
+frascella.dev has grown into one: Portfolio (Projects), built like the owner's other
+plugins (Agenda, Voci, Postino, Chiaro) — same menu shape, header (tabs when there is more
+than one view), cards, tables and
 @wordpress/components. `npm run build` writes `build/` (committed), `bin/make-i18n.sh` the
 translations.
 

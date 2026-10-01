@@ -4,17 +4,17 @@ The rules everything else follows from. When two guidelines seem to disagree, th
 
 ## The theme draws; the plugin remembers and composes
 
-- **The plugin holds what the site *is*.** That covers the business's facts, the custom
-  post types and their data, the Elementor widgets, the dynamic tags and the Kit.
+- **The plugin holds what the site *is*.** That covers the custom post types and their
+  data, the Elementor widgets and the Kit.
   A change of theme must never take the content with it.
-- **The theme holds what the site *looks like*.** That covers templates, CSS, motion, and
-  the words it says by itself.
+- **The theme holds what the site *looks like*.** That covers templates, CSS, motion,
+  the words it says by itself, and who the site belongs to (`inc/content/who.php`).
 - **Every call across the line is guarded.** Wrap it in `function_exists()`, in both directions:
   - with the plugin deactivated, the theme still renders with its defaults;
-  - with the theme switched, the plugin still holds every fact.
+  - with the theme switched, the plugin still holds every record.
 
 ```php
-$facts = function_exists('frascella_facts') ? frascella_facts() : [];
+$projects = function_exists('frascella_projects') ? frascella_projects() : [];
 ```
 
 ## Native first
@@ -24,7 +24,6 @@ $facts = function_exists('frascella_facts') ? frascella_facts() : [];
   and move them in the editor.
 - **A widget of the plugin exists only where there is data or behaviour.** Examples:
   - a query (the latest posts, a list of services);
-  - a fact from the settings (the contact card);
   - a script (a slider, a form).
 - **Its texts are still fields**, and each field starts from the site's words in the page's
   language.

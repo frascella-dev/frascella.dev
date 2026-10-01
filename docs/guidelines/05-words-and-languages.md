@@ -7,7 +7,7 @@
 - Each other file starts with `$base = require __DIR__ . '/it.php'` and returns `array_replace($base, [...])`.
 
 **Reading them.**
-- `frascella_s('contact.lede')` gives a string; closures are called with the facts.
+- `frascella_s('contact.lede')` gives a string; closures are called with the facts (`frascella_who()`).
 - `frascella_t('path')` gives the raw value: a string, a list or a closure.
 
 **Why a PHP tree and not .po files.**
@@ -24,14 +24,16 @@
    `grep -rnP '\$[A-Za-z_]\w*[\x80-\xFF]' inc/`.
 2. **`array_replace` is shallow.** A translation that overrides a section (`'contact' =>
    [...]`) replaces the whole Italian subtree, so it must repeat every key of it.
-3. **Closures take `frascella_who()`.** A closure that needs anything else (a count, a
-   title) is read with `frascella_t()` and called by its caller.
+3. **Closures take `frascella_who()`.** It returns `inc/content/who.php`: who the site
+   belongs to (name, city, country, email, VAT, GitHub, LinkedIn), typed once. A closure that
+   needs anything else (a count, a title) is read with `frascella_t()` and called by its caller.
 
 ## Placeholders in typed fields
 
-When a field's words wrap a fact, the person typing uses `{name}`, `{city}`, `{street}`,
-`{phone}` or `{email}`. `frascella_text_fill()` puts the facts in. A list of paragraphs is typed
-with a blank line between them.
+When a field's words wrap a fact, the person typing uses `{name}`, `{city}`, `{email}`,
+`{vat}` (any key of `inc/content/who.php`), or `{year}` for the current year.
+`frascella_text_fill()` puts them in. A list of paragraphs is typed with a blank line between
+them.
 
 ## Polylang: addresses
 

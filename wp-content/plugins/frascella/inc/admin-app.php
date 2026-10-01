@@ -5,13 +5,14 @@
  *
  *   Portfolio
  *     Projects   write, translate, order and publish the work the home page shows
- *     Settings   the business's facts: name, place, VAT number, profiles
+ *
+ * Nothing else: the site's words, the business's name and VAT number, its profiles, are
+ * typed into the pages and the footer in Elementor, where they are read.
  *
  * Each item is a WordPress page holding the same React app (`build/admin.js`, source in
  * `src/`), told which view to show by `data-view` — the same shape as the owner's other
  * plugins (Agenda, Voci, Postino, Chiaro): their menu, their header with the views as tabs,
- * their cards and tables, @wordpress/components underneath. The settings live inside the
- * plugin's own section, as theirs do, not under WordPress's Settings.
+ * their cards and tables, @wordpress/components underneath.
  */
 
 declare(strict_types=1);
@@ -23,7 +24,6 @@ function frascella_admin_views(): array
 {
     return [
         'frascella' => ['projects', 'frascella_edit'],
-        'frascella-settings' => ['settings', 'frascella_manage'],
     ];
 }
 
@@ -37,7 +37,6 @@ add_action('admin_menu', static function (): void {
     };
     $labels = [
         'frascella' => __('Projects', 'frascella'),
-        'frascella-settings' => __('Settings', 'frascella'),
     ];
 
     $svg = (string) file_get_contents(FRASCELLA_DIR . 'assets/menu-icon.svg'); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- our own icon.
@@ -73,10 +72,7 @@ function frascella_admin_assets(): void
         }
         wp_add_inline_script('frascella-admin', 'window.frascellaAdmin = ' . wp_json_encode([
             'site' => wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES),
-            'can' => [
-                'manage' => current_user_can('frascella_manage'),
-                'edit' => current_user_can('frascella_edit'),
-            ],
+            'can' => ['edit' => current_user_can('frascella_edit')],
             'pages' => $pages,
             'icon' => FRASCELLA_URL . 'assets/icon.svg',
             'languages' => frascella_languages(),
@@ -87,12 +83,3 @@ function frascella_admin_assets(): void
 
     add_filter('admin_body_class', static fn (string $classes): string => "$classes frascella-screen");
 }
-
-/** "Settings" next to "Deactivate" in the plugin list. */
-add_filter('plugin_action_links_' . plugin_basename(FRASCELLA_FILE), static function (array $links): array {
-    if (current_user_can('frascella_manage')) {
-        array_unshift($links, sprintf('<a href="%s">%s</a>', esc_url(admin_url('admin.php?page=frascella-settings')), esc_html__('Settings', 'frascella')));
-    }
-
-    return $links;
-});

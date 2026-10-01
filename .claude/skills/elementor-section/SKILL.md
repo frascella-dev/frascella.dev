@@ -11,7 +11,7 @@ Answer in the user's language. The rules are in `docs/guidelines/04-elementor.md
 
 What is the section made of?
 - **Words, pictures, buttons, links:** native. Continue here.
-- **A fact from the settings:** native, with the plugin's dynamic tag (Fact, Contact link).
+- **A fact (address, phone, email):** native, the fact typed in the widget.
 - **A query, behaviour a script drives, or another plugin's output:** stop. Use the
   `elementor-widget` skill.
 

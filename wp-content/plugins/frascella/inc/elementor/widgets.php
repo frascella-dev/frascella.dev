@@ -90,7 +90,7 @@ abstract class Frascella_Section extends \Elementor\Widget_Base
             $this->start_controls_section('frascella_texts', ['label' => __('Texts', 'frascella')]);
             $this->add_control('frascella_texts_note', [
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
-                'raw' => '<p class="elementor-descriptor">' . esc_html((string) ($spec['note'] ?? __('Each field starts from the site’s words in this language; empty, it says them. {name}, {city}, {street}, {phone} and {email} become the facts in Portfolio → Settings.', 'frascella'))) . '</p>',
+                'raw' => '<p class="elementor-descriptor">' . esc_html((string) ($spec['note'] ?? __('Each field starts from the site’s words in this language; empty, it says them. {name}, {city}, {email}, {vat} and {year} become the business’s facts (the theme’s inc/content/who.php).', 'frascella'))) . '</p>',
             ]);
             foreach ($texts as $path => [$label, $type]) {
                 frascella_elementor_text_control($this, (string) $path, (string) $label, (string) $type);

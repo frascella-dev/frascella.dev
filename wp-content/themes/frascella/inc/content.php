@@ -104,24 +104,22 @@ function frascella_s(string $path, string $fallback = ''): string
 }
 
 /**
- * The facts a sentence may wrap itself around: the plugin's (Portfolio → Settings), or the
- * site's name alone when the plugin is off. Every closure in the tree takes this shape,
- * so a sentence naming the business names whichever business this install belongs to.
+ * Who the site belongs to (inc/content/who.php): the facts a sentence may wrap itself
+ * around, and what the titles and the structured data name. Every closure in the tree takes
+ * this shape. Without a name, the site's.
  *
  * @return array<string, string>
  */
 function frascella_who(): array
 {
-    $facts = function_exists('frascella_facts') ? frascella_facts() : [];
+    static $who = null;
+    if ($who === null) {
+        $facts = (array) require FRASCELLA_THEME_DIR . '/inc/content/who.php';
+        $who = array_map(static fn ($v): string => trim((string) $v), $facts);
+        $who['name'] = ($who['name'] ?? '') ?: wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES);
+    }
 
-    return [
-        'name' => (string) ($facts['name'] ?? '') ?: wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES),
-        'city' => (string) ($facts['city'] ?? ''),
-        'street' => (string) ($facts['street'] ?? ''),
-        'phone' => (string) ($facts['phone'] ?? ''),
-        'email' => (string) ($facts['email'] ?? ''),
-        'vat' => (string) ($facts['vat'] ?? ''),
-    ];
+    return $who;
 }
 
 /** The `<html lang>` of this language, from its own tree. */
@@ -138,8 +136,8 @@ function frascella_html_lang(): string
  * frascella_t() answers from it before the tree. An empty field is not on the stack, so it says
  * what the tree says in the page's language — which is also what the field shows.
  *
- * A typed sentence takes placeholders for the facts: {name}, {city}, {street}, {phone},
- * {email}. A list of paragraphs takes a blank line between them.
+ * A typed sentence takes placeholders for the facts: {name}, {city}, {email}, {vat}, and
+ * {year}, the current one. A list of paragraphs takes a blank line between them.
  */
 
 /** @param array<string, mixed> $texts path => value */
@@ -164,7 +162,7 @@ function frascella_text_overrides(): array
 /** A typed sentence with the facts put in. */
 function frascella_text_fill(string $text): string
 {
-    $pairs = [];
+    $pairs = ['{year}' => gmdate('Y')];
     foreach (frascella_who() as $key => $value) {
         $pairs['{' . $key . '}'] = $value;
     }

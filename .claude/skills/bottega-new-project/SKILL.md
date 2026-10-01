@@ -45,7 +45,8 @@ Answer in the user's language. Read `docs/guidelines/01-principles.md` first if 
 
    **Only facts the user gives.** Never invent an address, a phone number or a VAT number.
    Leave a field empty rather than guess.
-2. Put the same facts in Settings → <Name> on the local site.
+2. Put the same facts in the theme's `inc/content/who.php` (name, city, email, VAT,
+   profiles). An unknown one stays empty.
 3. Change `tokens.json` (palette and fonts) only when the user has a design. Then run
    `npm run build` in the theme and `bin/wp <slug> kit`.
 

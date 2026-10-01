@@ -9,7 +9,6 @@
  *   GET     projects/{tgroup}        a project in every language
  *   PATCH   projects/{id}            one language (the shared fields change in every language)
  *   DELETE  projects/{id}            one language (?all=1: every language)
- *   GET     settings · POST settings the business's facts
  *
  * Every route checks a capability (inc/capabilities.php); `wp.apiFetch` adds the REST nonce.
  * The list is small (a portfolio), so it is answered whole rather than paged.
@@ -22,7 +21,6 @@ defined('ABSPATH') || exit;
 add_action('rest_api_init', static function (): void {
     $ns = 'frascella/v1';
     $edit = static fn (): bool => current_user_can('frascella_edit');
-    $manage = static fn (): bool => current_user_can('frascella_manage');
     register_rest_route($ns, '/admin/projects', [
         ['methods' => 'GET', 'callback' => 'frascella_admin_projects', 'permission_callback' => $edit],
         ['methods' => 'POST', 'callback' => 'frascella_admin_project_create', 'permission_callback' => $edit],
@@ -40,14 +38,6 @@ add_action('rest_api_init', static function (): void {
                 ? new WP_REST_Response(['deleted' => true])
                 : frascella_rest_error(__('That project does not exist.', 'frascella'), 404);
         }, 'permission_callback' => $edit],
-    ]);
-    register_rest_route($ns, '/admin/settings', [
-        ['methods' => 'GET', 'callback' => 'frascella_admin_settings', 'permission_callback' => $manage],
-        ['methods' => 'POST', 'callback' => static function (WP_REST_Request $r): WP_REST_Response {
-            update_option(FRASCELLA_OPTION_FACTS, frascella_sanitize_facts((array) $r->get_json_params()));
-
-            return frascella_admin_settings();
-        }, 'permission_callback' => $manage],
     ]);
 });
 
@@ -141,18 +131,4 @@ function frascella_admin_project_patch(WP_REST_Request $r): WP_REST_Response
     $saved = frascella_project_update((int) $r['id'], $in);
 
     return is_wp_error($saved) ? frascella_rest_from_error($saved) : new WP_REST_Response($saved);
-}
-
-function frascella_admin_settings(): WP_REST_Response
-{
-    $fields = [];
-    foreach (frascella_fact_fields() as $key => $label) {
-        $fields[] = [
-            'key' => $key,
-            'label' => $label,
-            'type' => $key === 'email' ? 'email' : (in_array($key, FRASCELLA_FACT_URLS, true) ? 'url' : 'text'),
-        ];
-    }
-
-    return new WP_REST_Response(['settings' => frascella_facts(), 'fields' => $fields]);
 }

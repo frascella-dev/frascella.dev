@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-const FRASCELLA_DB_VERSION = '0.2.0';
+const FRASCELLA_DB_VERSION = '0.3.0';
 
 function frascella_table(string $name): string
 {
@@ -64,6 +64,7 @@ function frascella_migrations(): array
 {
     return [
         '0.2.0' => 'frascella_migrate_project_posts',
+        '0.3.0' => 'frascella_drop_settings',
     ];
 }
 
@@ -88,6 +89,19 @@ function frascella_upgrade(): void
 }
 
 add_action('plugins_loaded', 'frascella_upgrade', 5);
+
+/**
+ * 0.3.0: the settings are gone. The business's facts are typed where they are read (the
+ * footer in Elementor, the theme's inc/content/who.php), so the option and the capability
+ * that guarded it go too.
+ */
+function frascella_drop_settings(): void
+{
+    delete_option('frascella_facts');
+    foreach (wp_roles()->role_objects as $role) {
+        $role->remove_cap('frascella_manage');
+    }
+}
 
 /**
  * 0.2.0: the projects that were posts (`frascella_project`) become rows. Each Polylang

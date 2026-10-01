@@ -1,14 +1,13 @@
 /**
- * Portfolio, the dashboard: the projects and the settings, end to end.
+ * Portfolio, the dashboard: the projects, end to end.
  *
- * - The API refuses a visitor, and refuses the settings to an editor.
+ * - The API refuses a visitor; an editor has the projects.
  * - The list shows every project with its languages, in the home page's order; the arrows
  *   change that order, and the home page follows.
  * - The editor: a word changed in one language shows on that language's page only; a
  *   refused address says why under its field; a new project starts as a draft, off the
  *   home page, and can be deleted in every language.
- * - Settings: the facts, by section.
- * - There is one way in: no menu of the old post type.
+ * - There is one way in: no menu of the old post type, and no settings (0.3.0 dropped them).
  * - axe on the app, on every screen.
  *
  * Everything it changes is put back (the projects through the API, the user deleted).
@@ -47,9 +46,10 @@ try {
 	const menu = await page.evaluate( () => ( {
 		portfolio: !! document.querySelector( '#adminmenu a[href="admin.php?page=frascella"]' ),
 		cpt: !! document.querySelector( '#adminmenu a[href*="post_type=frascella_project"]' ),
-		oldSettings: !! document.querySelector( '#adminmenu a[href="options-general.php?page=frascella"]' ),
+		oldSettings: !! document.querySelector( '#adminmenu a[href="options-general.php?page=frascella"], #adminmenu a[href="admin.php?page=frascella-settings"]' ),
 	} ) );
-	check( 'menu: Portfolio, and neither the old post type nor the old settings page', menu.portfolio && ! menu.cpt && ! menu.oldSettings, JSON.stringify( menu ) );
+	check( 'menu: Portfolio, and neither the old post type nor any settings page', menu.portfolio && ! menu.cpt && ! menu.oldSettings, JSON.stringify( menu ) );
+	check( 'upgrade: the settings’ option and capability are gone', php( "echo (get_option('frascella_facts') === false && !get_role('administrator')->has_cap('frascella_manage')) ? 'ok' : 'no';" ) === 'ok' );
 
 	// The list.
 	await page.goto( `${ BASE }/wp-admin/admin.php?page=frascella`, { waitUntil: 'load' } );
@@ -97,14 +97,7 @@ try {
 	await page.waitForSelector( '.frascella-table--projects' );
 	check( 'new: deleted', php( `global $wpdb; echo (int) $wpdb->get_var("SELECT COUNT(*) FROM ${ table } WHERE title = 'Progetto di prova'");` ) === '0' );
 
-	// Settings.
-	await page.goto( `${ BASE }/wp-admin/admin.php?page=frascella-settings`, { waitUntil: 'load' } );
-	const vat = page.getByLabel( /^(Partita IVA|VAT number)$/ );
-	await vat.waitFor();
-	check( 'settings: the facts, from the option', ( await vat.inputValue() ) === php( 'echo frascella_facts()["vat"];' ) );
-	await auditApp( page, 'Settings' );
-
-	// An editor: the projects, not the settings.
+	// An editor: the projects.
 	php( `wp_insert_user(['user_login' => ${ phpValue( editorLogin ) }, 'user_pass' => ${ phpValue( editorPass ) }, 'user_email' => ${ phpValue( editorLogin + '@example.com' ) }, 'role' => 'editor']); echo 'ok';` );
 	const ed = await ( await browser.newContext() ).newPage();
 	await ed.goto( `${ BASE }/wp-login.php` );
@@ -115,8 +108,7 @@ try {
 	await ed.goto( `${ BASE }/wp-admin/admin.php?page=frascella`, { waitUntil: 'load' } );
 	await ed.waitForSelector( '.frascella-table--projects' );
 	const tabs = await ed.$$eval( '.frascella-tab', ( t ) => t.length );
-	const settingsStatus = await ed.evaluate( async () => ( await fetch( '/wp-json/frascella/v1/admin/settings', { headers: { 'X-WP-Nonce': window.wpApiSettings?.nonce || '' } } ) ).status );
-	check( 'editor role: the projects, but no settings (no tab, and the API refuses)', tabs === 1 && settingsStatus === 403, `${ tabs } tab(s), ${ settingsStatus }` );
+	check( 'editor role: the projects, and one view, so no tabs', tabs === 0, `${ tabs } tab(s)` );
 } finally {
 	await browser.close();
 	restore();

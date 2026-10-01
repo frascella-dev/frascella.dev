@@ -5,8 +5,8 @@ The website of frascella.dev, on WordPress with Elementor and Polylang, built fr
 
 | | |
 |---|---|
-| `wp-content/themes/frascella` | **The look.** Templates, CSS and motion (built with Vite), the words per language in `inc/content/`. |
-| `wp-content/plugins/frascella` | **The rest.** The facts (Settings → frascella.dev), the Elementor widgets, the dynamic tags, the Kit, the e2e tests. |
+| `wp-content/themes/frascella` | **The look.** Templates, CSS and motion (built with Vite), the words per language and who the site belongs to in `inc/content/`. |
+| `wp-content/plugins/frascella` | **The rest.** The projects (Portfolio), the Elementor widgets, the Kit, the e2e tests. |
 | `wp-content/mu-plugins/local-mail.php` | Locally, no email leaves: everything goes to Mailpit. |
 | `docs/guidelines/` | How the site is built, and why. |
 | `.claude/` | The Claude Code skills and agents for working on it. |

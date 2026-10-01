@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Structured data: one JSON-LD graph per page, built from the facts in Portfolio → Settings.
+ * Structured data: one JSON-LD graph per page, built from who the site belongs to (inc/content/who.php).
  *
  * The business is a person: Emanuele Frascella, a freelance software engineer, with his VAT
  * number, his city and his profiles — what the footer shows. Hence `Person`, not
@@ -37,19 +37,16 @@ function frascella_schema_root(): string
 /** @return array<string, mixed> */
 function frascella_schema_business(): array
 {
-    $facts = function_exists('frascella_facts') ? frascella_facts() : [];
     $who = frascella_who();
     $address = array_filter([
         '@type' => 'PostalAddress',
-        'streetAddress' => (string) ($facts['street'] ?? ''),
-        'postalCode' => (string) ($facts['postcode'] ?? ''),
-        'addressLocality' => (string) ($facts['city'] ?? ''),
-        'addressRegion' => (string) ($facts['region'] ?? ''),
-        'addressCountry' => (string) ($facts['country'] ?? ''),
+        'streetAddress' => $who['street'] ?? '',
+        'addressLocality' => $who['city'] ?? '',
+        'addressCountry' => $who['country'] ?? '',
     ]);
 
-    // The profiles the footer links to: the same person elsewhere.
-    $same = array_values(array_filter([(string) ($facts['github'] ?? ''), (string) ($facts['linkedin'] ?? '')]));
+    // The same person elsewhere.
+    $same = array_values(array_filter([$who['github'] ?? '', $who['linkedin'] ?? '']));
 
     return array_filter([
         '@type' => (string) apply_filters('frascella_schema_type', 'Person'),
@@ -60,7 +57,7 @@ function frascella_schema_business(): array
         'telephone' => $who['phone'],
         'email' => $who['email'],
         'address' => count($address) > 1 ? $address : null,
-        'vatID' => (string) ($facts['vat'] ?? ''),
+        'vatID' => $who['vat'],
         'sameAs' => $same !== [] ? $same : null,
     ], static fn ($v): bool => $v !== '' && $v !== null);
 }

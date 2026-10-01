@@ -129,7 +129,21 @@ function frascella_elementor_sections(): array
             'entry' => 'site',
             'args' => ['tag' => 'div'],
             'keywords' => ['footer', 'colophon'],
-            'note' => __('The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Portfolio → Settings), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts.', 'frascella'),
+            'controls' => [
+                'github' => [
+                    'label' => __('GitHub profile (address; empty, no link)', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
+                ],
+                'linkedin' => [
+                    'label' => __('LinkedIn profile (address; empty, no link)', 'frascella'),
+                    'type' => 'text',
+                    'label_block' => true,
+                    'default' => '',
+                ],
+            ],
+            'note' => __('The mark, who and where, the index (the «Primary» menu), the profiles, the privacy notice, the languages. For a Theme Builder footer. Each field starts from the site’s words in this language; {year} becomes the current year.', 'frascella'),
             'texts' => [
                 'footer.role' => [__('Under the mark', 'frascella'), 't'],
                 'footer.legal' => [__('The small print', 'frascella'), 't'],
