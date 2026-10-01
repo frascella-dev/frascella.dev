@@ -38,6 +38,36 @@ bin/build-zips      # dist/frascella-theme-<v>.zip and dist/frascella-plugin-<v>
 **The release notes say what to install**, including which version of each companion plugin
 the release was tested with.
 
+## The server: what the privacy notice promises about it
+
+The notice states how long the web server keeps its access logs (frascella.dev: **14 days**,
+on an OVHcloud VPS, SBG6, Strasbourg). A figure in the notice is only true if the server is
+set to it, so the first deploy to a server, and any move to a new one, includes:
+
+- **access logs rotated daily and kept 14 days**, nothing older — with logrotate, for the
+  web server's access logs (nginx or Apache, and the panel's own copy if it keeps one, as
+  CloudPanel does per site):
+
+  ```
+  /var/log/nginx/*access.log /home/*/logs/nginx/*access.log {
+      daily
+      rotate 14
+      maxage 14
+      missingok
+      notifempty
+      compress
+      delaycompress
+      sharedscripts
+      postrotate
+          [ -s /run/nginx.pid ] && kill -USR1 "$(cat /run/nginx.pid)"
+      endscript
+  }
+  ```
+
+  then `logrotate -d <file>` to check it, and, a day later, that no file older than 14 days
+  is left (`find <log dirs> -name '*access*' -mtime +14`);
+- if the retention changes, the notice changes in the same release, in every language.
+
 ## Deploying (WordPress over SSH)
 
 **Prerequisites:**
