@@ -23,9 +23,10 @@
     color: var(--soft);
 }
 
+/* More room above a heading than below it: it belongs to what follows. */
 .prose h2,
 .prose h3 {
-    margin-top: 2em;
+    margin-top: var(--s-10);
     color: var(--text);
     font-family: var(--font-heading);
     font-weight: 400;
@@ -49,8 +50,13 @@
     padding-left: 1.2em;
 }
 
+.prose h2 + *,
+.prose h3 + * {
+    margin-top: var(--s-3);
+}
+
 .prose li + li {
-    margin-top: 0.4em;
+    margin-top: var(--s-2);
 }
 
 .prose table {

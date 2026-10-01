@@ -54,6 +54,34 @@
     --lh6: 0.98;
     --lh7: 0.96;
     --measure: 68ch;
+
+    /* The spacing scale. Every vertical space between the page's texts is one of these,
+       measured on the Sketch file (page Web): the phone's value at 390 px, the desktop's at
+       1440, straight between them, and growing with the type above 1440 (×1.257 at 2560,
+       like --t0): clamp(phone, line, desktop) plus whatever the growth adds past 1440. Where the two frames differ the token carries both:
+         token   390   1440   used for
+         --s-1     2     4    a number above its heading ("01" / "Siti e piattaforme web")
+         --s-2     6     6    a fact's value to its label; a footer link to the next; label to field
+         --s-3    10    10    a fact's label to its rule; a field's label to its line
+         --s-4    14    14    the band's rows on a phone; paragraph to paragraph
+         --s-5    14    18    the project card's rows; a footer heading to its links
+         --s-6    14    20    a band's rule to its first line (+1 px of rule: Sketch's 15 / 21)
+         --s-7    16    24    the contact sentence to "oppure …"
+         --s-8    20    28    form field to field; the mark to the line under it
+         --s-9    28    32    the footer's rule to its mark; the last field to the button
+         --s-10   32    36    the footer's small print; a document's heading above it
+         --s-11   64    64    the footer's brand to its lists on a phone */
+    --s-1: calc(clamp(2px, 1.257px + 0.1905vw, 4px) + max(0px, -1.322px + 0.0918vw));
+    --s-2: calc(6px + max(0px, -1.984px + 0.1378vw));
+    --s-3: calc(10px + max(0px, -3.306px + 0.2296vw));
+    --s-4: calc(14px + max(0px, -4.628px + 0.3214vw));
+    --s-5: calc(clamp(14px, 12.514px + 0.3810vw, 18px) + max(0px, -5.951px + 0.4133vw));
+    --s-6: calc(clamp(14px, 11.771px + 0.5714vw, 20px) + max(0px, -6.612px + 0.4592vw));
+    --s-7: calc(clamp(16px, 13.029px + 0.7619vw, 24px) + max(0px, -7.934px + 0.5510vw));
+    --s-8: calc(clamp(20px, 17.029px + 0.7619vw, 28px) + max(0px, -9.257px + 0.6429vw));
+    --s-9: calc(clamp(28px, 26.514px + 0.3810vw, 32px) + max(0px, -10.579px + 0.7347vw));
+    --s-10: calc(clamp(32px, 30.514px + 0.3810vw, 36px) + max(0px, -11.902px + 0.8266vw));
+    --s-11: calc(64px + max(0px, -21.158px + 1.4694vw));
     --cut-s: 24svh;
     --cut-m: 32svh;
     --cut-l: 43svh;
@@ -183,7 +211,7 @@
 /* A running head: the small label at the start of a band ("Servizi", "Taranto · CET"). */
 .rh {
     display: flex;
-    gap: 0.6em;
+    gap: var(--s-2);
     align-items: baseline;
     color: var(--meta);
     font-family: var(--font-body);
@@ -213,9 +241,9 @@
     text-wrap: pretty;
 }
 
-.txt > p + p,
+.txt p + p,
 .prose > * + * {
-    margin-top: 0.75em;
+    margin-top: var(--s-4);
 }
 
 /* Visually hidden, still read. */

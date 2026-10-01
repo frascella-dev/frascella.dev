@@ -40,7 +40,7 @@ try {
 	// The cut-out word.
 	const page = await text( '/' );
 	check( 'cut: the opening is the page’s one h1, with its words for screen readers', count( page, '<h1' ) === 1 && /<h1 class="cut-h"><span class="sr">piattaforme, app e integrazioni<\/span>/.test( page ) );
-	check( 'cut: the word is hidden from screen readers, with its fixed lines', page.includes( 'class="cut" aria-hidden="true" data-lines="piattaforme,|app e integrazioni" data-lines-n="piattaforme,|app e|integrazioni"' ) );
+	check( 'cut: the word is hidden from screen readers, with its fixed lines', page.includes( 'class="cut" aria-hidden="true" data-lines="piattaforme, app|e integrazioni" data-lines-n="piattaforme,|app e|integrazioni"' ) );
 	check( 'cut: a soft hyphen typed as an entity becomes a break point', ( () => {
 		setWidget( it, 'frascella-cut', { word: 'piatta&shy;forme', tag: '', lines: '', lines_n: '' } );
 		return true;

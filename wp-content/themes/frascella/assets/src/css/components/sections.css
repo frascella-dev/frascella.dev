@@ -32,9 +32,10 @@
 }
 
 @media (max-width: 900px) {
+    /* Sketch: "Servizi" 50 px under the header, the title 18 px under it. */
     .intro {
-        row-gap: 1.1em;
-        padding: 12vh var(--page-margin) 8vh;
+        row-gap: calc(var(--s-4) + 2 * var(--s-1));
+        padding: calc(var(--hh) + var(--s-11) - var(--s-4)) var(--page-margin) 8vh;
     }
 
     .intro > :nth-child(n) {
@@ -65,9 +66,9 @@
     grid-column: 1 / span 4;
     display: flex;
     flex-direction: column;
-    gap: 1.1em;
+    gap: var(--s-5);
     border-top: 1px solid var(--line);
-    padding-top: 1.15em;
+    padding-top: var(--s-6);
 }
 
 .pname {
@@ -143,16 +144,16 @@ html.desk-loading .plate-shot {
 
 .facts {
     display: grid;
-    gap: 0.85em;
+    gap: var(--s-4);
     margin: 0;
 }
 
 .facts > div {
     display: flex;
     flex-direction: column;
-    gap: 0.35em;
+    gap: var(--s-2);
     border-bottom: 1px solid var(--line);
-    padding-bottom: 0.6em;
+    padding-bottom: var(--s-3);
 }
 
 .facts b {
@@ -176,7 +177,7 @@ html.desk-loading .plate-shot {
         flex-direction: row;
         justify-content: space-between;
         align-items: baseline;
-        gap: 0.75em;
+        gap: var(--s-4);
     }
 
     .facts span {

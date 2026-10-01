@@ -130,9 +130,6 @@
 
 /* The two words share one cell, right-aligned, and swap by visibility: the button keeps
    one width, so nothing in the header moves when "menu" becomes "chiudi". */
-.menu-btn:not([hidden]) {
-    display: grid;
-}
 
 .menu-btn span {
     grid-area: 1 / 1;
@@ -241,10 +238,11 @@ html.motion .drawer.is-open .drawer-legal { transition-delay: 0.4s; }
     grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
     column-gap: var(--gutter);
     align-items: baseline;
-    padding: 0.5em 0 0.55em;
+    /* Sketch: 9 px from the rule above to the word, 24 px from the word to the rule below. */
+    padding: var(--s-3) 0 calc(var(--s-4) + var(--s-3));
     color: var(--text);
     font-family: var(--font-heading);
-    font-size: var(--t5);
+    font-size: var(--t6);
     line-height: var(--lh5);
     letter-spacing: -0.012em;
     text-decoration: none;
@@ -262,7 +260,7 @@ html.motion .drawer.is-open .drawer-legal { transition-delay: 0.4s; }
     display: flex;
     align-items: center;
     gap: 1.25em;
-    margin-top: 1.6em;
+    margin-top: var(--s-10);
     font-size: var(--t-1);
     font-weight: 500;
 }
@@ -278,7 +276,7 @@ html.motion .drawer.is-open .drawer-legal { transition-delay: 0.4s; }
 
 .drawer-legal {
     display: grid;
-    gap: 0.6em;
+    gap: var(--s-2);
     color: var(--meta);
     font-size: var(--t-1);
     line-height: var(--lh-1);
@@ -304,8 +302,8 @@ html.drawer-open body {
         display: none;
     }
 
-    .menu-btn {
-        display: inline-block;
+    .menu-btn:not([hidden]) {
+        display: grid;
     }
 }
 

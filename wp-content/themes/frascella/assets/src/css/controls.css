@@ -67,8 +67,8 @@
     .input {
         display: block;
         width: 100%;
-        margin-top: 0.5em;
-        padding: 0.45em 0 0.55em;
+        margin-top: var(--s-2);
+        padding: var(--s-3) 0 0.55em;
         border: 0;
         border-bottom: 1px solid var(--ctl-rule);
         border-radius: 0;
@@ -88,6 +88,7 @@
         outline: none;
         border-bottom: 2px solid var(--ctl-fill);
         padding-bottom: calc(0.55em - 1px);
+        padding-top: var(--s-3);
     }
 
     textarea.input {
@@ -102,7 +103,7 @@
     /* A refusal under a field: empty until the server says otherwise. */
     .field-error {
         display: block;
-        margin-top: 0.45em;
+        margin-top: var(--s-2);
         color: var(--alert);
         font-size: var(--t-1);
         line-height: var(--lh-1);

@@ -67,7 +67,7 @@ $it = [
     'home' => 'Home',
     'hero' => [
         'cut' => 'piattaforme, app e integrazioni',
-        'lines' => 'piattaforme,|app e integrazioni',
+        'lines' => 'piattaforme, app|e integrazioni',
         'lines_n' => 'piattaforme,|app e|integrazioni',
         'rest' => 'dall’architettura al rilascio',
         'where' => 'Taranto · CET · da remoto',
@@ -77,6 +77,7 @@ $it = [
     'services' => [
         'label' => 'Servizi',
         'title' => 'Cosa faccio.',
+        'breaks' => ['piattaforme' => 'piatta|forme', 'integrazioni' => 'integra|zioni'],
         'items' => [
             ['piattaforme', 'Siti e piattaforme web', 'Sviluppo siti in WordPress oppure da zero, senza CMS. Per le piattaforme più complesse progetto anche la parte server, con API, database e autenticazione, e quando ha senso la divido in microservizi.'],
             ['app', 'App mobile e web app', 'App per iOS e Android in Flutter, web app in React o Nuxt. Le sviluppo insieme alla parte server, oppure le collego a quella che c’è già.'],
@@ -348,7 +349,8 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
     foreach ($w['services']['items'] as $i => [$word, $title, $body]) {
         $n = sprintf('%02d', $i + 1);
         $services[] = $box('poster svc' . ($i === 1 ? ' poster--flip' : ''), [
-            $cut($word, [], $i === 1 ? 'cut-r' : ''),
+            // A phone breaks the long words where Sketch does (lines_n); a desktop keeps them whole.
+            $cut($word, ['lines_n' => $w['services']['breaks'][$word] ?? ''], $i === 1 ? 'cut-r' : ''),
             $box('band pane frascella-reveal', [
                 $heading('<span class="no">' . $n . '</span><br>' . $title, 'h3', 'display'),
                 $text('<p>' . $body . '</p>', 'txt'),

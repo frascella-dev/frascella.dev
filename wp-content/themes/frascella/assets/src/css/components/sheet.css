@@ -99,20 +99,45 @@ html:not(.cutting) .cut {
 
 /* --- posters and bands ------------------------------------------------------ */
 
-/* A poster: one station of the camera, one screen. */
+/* A poster: one station of the camera, one screen.
+ *
+ * Sketch (page Web) puts every poster's band on the same line of the screen: its rule at
+ * 648 of 900 on a desktop (72 %), 520 of 844 on a phone (61.6 %; the opening's at 487,
+ * 57.7 %), whatever the word above it and however long the band's text. So the poster is
+ * two rows: the word, at the top, in a row tall enough to bring the rule to that line, and
+ * the band, which runs on below it (a long band makes the poster longer than the screen). */
 .poster {
+    --poster-top: calc(var(--hh) + 3.2vh);
+    --rule-at: 72svh;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 4vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(calc(var(--rule-at) - var(--poster-top)), auto) auto;
+    align-content: start;
+    align-items: start;
+    /* Elementor gives a container a row gap of its own; the rows here are the layout. */
+    row-gap: 0;
     min-height: 100vh;
     min-height: 100svh;
-    padding: calc(var(--hh) + 3.2vh) var(--page-margin) 4.5vh;
+    padding: var(--poster-top) var(--page-margin) 4.5vh;
 }
 
+/* The other way up (Sketch: «app»): the band at the top, the word at the foot. */
 .poster--flip {
+    display: flex;
     flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 4vh;
+}
+
+@media (max-width: 900px) {
+    .poster {
+        --rule-at: 61.6svh;
+    }
+
+    .hero {
+        --rule-at: 57.7svh;
+    }
 }
 
 /* A band: the line of words at the foot of a poster, on the page's grid.
@@ -122,10 +147,10 @@ html:not(.cutting) .cut {
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     column-gap: var(--gutter);
-    row-gap: 1em;
+    row-gap: var(--s-4);
     align-items: start;
     border-top: 1px solid var(--line);
-    padding-top: 1.15em;
+    padding-top: var(--s-6);
 }
 
 .band > :nth-child(1) {
@@ -153,13 +178,21 @@ html:not(.cutting) .cut {
     line-height: var(--lh3);
 }
 
-.band .rh {
-    padding-top: 0.25em;
+/* A number above its heading ("01" / "Siti e piattaforme web"): a line of its own, the
+   size of the number and not of the heading, so the band's rule is as far from the number
+   as from any other first line. */
+.band h3 .no {
+    display: block;
+    margin-bottom: var(--s-1);
+}
+
+.band h3 .no + br {
+    display: none;
 }
 
 @media (max-width: 900px) {
     .band {
-        row-gap: 0.9em;
+        row-gap: var(--s-4);
     }
 
     .band > :nth-child(n) {
@@ -173,25 +206,29 @@ html:not(.cutting) .cut {
     }
 
     .poster {
-        gap: 3vh;
         padding-bottom: 4vh;
+    }
+
+    .poster--flip {
+        gap: 3vh;
     }
 }
 
 /* --- the opening ------------------------------------------------------------ */
 
+/* Room under the band for the scroll cue, which is fixed at the foot of the screen. */
 .hero {
-    /* Room under the band for the scroll cue (3.55em tall), on the page's right margin. */
-    padding-bottom: calc(max(48px, 6svh) + 4.9 * var(--t-1));
+    padding-bottom: calc(max(48px, 6svh) + 3.55 * var(--t-1));
 }
 
 .hero .cut {
     line-height: 0.86;
 }
 
+/* Sketch: the second line 55 px under the word's box on a desktop, 21 px on a phone. */
 .hero-rest {
-    margin-top: 0.28em;
-    --frascella-margin: 0.28em 0 0;
+    margin-top: calc(var(--s-11) - var(--s-3));
+    --frascella-margin: calc(var(--s-11) - var(--s-3)) 0 0;
     font-family: var(--font-heading);
     font-size: var(--t6);
     line-height: var(--lh6);
@@ -214,6 +251,9 @@ html:not(.cutting) .cut {
     .hero .band .btn {
         justify-self: start;
         text-align: left;
+        /* Sketch: 20 px from the text to the button, the band's 14 plus 6. */
+        margin-top: var(--s-2);
+        --frascella-margin: var(--s-2) 0 0;
     }
 }
 
@@ -223,6 +263,8 @@ html:not(.cutting) .cut {
     }
 
     .hero-rest {
+        margin-top: var(--s-8);
+        --frascella-margin: var(--s-8) 0 0;
         text-align: left;
         font-size: var(--t4);
         line-height: var(--lh4);
