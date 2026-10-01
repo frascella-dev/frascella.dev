@@ -18,15 +18,17 @@ if ( php( "echo defined('ELEMENTOR_PRO_VERSION') ? 'pro' : 'free';" ) !== 'pro' 
 
 const created = [];
 try {
-	// A footer document shown everywhere, holding one Heading.
+	// A footer document on the front page, holding one Heading. On the front page only, so
+	// that it wins over the site's own footer (shown everywhere): Elementor Pro serves the
+	// document with the more specific condition.
 	const footer = Number( php( `$id = wp_insert_post(['post_type' => 'elementor_library', 'post_status' => 'publish', 'post_title' => 'Test footer']);
 update_post_meta($id, '_elementor_edit_mode', 'builder');
 update_post_meta($id, '_elementor_template_type', 'footer');
 wp_set_object_terms($id, 'footer', 'elementor_library_type');
 update_post_meta($id, '_elementor_data', wp_slash(wp_json_encode([['id' => 'f00ter1', 'elType' => 'widget', 'widgetType' => 'heading', 'settings' => ['title' => 'Piede italiano'], 'elements' => []]])));
-update_post_meta($id, '_elementor_conditions', ['include/general']);
+update_post_meta($id, '_elementor_conditions', ['include/singular/front_page']);
 $conditions = (array) get_option('elementor_pro_theme_builder_conditions', []);
-$conditions['footer'][$id] = ['include/general'];
+$conditions['footer'][$id] = ['include/singular/front_page'];
 update_option('elementor_pro_theme_builder_conditions', $conditions);
 echo $id;` ) );
 	created.push( footer );

@@ -14,6 +14,7 @@ npm test                 # all of them
 npm run test:widgets     # typed fields, fallbacks, languages, markup filtering, the editor's fields
 npm run test:editor      # reveal for a visitor, everything visible in the editor, preview follows the panel
 npm run test:languages   # Theme Builder per language (skipped without Elementor Pro)
+npm run test:contact     # the contact form: refused, sent with and without a script, Mailpit
 npm run test:a11y        # axe on every kind of page, desktop and phone, every language
 ```
 

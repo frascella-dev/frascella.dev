@@ -9,8 +9,7 @@
  *
  *   npm run test:editor
  */
-import { chromium } from 'playwright';
-import { BASE, check, finish, homes, login, openEditor, text } from './_harness.mjs';
+import { BASE, check, finish, homes, launch, login, openEditor, text } from './_harness.mjs';
 
 const { it } = homes();
 /**
@@ -23,13 +22,13 @@ const visible = ( frame ) => frame.evaluate( ( selector ) => [ ...document.query
 	return s.getBoundingClientRect().height > 40 && hidden === 0;
 } ), SECTIONS );
 
-const browser = await chromium.launch();
+const browser = await launch();
 try {
 	// A short window, so the revealed section starts below the fold.
 	const visitor = await ( await browser.newContext( { viewport: { width: 1280, height: 480 } } ) ).newPage();
 	await visitor.goto( `${ BASE }/`, { waitUntil: 'networkidle' } );
 	const before = await visitor.evaluate( () => getComputedStyle( document.querySelector( '.frascella-reveal > .e-con-inner > .elementor-element, .frascella-reveal > .elementor-element' ) ).opacity );
-	for ( let y = 0; y < 4000; y += 300 ) {
+	for ( let y = 0; y < 12000; y += 300 ) {
 		await visitor.mouse.wheel( 0, 300 );
 		await visitor.waitForTimeout( 80 );
 	}
@@ -48,11 +47,12 @@ try {
 	check( 'editor: the preview is marked as editing', await frame.evaluate( () => document.documentElement.classList.contains( 'editing' ) ) );
 
 	await page.evaluate( () => {
-		const find = ( c ) => ( c.model?.get?.( 'widgetType' ) === 'heading' && ( c.model.get( 'settings' ).get( '_css_classes' ) || '' ).includes( 'display' ) ) ? c : ( c.children || [] ).map( find ).find( Boolean );
+		const find = ( c ) => ( c.model?.get?.( 'widgetType' ) === 'heading' && ( c.model.get( 'settings' ).get( '_css_classes' ) || '' ).includes( 'hero-rest' ) ) ? c : ( c.children || [] ).map( find ).find( Boolean );
 		window.$e.run( 'document/elements/settings', { container: find( window.elementor.getPreviewContainer() ), settings: { title: 'Dall’editor' } } );
 	} );
 	await page.waitForTimeout( 1200 );
-	check( 'editor: the preview follows the panel', ( await frame.locator( 'h1' ).first().textContent() ).includes( 'Dall’editor' ) );
+	check( 'editor: the preview follows the panel', ( await frame.locator( '.hero-rest' ).first().textContent() ).includes( 'Dall’editor' ) );
+	check( 'editor: no desk and no sheet over the page being written', await frame.evaluate( () => ! document.querySelector( '#desk, #sheet' ) && ! document.documentElement.classList.contains( 'cutting' ) ) );
 } finally {
 	await browser.close();
 }

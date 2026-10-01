@@ -9,6 +9,7 @@
  *   BASE=http://localhost:8110 WP_USER=admin WP_PASS=admin node tests/e2e/<test>.mjs
  */
 import { execFileSync } from 'node:child_process';
+import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -43,6 +44,17 @@ export const finish = () => {
 };
 
 export const text = ( url ) => fetch( BASE + url ).then( ( r ) => r.text() );
+
+/**
+ * A browser for the page's tests, without WebGL.
+ *
+ * The home page draws a 3D desk; a headless browser draws it in software, on the page's
+ * main thread, and every frame of it delays the test's own clicks until they time out.
+ * Without WebGL the desk shows its still pictures (`html.desk-fallback`), which is a state
+ * a visitor can be in too. The desk's own tests (themes/frascella/assets/src/desk/test)
+ * run with WebGL.
+ */
+export const launch = () => chromium.launch( { args: [ '--disable-3d-apis' ] } );
 
 /** The front page's id, and its English translation's. */
 export const homes = () => {
