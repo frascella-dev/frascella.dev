@@ -69,8 +69,10 @@
     max-width: var(--measure);
 }
 
+/* A link inside a sentence is underlined: its colour alone does not tell it apart (WCAG 1.4.1). */
 .contact-form .form-note a {
     color: var(--text);
+    text-decoration: underline;
 }
 
 .contact-form .form-status {

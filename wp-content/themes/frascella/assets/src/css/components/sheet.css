@@ -242,6 +242,17 @@ html:not(.cutting) .cut {
     height: 100svh;
 }
 
+/* In Elementor's editor there is no desk to look at: the intermezzo is a short placeholder,
+   so the sections around it stay close enough to edit. */
+html.editing .desk-int {
+    height: 40vh;
+    border: 1px dashed var(--line);
+}
+
+html.editing .hold {
+    height: 50%;
+}
+
 /* The hotspots: dots only, moved onto their objects by the scene every frame the camera moves. */
 .hotspots {
     position: fixed;
