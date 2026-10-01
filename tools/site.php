@@ -104,7 +104,7 @@ $it = [
     'ids' => ['services' => 'servizi', 'works' => 'lavori', 'bio' => 'chi-sono', 'contact' => 'contatti'],
     'privacy' => 'Informativa privacy',
     // The notice's own description (search results), instead of its first lines.
-    'privacyExcerpt' => 'Cosa fa questo sito con i dati di chi lo visita: il modulo di contatto, un solo cookie tecnico, nessuna statistica e nessun servizio di terze parti.',
+    'privacyExcerpt' => 'Cosa fa questo sito con i dati di chi lo visita: il modulo di contatto, le statistiche senza cookie e, solo con il consenso, con due cookie; nessun servizio di terze parti.',
     'projects' => [
         ['seveninktattoo-it', 'seveninktattoo.it', 'cliente', 'Sito per uno studio di tatuaggi di Taranto, in WordPress ed Elementor. Gestisce richieste di appuntamento, recensioni, newsletter e FAQ senza appoggiarsi a servizi esterni, quindi i dati restano sul server dello studio.', 'WordPress · Elementor', 'online', 'https://seveninktattoo.it', 'sevenink-home.webp', 'La home page di seveninktattoo.it'],
         // A proprietary project: no technologies (COPY.md, Registro); the card leaves the line out.
@@ -151,7 +151,7 @@ $en = [
     'menu' => [['services', '#services'], ['work', '#work'], ['about', '#about']],
     'ids' => ['services' => 'services', 'works' => 'work', 'bio' => 'about', 'contact' => 'contact'],
     'privacy' => 'Privacy notice',
-    'privacyExcerpt' => 'What this site does with its visitors’ data: the contact form, a single technical cookie, no statistics and no third-party services.',
+    'privacyExcerpt' => 'What this site does with its visitors’ data: the contact form, statistics without cookies and, only with consent, with two cookies; no third-party services.',
     'projects' => [
         ['seveninktattoo-it', 'seveninktattoo.it', 'client', 'Website for a tattoo studio in Taranto, built with WordPress and Elementor. It handles appointment requests, reviews, the newsletter and the FAQ without relying on external services, so the data stays on the studio’s own server.', 'WordPress · Elementor', 'live', 'https://seveninktattoo.it', 'sevenink-home.webp', 'The seveninktattoo.it home page'],
         ['skeda-fit', 'skeda.fit', 'co-founder', 'An app for freelance personal trainers, with workout plans, set logging at the gym, chat, check-ins and a public profile on a map. It hasn’t launched yet, and the waitlist is open.', '', 'in development', 'https://skeda.fit', 'skeda-home.webp', 'The skeda.fit home page'],
@@ -180,18 +180,34 @@ $privacy = [
 <p>Per proteggere il modulo da invii automatici il sito usa un campo nascosto, un controllo sul tempo di compilazione e un limite al numero di invii. Il limite si basa sull’indirizzo IP, che non viene mai salvato: è trasformato in un codice (un hash con una chiave che cambia ogni giorno) conservato al massimo per un’ora. Per evitare doppi invii, un secondo messaggio dallo stesso indirizzo email nei 15 minuti successivi non viene accettato.</p>
 <h2>Il fruscio del vinile</h2>
 <p>Il suono del giradischi sulla scrivania («audio on / off») è generato dal browser, sul momento: il sito non scarica alcun file audio, non registra nulla e non riceve nulla.</p>
+<h2>Le statistiche</h2>
+<p>Il sito misura le visite con Analytics, il servizio di statistiche del titolare, all’indirizzo <code>analytics.frascella.dev</code>: un servizio installato e gestito dal titolare sul proprio server, non di terzi. Lo script che misura le visite si scarica da quell’indirizzo; chi è collegato al pannello del sito come autore o amministratore non viene contato.</p>
+<h3>Senza consenso</h3>
+<p>Per ogni pagina vista il browser invia al servizio: l’indirizzo della pagina (senza parametri diversi da <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> e <code>ref</code>, e ripulito da indirizzi email e numeri lunghi), il sito di provenienza (solo il nome del dominio), il tempo passato sulla pagina e quanto è stata scorsa, i clic sui link verso altri siti (l’indirizzo del link) e l’invio del modulo di contatto (solo che è avvenuto: mai il contenuto dei campi).</p>
+<p>Il servizio ricava dalla richiesta il tipo di dispositivo, il sistema operativo e il browser (famiglia e versione principale) e il paese (due lettere). L’indirizzo IP viene accorciato prima di ogni uso e non viene mai salvato; per contare i visitatori di un giorno il servizio usa un codice (un hash) calcolato con una chiave che cambia ogni giorno e poi viene distrutta, quindi non è possibile riconoscere la stessa persona in giorni diversi. A questo livello il sito non scrive nulla nel browser: nessun cookie, nessuna memoria locale.</p>
+<p>Base giuridica: il legittimo interesse del titolare a sapere come viene letto il sito (art. 6, par. 1, lett. f) GDPR), con dati che non identificano chi visita.</p>
+<h3>Con il consenso</h3>
+<p>Alla prima visita un riquadro chiede se accettare i cookie di statistica. Solo se si accetta, il sito scrive due cookie (<code>an_vid</code> e <code>an_sid</code>, nella tabella sotto) che permettono di riconoscere una visita successiva e di raggruppare le pagine di una stessa visita. Rifiutare, o chiudere il riquadro, equivale a non accettare: i cookie di statistica non vengono scritti, o vengono cancellati se c’erano. Il sito ricorda la scelta per 180 giorni, poi la chiede di nuovo.</p>
+<p>Se il browser invia il segnale Global Privacy Control, o Do Not Track, il riquadro non compare e i cookie di statistica non vengono mai scritti.</p>
+<p>Base giuridica: il consenso (art. 6, par. 1, lett. a) GDPR e art. 122 Codice Privacy). La scelta si cambia in ogni momento con il link «cookie» in fondo a ogni pagina, che riapre il riquadro.</p>
+<h3>Conservazione e destinatari</h3>
+<p>I dati delle statistiche sono conservati per <strong>13 mesi</strong> e poi cancellati. Li legge solo il titolare, in forma aggregata: il servizio non mostra le visite di una singola persona. Non sono usati per profilazione né per pubblicità, non vengono incrociati con altri dati e non vengono ceduti a nessuno.</p>
 <h2 id="cookie">Cookie</h2>
-<p>Il sito usa un solo cookie per chi lo visita. È un cookie tecnico, impostato soltanto da chi invia il modulo, e per questo non richiede consenso né un banner (art. 122 Codice Privacy; Garante, linee guida cookie del 10 giugno 2021).</p>
+<p>Il sito usa questi cookie, tutti propri (di <code>frascella.dev</code>), nessuno di terzi. Senza consenso solo il primo e, per chi invia il modulo, l’ultimo, entrambi tecnici (art. 122 Codice Privacy; Garante, linee guida cookie del 10 giugno 2021).</p>
 <table>
-<thead><tr><th scope="col">Nome</th><th scope="col">Funzione</th><th scope="col">Durata</th></tr></thead>
-<tbody><tr><td><code>agenda_draft</code></td><td>Collega l’invio del modulo alla conferma che segue. Contiene un codice casuale; il server ne conserva soltanto un hash.</td><td>Fino alla conferma dell’invio, o alla chiusura del browser.</td></tr></tbody>
+<thead><tr><th scope="col">Nome</th><th scope="col">Funzione</th><th scope="col">Durata</th><th scope="col">Consenso</th></tr></thead>
+<tbody>
+<tr><td><code>an_consent</code></td><td>Ricorda la scelta sui cookie di statistica (accettati o rifiutati) e la versione del riquadro a cui si riferisce. Scritto solo dopo la scelta.</td><td>180 giorni</td><td>No, tecnico</td></tr>
+<tr><td><code>an_vid</code></td><td>Statistiche: un codice casuale che riconosce una visita successiva dallo stesso browser.</td><td>13 mesi, non prolungati</td><td>Sì</td></tr>
+<tr><td><code>an_sid</code></td><td>Statistiche: un codice casuale che raggruppa le pagine di una stessa visita.</td><td>30 minuti dall’ultima pagina</td><td>Sì</td></tr>
+<tr><td><code>agenda_draft</code></td><td>Collega l’invio del modulo alla conferma che segue. Contiene un codice casuale; il server ne conserva soltanto un hash.</td><td>Fino alla conferma dell’invio, o alla chiusura del browser</td><td>No, tecnico</td></tr>
+</tbody>
 </table>
 <p>Chi accede al pannello di amministrazione riceve inoltre i cookie di accesso di WordPress; i visitatori no.</p>
 <h2>Quello che il sito non fa</h2>
 <ul>
-<li>Non misura le visite: non ci sono statistiche né strumenti di analisi.</li>
-<li>Non carica nulla da altri siti: caratteri tipografici, script e immagini sono serviti da questo dominio. Nessuna pubblicità, nessun pulsante social, nessun video o mappa di terze parti.</li>
-<li>Non usa cookie di profilazione o di terze parti, e non conserva altro nel browser.</li>
+<li>Non carica nulla da siti di terzi: caratteri tipografici, script e immagini sono serviti da questo dominio, e lo script delle statistiche da <code>analytics.frascella.dev</code>, il servizio del titolare. Nessuna pubblicità, nessun pulsante social, nessun video o mappa di terze parti.</li>
+<li>Non usa cookie di profilazione o di terze parti, e non conserva altro nel browser oltre ai cookie elencati sopra.</li>
 <li>Non cede né vende i dati a nessuno.</li>
 </ul>
 <h2>Il server</h2>
@@ -218,18 +234,34 @@ $privacy['en'] = <<<'HTML'
 <p>To protect the form from automated submissions the site uses a hidden field, a check on the time taken to fill it in and a limit on the number of submissions. The limit is based on the IP address, which is never stored: it is turned into a code (a hash with a key that changes every day) kept for one hour at most. To avoid duplicates, a second message from the same email address within the following 15 minutes is not accepted.</p>
 <h2>The vinyl crackle</h2>
 <p>The sound of the record player on the desk («audio on / off») is generated by the browser, on the spot: the site downloads no audio file, records nothing and receives nothing.</p>
+<h2>Statistics</h2>
+<p>The site measures visits with Analytics, the controller’s own statistics service, at <code>analytics.frascella.dev</code>: a service installed and run by the controller on their own server, not a third party’s. The script that measures visits is downloaded from that address; people signed in to the site’s panel as authors or administrators are not counted.</p>
+<h3>Without consent</h3>
+<p>For every page viewed the browser sends the service: the page’s address (without parameters other than <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code>, <code>utm_content</code>, <code>utm_term</code> and <code>ref</code>, and cleaned of email addresses and long numbers), the referring site (its domain name only), the time spent on the page and how far it was scrolled, clicks on links to other sites (the link’s address) and the sending of the contact form (only that it happened: never what the fields contain).</p>
+<p>From the request the service derives the type of device, the operating system and the browser (family and major version) and the country (two letters). The IP address is shortened before any use and never stored; to count a day’s visitors the service uses a code (a hash) computed with a key that changes every day and is then destroyed, so the same person cannot be recognised on different days. At this level the site writes nothing in the browser: no cookies, no local storage.</p>
+<p>Legal basis: the controller’s legitimate interest in knowing how the site is read (Art. 6(1)(f) GDPR), with data that does not identify visitors.</p>
+<h3>With consent</h3>
+<p>On a first visit a box asks whether to accept statistics cookies. Only if they are accepted does the site set two cookies (<code>an_vid</code> and <code>an_sid</code>, in the table below), which recognise a later visit and group the pages of one visit. Rejecting, or closing the box, means not accepting: the statistics cookies are not set, or are deleted if they were there. The site remembers the choice for 180 days, then asks again.</p>
+<p>If the browser sends the Global Privacy Control or Do Not Track signal, the box does not appear and the statistics cookies are never set.</p>
+<p>Legal basis: consent (Art. 6(1)(a) GDPR and Art. 122 of the Italian Privacy Code). The choice can be changed at any time with the «cookies» link at the foot of every page, which reopens the box.</p>
+<h3>Retention and recipients</h3>
+<p>Statistics data is kept for <strong>13 months</strong> and then deleted. Only the controller reads it, in aggregate: the service does not show the visits of any single person. It is not used for profiling or advertising, not combined with other data and not passed on to anyone.</p>
 <h2 id="cookies">Cookies</h2>
-<p>The site uses a single cookie for its visitors. It is a technical cookie, set only for someone who sends the form, and therefore needs neither consent nor a banner (Art. 122 of the Italian Privacy Code; Garante, cookie guidelines of 10 June 2021).</p>
+<p>The site uses these cookies, all its own (<code>frascella.dev</code>’s), none of a third party. Without consent only the first and, for someone who sends the form, the last, both technical (Art. 122 of the Italian Privacy Code; Garante, cookie guidelines of 10 June 2021).</p>
 <table>
-<thead><tr><th scope="col">Name</th><th scope="col">Purpose</th><th scope="col">Duration</th></tr></thead>
-<tbody><tr><td><code>agenda_draft</code></td><td>Links the sending of the form to the confirmation that follows. It holds a random code; the server keeps only a hash of it.</td><td>Until the sending is confirmed, or the browser is closed.</td></tr></tbody>
+<thead><tr><th scope="col">Name</th><th scope="col">Purpose</th><th scope="col">Duration</th><th scope="col">Consent</th></tr></thead>
+<tbody>
+<tr><td><code>an_consent</code></td><td>Remembers the choice about statistics cookies (accepted or rejected) and the version of the box it refers to. Set only after the choice.</td><td>180 days</td><td>No, technical</td></tr>
+<tr><td><code>an_vid</code></td><td>Statistics: a random code that recognises a later visit from the same browser.</td><td>13 months, not extended</td><td>Yes</td></tr>
+<tr><td><code>an_sid</code></td><td>Statistics: a random code that groups the pages of one visit.</td><td>30 minutes from the last page</td><td>Yes</td></tr>
+<tr><td><code>agenda_draft</code></td><td>Links the sending of the form to the confirmation that follows. It holds a random code; the server keeps only a hash of it.</td><td>Until the sending is confirmed, or the browser is closed</td><td>No, technical</td></tr>
+</tbody>
 </table>
 <p>Whoever signs in to the administration panel also receives WordPress’s sign-in cookies; visitors do not.</p>
 <h2>What the site does not do</h2>
 <ul>
-<li>It does not measure visits: there are no statistics and no analytics tools.</li>
-<li>It loads nothing from other sites: typefaces, scripts and images are served from this domain. No advertising, no social buttons, no third-party videos or maps.</li>
-<li>It uses no profiling or third-party cookies, and stores nothing else in the browser.</li>
+<li>It loads nothing from third-party sites: typefaces, scripts and images are served from this domain, and the statistics script from <code>analytics.frascella.dev</code>, the controller’s own service. No advertising, no social buttons, no third-party videos or maps.</li>
+<li>It uses no profiling or third-party cookies, and stores nothing else in the browser beyond the cookies listed above.</li>
 <li>It does not pass on or sell data to anyone.</li>
 </ul>
 <h2>The server</h2>
@@ -514,6 +546,24 @@ if (defined('ELEMENTOR_PRO_VERSION')) {
         }
         $say("✓ $type (Theme Builder)");
     }
+}
+
+/* The statistics (Analytics for WordPress) ------------------------------------------------------ */
+
+// The service and how the tracker loads. The public key (pk_…) and the API key come from the
+// service and are not known here: a key already set is kept, and without one the plugin
+// loads nothing. The site's settings and its banner on the service: tools/analytics/site.json.
+if (function_exists('analytics_connector_get_settings')) {
+    $current = analytics_connector_get_settings();
+    update_option('analytics_connector_settings', [
+        'service_url' => 'https://analytics.frascella.dev',
+        'public_key' => (string) ($current['public_key'] ?? ''),
+        'mode' => 'direct',
+        'proxy_path' => '/stats/',
+        'skip_capability' => 'edit_posts',
+        'global_name' => 'analytics',
+    ]);
+    $say('✓ statistics (' . (($current['public_key'] ?? '') !== '' ? 'public key set' : 'no public key yet: nothing loads') . ')');
 }
 
 /* The contact form (Agenda), hosted by the home page ------------------------------------------- */

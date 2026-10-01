@@ -58,7 +58,10 @@ $arrow = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-widt
                 <h2 class="colophon-h" id="colophon-legal"><?= frascella_e(frascella_s('footer.legalHeading')) ?></h2>
                 <ul>
                     <li><a href="<?= esc_url($privacy) ?>"><?= frascella_e(frascella_s('footer.privacy')) ?></a></li>
-                    <li><a href="<?= esc_url($privacy . '#' . frascella_s('footer.cookieAnchor')) ?>"><?= frascella_e(frascella_s('footer.cookie')) ?></a></li>
+                    <?php /* With the statistics on the page, "cookie" reopens their consent banner (the tracker
+                             handles any element with data-analytics-consent); without them it is the notice's
+                             cookie section, where the link leads anyway. */ ?>
+                    <li><a href="<?= esc_url($privacy . '#' . frascella_s('footer.cookieAnchor')) ?>"<?= function_exists('frascella_analytics_active') && frascella_analytics_active() ? ' data-analytics-consent' : '' ?>><?= frascella_e(frascella_s('footer.cookie')) ?></a></li>
                 </ul>
             </nav>
         <?php endif; ?>

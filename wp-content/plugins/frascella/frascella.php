@@ -45,6 +45,7 @@ if (!defined('PLL_COOKIE')) {
 require FRASCELLA_DIR . 'inc/facts.php';      // the business's facts, in one option
 require FRASCELLA_DIR . 'inc/projects.php';   // the projects the home page shows
 require FRASCELLA_DIR . 'inc/agenda.php';     // Agenda: where a request's email goes
+require FRASCELLA_DIR . 'inc/analytics.php';  // the statistics service: is it on the page, and its referrer policy
 require FRASCELLA_DIR . 'inc/media.php';      // a photograph's alt text in every language
 require FRASCELLA_DIR . 'inc/polylang.php';   // the languages: what is translatable, and its addresses
 require FRASCELLA_DIR . 'inc/elementor.php';  // the widgets, the dynamic tags, the Kit

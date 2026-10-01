@@ -39,6 +39,21 @@ else
     bin/wp plugin install "$AGENDA_ZIP" --activate >/dev/null || echo "! Agenda not installed: the contact poster has no form (AGENDA_ZIP=…)."
 fi
 
+# Analytics for WordPress (frascella-dev/analytics): the statistics and their consent banner.
+# From its release with gh (the repository may be private), or from a zip on this machine
+# (ANALYTICS_ZIP=/path/to/analytics-connector.zip).
+if [ -z "${ANALYTICS_ZIP:-}" ] && command -v gh >/dev/null; then
+    gh release download wordpress-plugin-v1.0.0 -R frascella-dev/analytics -p 'analytics-connector-*.zip' -O wp-content/plugins/frascella/.analytics.zip --clobber \
+        && ANALYTICS_ZIP=wp-content/plugins/frascella/.analytics.zip || true
+fi
+if [ -n "${ANALYTICS_ZIP:-}" ] && [ -f "$ANALYTICS_ZIP" ]; then
+    [ "$ANALYTICS_ZIP" = wp-content/plugins/frascella/.analytics.zip ] || cp "$ANALYTICS_ZIP" wp-content/plugins/frascella/.analytics.zip
+    bin/wp plugin install /var/www/html/wp-content/plugins/frascella/.analytics.zip --activate >/dev/null
+    rm -f wp-content/plugins/frascella/.analytics.zip
+else
+    echo "! Analytics for WordPress not installed (gh release download, or ANALYTICS_ZIP=…)."
+fi
+
 # The build the theme reads its stylesheets from, and the panel's.
 (cd wp-content/themes/frascella && npm install --silent && npm run build --silent)
 
