@@ -1,25 +1,95 @@
-/* Documents: a page of prose, the 404. */
+/* Documents: a page of prose (the privacy notice), the 404. On Ink, like the rest of the
+ * site, held to a reading measure on the page's grid. */
+
+.doc {
+    padding: clamp(3.5rem, 9vw, 7rem) var(--page-margin) clamp(3rem, 7vw, 6rem);
+}
+
+.doc-inner {
+    max-width: 46rem;
+}
 
 .page-title {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5em;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: var(--t5);
+    line-height: var(--lh5);
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+}
+
+.doc .prose {
+    color: var(--soft);
 }
 
 .prose h2,
 .prose h3 {
     margin-top: 2em;
+    color: var(--text);
     font-family: var(--font-heading);
     font-weight: 400;
-    line-height: 1.2;
+    line-height: var(--lh3);
 }
 
 .prose h2 {
-    font-size: 1.6rem;
+    font-size: var(--t2);
+}
+
+.prose h3 {
+    font-size: var(--t1);
 }
 
 .prose a {
+    color: var(--text);
     text-decoration-thickness: 1px;
 }
 
+.prose ul {
+    padding-left: 1.2em;
+}
+
+.prose li + li {
+    margin-top: 0.4em;
+}
+
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.prose th,
+.prose td {
+    padding: 0.6em 0.75em 0.6em 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.prose th {
+    color: var(--meta);
+    font-weight: 500;
+}
+
+.prose .note {
+    color: var(--meta);
+    font-size: var(--t-1);
+}
+
 .not-found {
-    min-height: 60vh;
+    min-height: 70vh;
+}
+
+.not-found .rh {
+    margin-bottom: 1em;
+}
+
+.not-found .page-title {
+    margin-bottom: 1em;
+}
+
+.not-found a {
+    color: var(--text);
 }

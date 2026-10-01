@@ -224,6 +224,20 @@ function frascella_og_image(): ?array
 }
 
 /**
+ * The two Latin font files, preloaded: the stylesheet names them only once it has arrived
+ * and been parsed, and the opening's words (the LCP) wait for them. The Latin-extended
+ * files load only when a page has such a letter.
+ */
+add_action('wp_head', static function (): void {
+    foreach (['assets/fonts/schibsted-grotesk-latin.woff2', 'assets/fonts/gloock-latin.woff2'] as $key) {
+        $file = (string) (frascella_manifest()[$key]['file'] ?? '');
+        if ($file !== '') {
+            printf('<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin />' . "\n", esc_url(frascella_dist_url($file)));
+        }
+    }
+}, 5);
+
+/**
  * The boot script: blocking on purpose, and tiny.
  *
  * The stylesheet holds back what the reveal layer brings in only under `html.motion`, so

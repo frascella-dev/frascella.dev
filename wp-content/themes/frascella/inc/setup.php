@@ -31,9 +31,22 @@ add_action('after_setup_theme', static function (): void {
      * all of them (inc/tokens.php). Add a plugin's own switches next to its email key —
      * for instance `'styles' => false` when the theme draws its front end itself.
      */
-    foreach (['agenda', 'voci', 'chiaro'] as $plugin) {
+    foreach (['voci', 'chiaro'] as $plugin) {
         add_theme_support($plugin, ['email' => frascella_email_tokens()]);
     }
+
+    /*
+     * Agenda (requests): the theme draws its form (agenda/forms/contatti/*) and styles it
+     * in the page's bundle, so Agenda's stylesheet stays off. Its script stays on: it is
+     * small, and it shows and hides fields by their conditions. No step name in the
+     * document title: the form lives in the home page, whose title is the site's.
+     */
+    add_theme_support('agenda', [
+        'styles' => false,
+        'scripts' => true,
+        'title' => false,
+        'email' => frascella_email_tokens(),
+    ]);
     add_theme_support('postino', frascella_email_tokens());
 });
 

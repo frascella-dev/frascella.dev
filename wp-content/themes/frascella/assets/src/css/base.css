@@ -1,11 +1,86 @@
-/* The reset, the two type voices, the page's furniture, and the reveal.
+/* The reset, the type scale, the grid, the two voices, the page's furniture, and the reveal.
  *
  * Colours and fonts are custom properties from tokens.generated.css (tokens.json); this
- * file never names a hex value. */
+ * file never names a hex value.
+ *
+ * Custom property names avoid Elementor's own (`--gap`, `--row-gap`, `--width`, `--padding-*`):
+ * a container redefines those on itself, and a theme variable of the same name would change
+ * value inside every container. */
 
 @import "./tokens.generated.css";
+@import "./fonts.css";
 
 @layer base, components;
+
+/* --- the type scale --------------------------------------------------------
+ *
+ * Text and UI (--t-1 … --t7): a modular scale, fluid in two straight segments and still
+ * between the anchors, capped above 2560 px:
+ *     width    base (--t0)   ratio
+ *      390 px   16.0 px      1.200   (phone: tighter steps, so big steps do not swamp it)
+ *     1440 px   17.5 px      1.250
+ *     2560 px   22.0 px      1.250   (large displays keep growing: 19.4 px at 1920)
+ * Each step is clamp(min, max(min(segment 390→1440, value@1440), segment 1440→2560), max).
+ *     step   390    1440   1920   2560   use
+ *     --t-1  13.3   14.0   15.5   17.6   captions, labels, nav, buttons, footer
+ *     --t0   16.0   17.5   19.4   22.0   body, hero lede, form fields, big buttons
+ *     --t1   19.2   21.9   24.3   27.5   contact lede, logo
+ *     --t3   27.6   34.2   37.9   43.0   band headings (h2/h3), facts
+ *     --t4   33.2   42.7   47.4   53.7   hero second line and project names (phone)
+ *     --t5   39.8   53.4   59.3   67.1   project names, services heading (phone), drawer
+ *     --t6   47.8   66.8   74.1   83.9   hero second line
+ *     --t7   57.3   83.4   92.6  104.9   services heading
+ *
+ * The cut-out words (--cut-s … --cut-xl) are a separate display scale, in viewport heights:
+ * lib/sheet.ts fits each word to its column and caps the block's height at its step. */
+
+:root {
+    --t-1: clamp(0.8333rem, max(min(0.8179rem + 0.0635vw, 0.875rem), 0.5857rem + 0.3214vw), 1.1rem);
+    --t0: clamp(1rem, max(min(0.9652rem + 0.1429vw, 1.0938rem), 0.7321rem + 0.4018vw), 1.375rem);
+    --t1: clamp(1.2rem, max(min(1.1379rem + 0.2548vw, 1.3672rem), 0.9152rem + 0.5022vw), 1.7188rem);
+    --t2: clamp(1.44rem, max(min(1.3401rem + 0.4099vw, 1.709rem), 1.144rem + 0.6278vw), 2.1484rem);
+    --t3: clamp(1.728rem, max(min(1.5764rem + 0.6221vw, 2.1362rem), 1.43rem + 0.7847vw), 2.6855rem);
+    --t4: clamp(2.0736rem, max(min(1.852rem + 0.9092vw, 2.6703rem), 1.7875rem + 0.9809vw), 3.3569rem);
+    --t5: clamp(2.4883rem, max(min(2.1728rem + 1.2945vw, 3.3379rem), 2.2343rem + 1.2262vw), 4.1962rem);
+    --t6: clamp(2.986rem, max(min(2.5453rem + 1.8078vw, 4.1723rem), 2.7929rem + 1.5327vw), 5.2452rem);
+    --t7: clamp(3.5832rem, max(min(2.9769rem + 2.4872vw, 5.2154rem), 3.4911rem + 1.9159vw), 6.5565rem);
+    --lh-1: 1.45;
+    --lh0: 1.55;
+    --lh1: 1.4;
+    --lh2: 1.25;
+    --lh3: 1.08;
+    --lh4: 1.02;
+    --lh5: 1;
+    --lh6: 0.98;
+    --lh7: 0.96;
+    --measure: 68ch;
+    --cut-s: 24svh;
+    --cut-m: 32svh;
+    --cut-l: 43svh;
+    --cut-xl: 57svh;
+
+    /* The grid (Sketch, page Web): 12 columns with 64 px margins and 48 px gutters at
+       1440, 4 columns with 17 px margins on a phone. */
+    --page-margin: clamp(16px, 4.4vw, 112px);
+    --gutter: clamp(1rem, 3.3333vw, 4.5rem);
+    --cols: 12;
+
+    /* The header grows with the type: 68 px at 1440, 86 px at 2560. */
+    --hh: calc(var(--t0) * 3.9);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --line: color-mix(in srgb, var(--text) 16%, transparent);
+
+    /* The desk scene's colours (assets/src/desk/CONTRACT.md §5). */
+    --desk-veil: var(--meta);
+    --desk-progress: var(--accent);
+    --desk-ground: var(--dark);
+}
+
+@media (max-width: 900px) {
+    :root {
+        --cols: 4;
+    }
+}
 
 @layer base {
     *,
@@ -14,23 +89,36 @@
         box-sizing: border-box;
     }
 
-    :root {
-        /* The page's side margin, once: the sheets, the header and the footer all use it,
-           so their content lines up. */
-        --gutter: clamp(1.25rem, 5vw, 4rem);
-    }
-
     html {
         -webkit-text-size-adjust: 100%;
-        scroll-padding-top: 5rem;
+        scroll-behavior: smooth;
+        scroll-padding-top: var(--hh);
+        scrollbar-color: var(--rule) var(--ground);
+        scrollbar-width: thin;
+        background: var(--ground);
     }
 
     body {
         margin: 0;
         background: var(--ground);
         color: var(--text);
-        font: 400 1.0625rem/1.65 var(--font-body);
+        font-family: var(--font-body);
+        font-size: var(--t0);
+        line-height: var(--lh0);
+        font-kerning: normal;
+        text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
+        caret-color: var(--accent);
+    }
+
+    ::selection {
+        background: var(--accent);
+        color: var(--accent-text);
+    }
+
+    ::placeholder {
+        color: var(--stone);
+        opacity: 1;
     }
 
     img,
@@ -43,7 +131,8 @@
 
     a {
         color: inherit;
-        text-underline-offset: 0.2em;
+        text-underline-offset: 0.22em;
+        text-decoration-thickness: 1px;
     }
 
     :focus-visible {
@@ -53,102 +142,110 @@
 
     h1,
     h2,
-    h3,
+    h3 {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        margin: 0;
+    }
+
     p {
         margin: 0;
     }
 }
 
-/* --- the two voices ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
 
-/* Every headline. A native Heading with this class is dressed by it: the plugin's
+/* --- the grid ------------------------------------------------------------- */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gutter);
+}
+
+/* --- the voices ------------------------------------------------------------ */
+
+/* A headline. A native Heading with this class is dressed by it: the plugin's
    elementor.css makes the `<h2>` inside inherit from the widget's wrapper. */
 .display {
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: clamp(2rem, 4.5vw, 3.5rem);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    font-size: var(--t3);
+    line-height: var(--lh3);
+    letter-spacing: -0.008em;
     text-wrap: balance;
 }
 
-.display em {
-    font-style: italic;
-}
-
-/* Labels and meta lines, spaced so they read as annotation.
- *
- * Every margin a class sets, it also says in `--frascella-margin`: Elementor zeroes a widget's
- * margins at a weight no class reaches, and the plugin's elementor.css hands the variable
- * back to it. One declaration for the theme's own markup, one for a native widget with
- * the same class. */
-.eyebrow {
-    margin-bottom: 1rem;
-    --frascella-margin: 0 0 1rem;
+/* A running head: the small label at the start of a band ("Servizi", "Taranto · CET"). */
+.rh {
+    display: flex;
+    gap: 0.6em;
+    align-items: baseline;
     color: var(--meta);
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    letter-spacing: 0.02em;
 }
 
-/* Reading measure. `--frascella-max` says the same measure to Elementor, which otherwise holds
-   every widget to `max-width: 100%` at a weight no class of the theme reaches (see the
-   plugin's assets/elementor.css). The same goes for margins and `--frascella-margin`. */
-.prose,
-.prose-each > p {
-    max-width: 62ch;
-    --frascella-max: 62ch;
+/* A number in vermilion: "01", "02". */
+.no {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--t0);
+    line-height: 1;
+    font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Running text, held to its measure. Every class that sets a measure or a margin says it
+   again in `--frascella-max` / `--frascella-margin`, which the plugin's elementor.css hands to
+   Elementor (it holds every widget to 100 % and no margin, at a weight no class reaches). */
+.txt,
+.prose {
+    max-width: var(--measure);
+    --frascella-max: var(--measure);
+    color: var(--soft);
     text-wrap: pretty;
 }
 
-.prose > * + *,
-.prose-each > p + p {
-    margin-top: 1em;
+.txt > p + p,
+.prose > * + * {
+    margin-top: 0.75em;
 }
 
-/* --- furniture ------------------------------------------------------------ */
-
-.sheet {
-    padding: clamp(3.5rem, 9vw, 7rem) var(--gutter);
-}
-
-.sheet--dark {
-    background: var(--dark);
-    color: var(--on-dark);
-}
-
-.measure {
-    max-width: 72rem;
-    margin-inline: auto;
-}
-
-.skip-link {
-    position: absolute;
-    left: 1rem;
-    top: -10rem;
-    z-index: 100;
-    padding: 0.75rem 1rem;
-    background: var(--surface);
-    color: var(--text);
-}
-
-.skip-link:focus {
-    top: 1rem;
-}
-
-.link-cue {
-    font-size: 0.875rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
+/* Visually hidden, still read. */
+.sr,
 .visually-hidden {
     position: absolute;
     width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
+    clip: rect(0 0 0 0);
     clip-path: inset(50%);
     white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: fixed;
+    left: var(--page-margin);
+    top: -10rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--text);
+    color: var(--ground);
+    font-size: var(--t-1);
+}
+
+.skip-link:focus {
+    top: 0.75rem;
 }
 
 /* --- the reveal ------------------------------------------------------------
@@ -164,10 +261,10 @@ html.motion [data-reveal],
 html.motion .frascella-reveal > .elementor-element,
 html.motion .frascella-reveal > .e-con-inner > .elementor-element {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translateY(1rem);
     transition:
-        opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.9s var(--ease),
+        transform 0.9s var(--ease);
     transition-delay: var(--reveal-delay, 0s);
 }
 

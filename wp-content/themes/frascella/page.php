@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 get_header();
 the_post();
 ?>
-<main id="content">
+<main id="content"<?= frascella_page_is_built() ? '' : ' class="doc-main"' ?>>
     <?php frascella_document('single', 'page-body'); ?>
 </main>
 <?php

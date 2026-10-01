@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 $GLOBALS['frascella_no_footer'] = true;
 get_header();
 ?>
-<main id="content">
+<main id="content" class="doc-main">
     <?php if (!frascella_location('single')) : ?>
         <?php get_template_part('template-parts/not-found'); ?>
     <?php endif; ?>

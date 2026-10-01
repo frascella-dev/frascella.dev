@@ -154,24 +154,40 @@ function frascella_entry_for_document(int $id): string
     return '';
 }
 
-add_action('wp_enqueue_scripts', static function (): void {
-    $entry = frascella_entry();
-    $chunk = frascella_chunk($entry);
-    if ($chunk === null) {
-        return;
+/**
+ * The entries this request loads: the page's own, then any a page needs next to it — the
+ * desk scene (`desk`) where the stage is printed (inc/desk.php). Its own entry, so a page
+ * without the desk never downloads it.
+ *
+ * @return list<string>
+ */
+function frascella_entries(): array
+{
+    $entries = [frascella_entry()];
+    if (function_exists('frascella_has_desk') && frascella_has_desk() && frascella_chunk('desk') !== null) {
+        $entries[] = 'desk';
     }
 
+    return $entries;
+}
+
+add_action('wp_enqueue_scripts', static function (): void {
     // After Elementor's stylesheets and the plugin's corrections to them (frascella-elementor),
     // so that a native widget carrying one of this theme's classes is dressed by the class.
     $after = wp_style_is('frascella-elementor', 'registered') ? ['frascella-elementor'] : [];
-    foreach (frascella_entry_styles($entry) as $i => $file) {
-        wp_enqueue_style("frascella-$entry-$i", frascella_dist_url($file), $i === 0 ? $after : [], null);
+    foreach (frascella_entries() as $entry) {
+        $chunk = frascella_chunk($entry);
+        if ($chunk === null) {
+            continue;
+        }
+        foreach (frascella_entry_styles($entry) as $i => $file) {
+            wp_enqueue_style("frascella-$entry-$i", frascella_dist_url($file), $i === 0 ? $after : [], null);
+        }
+        wp_enqueue_script("frascella-$entry", frascella_dist_url((string) $chunk['file']), [], null, [
+            'strategy' => 'defer',
+            'in_footer' => true,
+        ]);
     }
-
-    wp_enqueue_script("frascella-$entry", frascella_dist_url((string) $chunk['file']), [], null, [
-        'strategy' => 'defer',
-        'in_footer' => true,
-    ]);
 }, 10);
 
 /**
@@ -193,7 +209,48 @@ add_action('wp_head', static function (): void {
     foreach (frascella_entry_preloads(frascella_entry()) as $file) {
         printf('<link rel="modulepreload" href="%s" />' . "\n", esc_url(frascella_dist_url($file)));
     }
+    // The desk's scene chunks (three.js among them), which its entry imports after the first
+    // paint: fetched early and at low priority, so they download while the page renders and
+    // never compete with the stylesheet, the fonts or the text that is the LCP
+    // (assets/src/desk/CONTRACT.md §1).
+    if (in_array('desk', frascella_entries(), true)) {
+        foreach (frascella_dynamic_preloads('desk') as $file) {
+            printf('<link rel="modulepreload" href="%s" fetchpriority="low" />' . "\n", esc_url(frascella_dist_url($file)));
+        }
+    }
 }, 6);
+
+/**
+ * The chunks an entry imports dynamically, and what those import in turn, depth-first.
+ *
+ * @return list<string>
+ */
+function frascella_dynamic_preloads(string $entry): array
+{
+    $chunk = frascella_chunk($entry);
+    if ($chunk === null) {
+        return [];
+    }
+    $seen = [];
+    $walk = static function (string $key) use (&$walk, &$seen): void {
+        if (isset($seen[$key])) {
+            return;
+        }
+        $seen[$key] = true;
+        foreach ((array) (frascella_manifest()[$key]['imports'] ?? []) as $next) {
+            $walk((string) $next);
+        }
+    };
+    foreach ((array) ($chunk['dynamicImports'] ?? []) as $key) {
+        $walk((string) $key);
+    }
+    $own = array_flip(frascella_entry_preloads($entry));
+
+    return array_values(array_filter(array_map(
+        static fn (string $key): string => (string) (frascella_manifest()[$key]['file'] ?? ''),
+        array_keys($seen),
+    ), static fn (string $file): bool => $file !== '' && !isset($own[$file])));
+}
 
 /** A built theme is a built theme: say so where somebody can act on it. */
 add_action('admin_notices', static function (): void {

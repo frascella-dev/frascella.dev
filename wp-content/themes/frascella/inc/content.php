@@ -120,6 +120,7 @@ function frascella_who(): array
         'street' => (string) ($facts['street'] ?? ''),
         'phone' => (string) ($facts['phone'] ?? ''),
         'email' => (string) ($facts['email'] ?? ''),
+        'vat' => (string) ($facts['vat'] ?? ''),
     ];
 }
 

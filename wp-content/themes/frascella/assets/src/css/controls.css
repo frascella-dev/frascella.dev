@@ -1,100 +1,152 @@
-/* The controls, once: a button, a field, a box you tick.
+/* The controls, once: a button, a field.
  *
- * A control has to work on both surfaces the site has, light and dark. Rather than a
- * variant per surface, the values a control needs are variables, set here for the light
- * surface and set again by `.on-dark`: put that class on any dark container and every
- * control inside it flips. Inside `@layer components`, so a component's own rule can still
- * overrule a primitive. */
+ * The site has one surface, Ink, so the controls are drawn for it; the values a control
+ * reads are still variables (`--ctl-*`), so a light surface later is one rule that sets
+ * them again, not a variant per control. Inside `@layer components`, so a component's own
+ * rule can still overrule a primitive. */
 
 :root {
     --ctl-text: var(--text);
-    --ctl-muted: var(--soft);
-    --ctl-rule: var(--rule);
+    --ctl-muted: var(--meta);
+    --ctl-rule: color-mix(in srgb, var(--text) 40%, transparent);
+    --ctl-rule-hover: color-mix(in srgb, var(--text) 70%, transparent);
     --ctl-fill: var(--accent);
+    --ctl-fill-hover: color-mix(in srgb, var(--accent) 82%, var(--text));
     --ctl-fill-text: var(--accent-text);
 }
 
-.on-dark {
-    --ctl-text: var(--on-dark);
-    --ctl-muted: color-mix(in srgb, var(--on-dark) 75%, transparent);
-    --ctl-rule: color-mix(in srgb, var(--on-dark) 30%, transparent);
-    --ctl-fill: var(--on-dark);
-    --ctl-fill-text: var(--dark);
-}
-
 @layer components {
-    /* Two weights, one shape: `--solid` is the way forward (one on screen), `--quiet` an
-       alternative. Hierarchy by fill, never by size. An `<a>` drawn as a button wears the
-       same classes as a `<button>`. */
+    /* The button: square, vermilion, one weight. `.btn--big` is the band's call to action.
+       An `<a>` drawn as a button wears the same classes as a `<button>`; a native Elementor
+       Button gets them through `.cta` on its widget (below). */
     .btn {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 0.6em;
-        min-height: 2.875rem;
-        padding: 0.75rem 1.4rem;
-        border: 1px solid transparent;
+        gap: 0.65em;
+        padding: 0.85em 1.25em;
+        border: 0;
         border-radius: var(--radius);
-        background: transparent;
-        color: var(--ctl-text);
-        font: inherit;
-        font-size: 0.9375rem;
+        background: var(--ctl-fill);
+        color: var(--ctl-fill-text);
+        font-family: var(--font-body);
+        font-size: var(--t-1);
+        line-height: 1;
+        font-weight: 700;
         text-decoration: none;
         cursor: pointer;
-        transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+        transition: background-color 0.2s;
     }
 
-    .btn--solid {
-        background: var(--ctl-fill);
-        border-color: var(--ctl-fill);
+    .btn:hover {
+        background: var(--ctl-fill-hover);
         color: var(--ctl-fill-text);
     }
 
-    .btn--solid:hover {
-        opacity: 0.88;
+    .btn--big {
+        font-size: var(--t0);
+        padding: 1.05em 1.4em;
     }
 
-    .btn--quiet {
-        border-color: var(--ctl-rule);
+    .btn .arr {
+        transition: transform 0.3s var(--ease);
     }
 
-    .btn--quiet:hover {
-        border-color: var(--ctl-text);
+    .btn:hover .arr {
+        transform: translateX(4px);
     }
 
+    /* A field: a line to write on. The label above it is small and Stone. */
     .field-name {
         display: block;
-        margin-bottom: 0.5rem;
         color: var(--ctl-muted);
-        font-size: 0.875rem;
+        font-size: var(--t-1);
+        line-height: var(--lh-1);
+        letter-spacing: 0.02em;
     }
 
-    .input,
-    .textarea {
+    .input {
+        display: block;
         width: 100%;
-        padding: 0.75rem 0.9rem;
-        border: 1px solid var(--ctl-rule);
-        border-radius: var(--radius);
+        margin-top: 0.5em;
+        padding: 0.45em 0 0.55em;
+        border: 0;
+        border-bottom: 1px solid var(--ctl-rule);
+        border-radius: 0;
         background: transparent;
         color: var(--ctl-text);
-        font: inherit;
+        font-family: var(--font-body);
+        font-size: var(--t0);
+        line-height: 1.4;
+        transition: border-color 0.2s;
     }
 
-    .input:focus,
-    .textarea:focus {
+    .input:hover {
+        border-bottom-color: var(--ctl-rule-hover);
+    }
+
+    .input:focus {
         outline: none;
-        border-color: var(--ctl-text);
+        border-bottom: 2px solid var(--ctl-fill);
+        padding-bottom: calc(0.55em - 1px);
+    }
+
+    textarea.input {
+        min-height: 5.5em;
+        resize: vertical;
+    }
+
+    .input[aria-invalid="true"] {
+        border-bottom-color: var(--alert);
     }
 
     /* A refusal under a field: empty until the server says otherwise. */
+    .field-error {
+        display: block;
+        margin-top: 0.45em;
+        color: var(--alert);
+        font-size: var(--t-1);
+        line-height: var(--lh-1);
+    }
+
     .field-error:empty {
         display: none;
     }
+}
 
-    .field-error {
-        display: block;
-        margin-top: 0.4rem;
-        color: var(--alert);
-        font-size: 0.875rem;
-    }
+/* A native Elementor Button dressed as the site's: `cta` (and `cta--big`) on the widget.
+   Elementor's own button rules are scoped under `.elementor-button`, two classes deep; these
+   are three, and they say only what the site's button says. */
+.cta .elementor-button.elementor-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65em;
+    padding: 0.85em 1.25em;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--ctl-fill);
+    color: var(--ctl-fill-text);
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: 1;
+    font-weight: 700;
+    text-decoration: none;
+    fill: currentColor;
+    transition: background-color 0.2s;
+}
+
+.cta--big .elementor-button.elementor-button {
+    font-size: var(--t0);
+    padding: 1.05em 1.4em;
+}
+
+.cta .elementor-button.elementor-button:hover,
+.cta .elementor-button.elementor-button:focus-visible {
+    background: var(--ctl-fill-hover);
+    color: var(--ctl-fill-text);
+}
+
+.cta .elementor-button-content-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65em;
 }

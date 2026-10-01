@@ -1,44 +1,254 @@
-.site-header {
-    padding-inline: var(--gutter);
-    border-bottom: 1px solid var(--rule);
+/* The header (template-parts/header.php): fixed, Ink, a hairline under it.
+ *
+ * Desktop (Sketch, Web → header): the logo; then the menu, a divider, the "audio" switch,
+ * the other language and the square vermilion "scrivimi". Phone: the logo and "menu",
+ * which opens a drawer over the page (`.drawer`, lib/header.ts). */
+
+.top {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    height: var(--hh);
+    padding: 0 var(--page-margin);
+    border-bottom: 1px solid var(--line);
     background: var(--ground);
 }
 
-.site-header-inner {
+.logo {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem 2rem;
-    max-width: 72rem;
-    margin-inline: auto;
-    padding-block: 1.1rem;
-}
-
-.site-name {
-    margin-right: auto;
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
+    gap: 0.6em;
+    color: var(--text);
+    font-size: var(--t1);
     text-decoration: none;
 }
 
-.site-nav-list,
-.site-languages ul {
+.logo svg {
+    width: 1.5em;
+    height: 1.5em;
+    flex: none;
+}
+
+.logo .logo-paper {
+    fill: var(--text);
+}
+
+.logo .logo-square {
+    fill: var(--accent);
+}
+
+.logo span {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.005em;
+}
+
+.top-nav {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
+    align-items: center;
+    gap: 1.9em;
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    font-weight: 500;
+}
+
+.top-nav ul {
+    display: flex;
+    gap: 1.9em;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.site-nav a,
-.site-languages a {
-    font-size: 0.9375rem;
+.top-nav a:not(.btn),
+.top-sound {
+    color: var(--soft);
     text-decoration: none;
 }
 
-.site-nav a:hover,
-.site-languages a:hover,
-.site-languages a[aria-current] {
+.top-nav a:not(.btn):hover,
+.top-sound:hover {
+    color: var(--text);
     text-decoration: underline;
+}
+
+.top-divider {
+    width: 1px;
+    height: 1.35em;
+    background: var(--line);
+}
+
+.top-lang a:not(.btn) {
+    color: var(--meta);
+}
+
+/* The record's crackle: a text switch, "audio on" / "audio off". The scene keeps
+   `aria-pressed` in step with the turntable on the desk (CONTRACT.md §3, #snd-btn). */
+.top-sound {
+    padding: 0.4em 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.top-sound .off,
+.top-sound[aria-pressed="false"] .on {
+    display: none;
+}
+
+.top-sound[aria-pressed="false"] .off {
+    display: inline;
+}
+
+.top-cta {
+    min-height: 2.7em;
+}
+
+/* "menu" / "chiudi": only on a phone. */
+.menu-btn {
+    display: none;
+    padding: 0.6em 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.menu-btn[hidden] {
+    display: none;
+}
+
+.menu-btn .close,
+.menu-btn[aria-expanded="true"] .open {
+    display: none;
+}
+
+.menu-btn[aria-expanded="true"] .close {
+    display: inline;
+}
+
+/* --- the drawer: the menu on a phone --------------------------------------- */
+
+.drawer {
+    position: fixed;
+    inset: var(--hh) 0 0;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5em;
+    padding: 3.5em var(--page-margin) max(2.5em, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    background: var(--ground);
+}
+
+.drawer[hidden] {
+    display: none;
+}
+
+.drawer-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: drawer;
+}
+
+.drawer-list li {
+    counter-increment: drawer;
+    border-bottom: 1px solid var(--line);
+}
+
+.drawer-list a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    column-gap: var(--gutter);
+    align-items: baseline;
+    padding: 0.5em 0 0.55em;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: var(--t5);
+    line-height: var(--lh5);
+    letter-spacing: -0.012em;
+    text-decoration: none;
+}
+
+.drawer-list a::before {
+    content: counter(drawer, decimal-leading-zero);
+    color: var(--accent);
+    font-size: var(--t0);
+    font-variant-numeric: lining-nums tabular-nums;
+    letter-spacing: 0;
+}
+
+.drawer-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25em;
+    margin-top: 1.6em;
+    font-size: var(--t-1);
+    font-weight: 500;
+}
+
+.drawer-row .top-divider {
+    height: 1.4em;
+}
+
+.drawer-row a {
+    color: var(--meta);
+    text-decoration: none;
+}
+
+.drawer-legal {
+    display: grid;
+    gap: 0.6em;
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.drawer-legal p:first-child {
+    color: var(--soft);
+}
+
+/* While the drawer is open the page behind it does not scroll. */
+html.drawer-open,
+html.drawer-open body {
+    overflow: hidden;
+}
+
+@media (max-width: 900px) {
+    .top-nav {
+        display: none;
+    }
+
+    .menu-btn {
+        display: inline-block;
+    }
+}
+
+@media (min-width: 901px) {
+    .drawer {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .logo {
+        font-size: var(--t0);
+    }
+}
+
+/* Pages with no poster under the header: the document starts below it. */
+.doc-main {
+    padding-top: var(--hh);
 }

@@ -1,24 +1,146 @@
-/* The contact card (template-parts/contact.php): the example widget's look. */
+/* The contact poster: the cut-out "scrivimi", a sentence, and Agenda's form drawn by the
+ * theme (agenda/form.php, step.php, done.php and fields/* in this theme override Agenda's
+ * own templates; its stylesheet is off: add_theme_support('agenda', ['styles' => false])). */
 
-.contact-heading {
-    max-width: 20ch;
+.contact {
+    justify-content: flex-start;
+    gap: 5vh;
+    padding-top: calc(var(--hh) + 3.2vh + 5.5em);
 }
 
 .contact-lede {
-    max-width: 48ch;
-    margin-top: 1.25rem;
+    margin-top: 0.5em;
+    --frascella-margin: 0.5em 0 0;
+    max-width: 34ch;
+    --frascella-max: 34ch;
     color: var(--soft);
-    --frascella-max: 48ch;
-    --frascella-margin: 1.25rem 0 0;
+    font-size: var(--t1);
+    line-height: var(--lh1);
+    text-wrap: pretty;
 }
 
-.contact-actions {
+.contact-where {
+    margin-top: 1.6em;
+    --frascella-margin: 1.6em 0 0;
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+/* --- the form -------------------------------------------------------------- */
+
+.contact-form form {
+    display: grid;
+    gap: 1.6em;
+}
+
+.contact-form .form-step {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6em var(--gutter);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.contact-form .form-step legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.contact-form .field--textarea,
+.contact-form .field--content {
+    grid-column: 1 / -1;
+}
+
+.contact-form .field[hidden] {
+    display: none;
+}
+
+.contact-form .form-note {
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    max-width: var(--measure);
+}
+
+.contact-form .form-note a {
+    color: var(--text);
+}
+
+.contact-form .form-status {
+    margin: 0;
+    padding: 0.75em 1em;
+    border-left: 2px solid var(--alert);
+    background: color-mix(in srgb, var(--alert) 10%, transparent);
+    color: var(--text);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.contact-form .form-nav {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 2rem;
+    gap: 1.5em;
+    align-items: center;
 }
 
-.contact-value {
-    opacity: 0.8;
+.contact-form [aria-busy="true"] .btn {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+/* The confirmation, in the form's place. */
+.contact-done {
+    display: grid;
+    gap: 0.75em;
+    align-content: start;
+}
+
+.contact-done:focus {
+    outline: none;
+}
+
+.contact-done-title {
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--t3);
+    line-height: var(--lh3);
+}
+
+.contact-done-body {
+    color: var(--soft);
+}
+
+.contact-done .summary {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.4em 1.5em;
+    margin: 1em 0 0;
+    padding-top: 1em;
+    border-top: 1px solid var(--line);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.contact-done .summary dt {
+    color: var(--meta);
+}
+
+.contact-done .summary dd {
+    margin: 0;
+    color: var(--soft);
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .contact-form .form-step {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.4em;
+    }
 }

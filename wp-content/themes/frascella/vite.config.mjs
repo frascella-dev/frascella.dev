@@ -12,7 +12,7 @@
  */
 import { defineConfig } from "vite";
 import { basename, resolve } from "node:path";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const here = (p) => resolve(import.meta.dirname, p);
 const theme = basename(import.meta.dirname);
@@ -49,10 +49,20 @@ export default defineConfig({
         manifest: true,
         assetsDir: "",
         rollupOptions: {
-            input: {
-                site: here("assets/src/entries/site.ts"),
-                doc: here("assets/src/entries/doc.ts"),
+            // Every file in assets/src/entries is an entry, named after the file: a new kind
+            // of page (or the desk scene, `desk.ts`) is a new file there, not an edit here.
+            input: Object.fromEntries(
+                readdirSync(here("assets/src/entries"))
+                    .filter((f) => f.endsWith(".ts"))
+                    .map((f) => [f.replace(/\.ts$/, ""), here(`assets/src/entries/${f}`)]),
+            ),
+            output: {
+                // the desk's three.js on its own chunk: it changes far less often than the scene,
+                // so it stays cached across releases (desk/CONTRACT.md)
+                manualChunks: (id) => (id.includes("/node_modules/three/") ? "three" : undefined),
             },
         },
     },
+    // the desk's texture workers are module workers (`new Worker(url, { type: "module" })`)
+    worker: { format: "es" },
 });

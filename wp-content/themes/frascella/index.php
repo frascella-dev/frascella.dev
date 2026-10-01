@@ -8,10 +8,10 @@ defined('ABSPATH') || exit;
 
 get_header();
 ?>
-<main id="content">
+<main id="content" class="doc-main">
     <?php if (!frascella_location(is_singular() ? 'single' : 'archive')) : ?>
-        <div class="sheet">
-            <div class="measure prose">
+        <div class="doc">
+            <div class="doc-inner prose">
                 <?php if (have_posts()) : ?>
                     <?php while (have_posts()) : the_post(); ?>
                         <article <?php post_class(); ?>>

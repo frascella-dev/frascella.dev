@@ -28,3 +28,5 @@ require FRASCELLA_THEME_DIR . '/inc/schema.php';    // structured data, only wha
 require FRASCELLA_THEME_DIR . '/inc/sitemap.php';   // WordPress's sitemap, told what is not a document
 require FRASCELLA_THEME_DIR . '/inc/cleanup.php';   // what WordPress prints and this site does not
 require FRASCELLA_THEME_DIR . '/inc/template.php';  // the helpers the templates call
+require FRASCELLA_THEME_DIR . '/inc/desk.php';      // the 3D desk: which pages have it, and its stage
+require FRASCELLA_THEME_DIR . '/inc/agenda.php';    // the contact form (Agenda): where it lands, and what it says

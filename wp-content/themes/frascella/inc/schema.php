@@ -3,6 +3,11 @@
 /**
  * Structured data: one JSON-LD graph per page, built from the facts in Settings → frascella.dev.
  *
+ * The business is a person: Emanuele Frascella, a freelance software engineer, with his VAT
+ * number, his city and his profiles — what the footer shows. Hence `Person`, not
+ * `Organization` or a `LocalBusiness`, which would ask for an address and opening hours
+ * the site does not have.
+ *
  * Three rules.
  * - **Nothing declared to machines that the page does not show.** A fact in the graph is a
  *   fact a person can read on the site; an empty fact is an absent key, never "".
@@ -43,15 +48,20 @@ function frascella_schema_business(): array
         'addressCountry' => (string) ($facts['country'] ?? ''),
     ]);
 
+    // The profiles the footer links to: the same person elsewhere.
+    $same = array_values(array_filter([(string) ($facts['github'] ?? ''), (string) ($facts['linkedin'] ?? '')]));
+
     return array_filter([
-        '@type' => (string) apply_filters('frascella_schema_type', 'Organization'),
+        '@type' => (string) apply_filters('frascella_schema_type', 'Person'),
         '@id' => frascella_schema_root() . '#business',
         'name' => $who['name'],
+        'jobTitle' => frascella_s('schema.jobTitle'),
         'url' => home_url('/'),
         'telephone' => $who['phone'],
         'email' => $who['email'],
         'address' => count($address) > 1 ? $address : null,
         'vatID' => (string) ($facts['vat'] ?? ''),
+        'sameAs' => $same !== [] ? $same : null,
     ], static fn ($v): bool => $v !== '' && $v !== null);
 }
 

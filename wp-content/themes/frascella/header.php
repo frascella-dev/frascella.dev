@@ -19,6 +19,6 @@ defined('ABSPATH') || exit;
         <?php
         // The Theme Builder's header where the site has built one, the theme's otherwise.
         if (!frascella_location('header')) {
-            get_template_part('template-parts/nav');
+            get_template_part('template-parts/header');
         }
         ?>

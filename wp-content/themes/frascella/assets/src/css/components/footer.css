@@ -1,27 +1,166 @@
-.site-footer {
-    padding-inline: var(--gutter);
-    background: var(--dark);
-    color: var(--on-dark);
+/* The colophon (template-parts/footer.php), as in Sketch (Web → footer): a tall band on the
+ * page's grid. The brand and the small print in columns 1–4; four lists, each two columns
+ * wide (5–6, 7–8, 9–10, 11–12), with a small heading in spaced small caps. On a phone: the
+ * brand, the lists two by two, the small print last. */
+
+.colophon {
+    padding: clamp(5rem, 9vw, 8.25rem) var(--page-margin) clamp(6rem, 13vw, 12rem);
 }
 
-.site-footer-inner {
+.colophon-band {
     display: grid;
-    gap: 0.5rem;
-    max-width: 72rem;
-    margin-inline: auto;
-    padding-block: 3rem;
-    font-size: 0.9375rem;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    column-gap: var(--gutter);
+    row-gap: 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
 }
 
-.site-footer-name {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
+.colophon-brand {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    display: grid;
+    gap: 1.6em;
+    align-content: start;
 }
 
-.site-footer-legal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-    margin-top: 1rem;
-    color: color-mix(in srgb, var(--on-dark) 78%, transparent);
+.colophon-brand .logo {
+    font-size: var(--t1);
+}
+
+.colophon-role {
+    color: var(--soft);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.colophon-legal {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    margin-top: 2.6em;
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    font-variant-numeric: lining-nums;
+}
+
+.colophon-list {
+    grid-row: 1 / span 2;
+    padding-top: 0.2em;
+}
+
+.colophon-list:nth-of-type(1) {
+    grid-column: 5 / span 2;
+}
+
+.colophon-list:nth-of-type(2) {
+    grid-column: 7 / span 2;
+}
+
+.colophon-list:nth-of-type(3) {
+    grid-column: 9 / span 2;
+}
+
+.colophon-list:nth-of-type(4) {
+    grid-column: 11 / span 2;
+}
+
+.colophon-h {
+    margin: 0 0 1.1em;
+    color: var(--meta);
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    font-variant-caps: all-small-caps;
+}
+
+.colophon ul {
+    display: grid;
+    gap: 0.55em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.colophon ul a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.colophon ul a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.colophon ul a svg {
+    width: 0.7em;
+    height: 0.7em;
+    flex: none;
+    color: var(--meta);
+    transition:
+        transform 0.25s var(--ease),
+        color 0.2s;
+}
+
+.colophon ul a:hover svg {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+}
+
+.colophon [aria-current] {
+    color: var(--meta);
+}
+
+.colophon ul a[aria-current]:hover {
+    color: var(--meta);
+    text-decoration: none;
+}
+
+@media (max-width: 900px) {
+    .colophon-band {
+        grid-template-rows: none;
+        row-gap: 3.2em;
+    }
+
+    .colophon-brand,
+    .colophon-legal {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .colophon-brand {
+        gap: 1.2em;
+    }
+
+    .colophon-legal {
+        order: 5;
+        margin-top: 0.5em;
+    }
+
+    .colophon-list {
+        grid-row: auto;
+        padding-top: 0;
+    }
+
+    .colophon-list:nth-of-type(odd) {
+        grid-column: 1 / span 2;
+    }
+
+    .colophon-list:nth-of-type(even) {
+        grid-column: 3 / span 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .colophon ul a svg {
+        transition: none;
+    }
 }
