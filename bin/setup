@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# First run on this machine: WordPress, Elementor, Polylang (Italian and English), the
-# plugin and the theme, and a demo home page to look at and test against.
+# First run on this machine: WordPress, Elementor, Polylang (Italian and English), Agenda,
+# the plugin and the theme, and the site itself (tools/site.php): the home page, the privacy
+# notice, the menus, the header and footer, the projects and the contact form.
 #
 #   bin/setup                  admin / admin on http://localhost:8110
 #   ELEMENTOR_PRO_ZIP=/path/to/elementor-pro.zip bin/setup
@@ -27,6 +28,16 @@ if [ -n "${ELEMENTOR_PRO_ZIP:-}" ]; then
     bin/wp plugin install /var/www/html/wp-content/plugins/frascella/.elementor-pro.zip --activate >/dev/null
     rm -f wp-content/plugins/frascella/.elementor-pro.zip
 fi
+# Agenda (frascella-dev/agenda): the contact form's requests. From its public release, or
+# from a zip on this machine (AGENDA_ZIP=/path/to/agenda.zip, e.g. its own dist/).
+AGENDA_ZIP="${AGENDA_ZIP:-https://github.com/frascella-dev/agenda/releases/download/1.2.0/agenda-1.2.0.zip}"
+if [ -f "$AGENDA_ZIP" ]; then
+    cp "$AGENDA_ZIP" wp-content/plugins/frascella/.agenda.zip
+    bin/wp plugin install /var/www/html/wp-content/plugins/frascella/.agenda.zip --activate >/dev/null
+    rm -f wp-content/plugins/frascella/.agenda.zip
+else
+    bin/wp plugin install "$AGENDA_ZIP" --activate >/dev/null || echo "! Agenda not installed: the contact poster has no form (AGENDA_ZIP=…)."
+fi
 
 # The build the theme reads its stylesheets from, and the panel's.
 (cd wp-content/themes/frascella && npm install --silent && npm run build --silent)
@@ -34,7 +45,7 @@ fi
 bin/wp theme activate frascella >/dev/null
 bin/wp plugin activate frascella >/dev/null
 bin/wp eval-file /var/www/html/tools/setup-languages.php
-bin/wp eval-file /var/www/html/tools/demo.php
+bin/wp eval-file /var/www/html/tools/site.php
 
 echo
 echo "Ready: $URL/wp-admin (${WP_USER:-admin} / ${WP_PASS:-admin}) · mail: http://localhost:8135"

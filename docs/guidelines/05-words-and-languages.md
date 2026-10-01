@@ -72,7 +72,7 @@ would be `/en/privacy-2/`. Two parts of the plugin fix this:
 ## Menus
 
 - **One menu per language** in the «Primary» position, assigned through Polylang's
-  `nav_menus` option (see `tools/demo.php`).
+  `nav_menus` option (see `tools/site.php`).
 - **The header and the footer both read that menu.** A second list of links in a widget
   goes stale.
 
