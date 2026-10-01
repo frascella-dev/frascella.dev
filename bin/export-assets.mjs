@@ -1,5 +1,5 @@
 /**
- * Bottega's banner and icon, from their SVG sources in design/ to the PNGs the README
+ * frascella.dev's banner and icon, from their SVG sources in design/ to the PNGs the README
  * shows (.github/assets/). Run after changing a source:
  *
  *   node bin/export-assets.mjs
@@ -25,6 +25,8 @@ try {
 		const page = await browser.newPage( { viewport: { width, height } } );
 		const svg = readFileSync( path.join( root, 'design', source ), 'utf8' );
 		await page.setContent( `<!doctype html><style>html,body{margin:0;background:transparent}svg{display:block}</style>${ svg }` );
+		await page.evaluate( () => document.fonts.ready );
+		await page.waitForTimeout( 300 );
 		await page.screenshot( { path: path.join( root, '.github/assets', target ), omitBackground: true } );
 		console.log( `✓ ${ target }` );
 		await page.close();
