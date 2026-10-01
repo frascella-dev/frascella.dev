@@ -31,26 +31,26 @@
   "labels": {
     "submit": {
       "it": "Invia il messaggio →",
-      "en": "Invia il messaggio →"
+      "en": "Send message →"
     }
   },
   "messages": {
     "status": {
       "invalid": {
         "it": "Controlla i campi segnati.",
-        "en": "Controlla i campi segnati."
+        "en": "Check the highlighted fields."
       },
       "failed": {
         "it": "Il messaggio non è partito. Riprova tra qualche minuto o scrivimi a emanuele@frascella.dev.",
-        "en": "Il messaggio non è partito. Riprova tra qualche minuto o scrivimi a emanuele@frascella.dev."
+        "en": "The message didn’t go through. Try again in a few minutes, or email me at emanuele@frascella.dev."
       },
       "rate_limited": {
         "it": "Il messaggio non è partito. Riprova tra qualche minuto o scrivimi a emanuele@frascella.dev.",
-        "en": "Il messaggio non è partito. Riprova tra qualche minuto o scrivimi a emanuele@frascella.dev."
+        "en": "The message didn’t go through. Try again in a few minutes, or email me at emanuele@frascella.dev."
       },
       "cooldown": {
         "it": "Ho già ricevuto un messaggio da questo indirizzo pochi minuti fa: ti rispondo a quello.",
-        "en": "Ho già ricevuto un messaggio da questo indirizzo pochi minuti fa: ti rispondo a quello."
+        "en": "A message from this address arrived a few minutes ago. I’ll reply to that one."
       }
     }
   },
@@ -66,11 +66,11 @@
   "done": {
     "title": {
       "it": "Messaggio ricevuto.",
-      "en": "Messaggio ricevuto."
+      "en": "Message received."
     },
     "body": {
       "it": "Ti rispondo entro due giorni lavorativi.",
-      "en": "Ti rispondo entro due giorni lavorativi."
+      "en": "I’ll get back to you within two working days."
     }
   },
   "steps": [
@@ -79,11 +79,11 @@
       "slug": "message",
       "name": {
         "it": "scrivimi",
-        "en": "scrivimi"
+        "en": "contact"
       },
       "title": {
         "it": "Scrivimi",
-        "en": "Scrivimi"
+        "en": "Contact"
       },
       "fields": [
         {
@@ -94,7 +94,7 @@
           "required": true,
           "label": {
             "it": "Nome",
-            "en": "Nome"
+            "en": "Name"
           },
           "rules": {
             "max_length": 120
@@ -102,7 +102,7 @@
           "messages": {
             "required": {
               "it": "Scrivi il tuo nome.",
-              "en": "Scrivi il tuo nome."
+              "en": "Enter your name."
             }
           }
         },
@@ -119,11 +119,11 @@
           "messages": {
             "required": {
               "it": "L’indirizzo email non sembra valido.",
-              "en": "L’indirizzo email non sembra valido."
+              "en": "Check the email address. It doesn’t look valid."
             },
             "invalid": {
               "it": "L’indirizzo email non sembra valido.",
-              "en": "L’indirizzo email non sembra valido."
+              "en": "Check the email address. It doesn’t look valid."
             }
           }
         },
@@ -134,7 +134,7 @@
           "required": false,
           "label": {
             "it": "Azienda (facoltativo)",
-            "en": "Azienda (facoltativo)"
+            "en": "Company (optional)"
           },
           "rules": {
             "max_length": 160
@@ -147,11 +147,11 @@
           "rows": 4,
           "label": {
             "it": "Messaggio",
-            "en": "Messaggio"
+            "en": "Message"
           },
           "placeholder": {
             "it": "Es. un’app per i nostri agenti commerciali, collegata al gestionale, da lanciare entro marzo",
-            "en": "Es. un’app per i nostri agenti commerciali, collegata al gestionale, da lanciare entro marzo"
+            "en": "E.g. an app for our sales reps, connected to our ERP, live by March"
           },
           "rules": {
             "max_length": 5000
@@ -159,7 +159,7 @@
           "messages": {
             "required": {
               "it": "Scrivi due righe su cosa ti serve.",
-              "en": "Scrivi due righe su cosa ti serve."
+              "en": "Write a couple of lines about what you need."
             }
           }
         },
@@ -168,7 +168,7 @@
           "type": "content",
           "html": {
             "it": "Uso i dati del modulo solo per risponderti. Cosa ne faccio e per quanto li tengo: <a href=\"/privacy/\">privacy</a>.",
-            "en": "Uso i dati del modulo solo per risponderti. Cosa ne faccio e per quanto li tengo: <a href=\"/en/privacy/\">privacy</a>."
+            "en": "I use the form’s data only to reply to you. What I do with it and how long I keep it: <a href=\"/en/privacy/\">privacy</a>."
           }
         }
       ]

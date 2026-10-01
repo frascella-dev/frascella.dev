@@ -14,9 +14,9 @@
  * - the header and the footer as Theme Builder documents, with an English copy each;
  * - Agenda's contact form (tools/agenda/contatti.json), hosted by the home page.
  *
- * The words are the owner's (COPY.md). **English is not written yet**: the English pages,
- * projects and form carry the Italian words as placeholders (TODO(en)), in the structure
- * the English will fill, and are written separately once the Italian is approved.
+ * The words are the owner's: COPY.md in Italian, COPY.en.md in English, written separately
+ * (a line says the same thing, not the same words). Each language has its own anchors
+ * (`#servizi`, `#services`…); the intermezzo keeps `#scrivania`, which the desk scene reads.
  *
  * Agenda's form uses addresses with a query (`?agenda_step=…`), because its host is the front
  * page, which has no path of its own; and its one step's slug is its key (`message`):
@@ -100,6 +100,7 @@ $it = [
         'email' => 'emanuele@frascella.dev',
     ],
     'menu' => [['servizi', '#servizi'], ['lavori', '#lavori'], ['chi sono', '#chi-sono']],
+    'ids' => ['services' => 'servizi', 'works' => 'lavori', 'bio' => 'chi-sono', 'contact' => 'contatti'],
     'privacy' => 'Informativa privacy',
     // The notice's own description (search results), instead of its first lines.
     'privacyExcerpt' => 'Cosa fa questo sito con i dati di chi lo visita: il modulo di contatto, un solo cookie tecnico, nessuna statistica e nessun servizio di terze parti.',
@@ -110,9 +111,53 @@ $it = [
         ['vitrine', 'vitrine', 'mio', 'Un overlay trasparente che sta dietro le icone del desktop di Windows, con i temi scritti come pagine React. Su Ubuntu usavo Conky e su Windows non c’era niente di simile. Parte con il PC e lo uso tutti i giorni.', 'C# · WPF · WebView2', 'codice pubblico su GitHub', 'https://github.com/manuto276/vitrine', 'vitrine-hero.webp', 'vitrine sul desktop di Windows'],
     ],
 ];
-// TODO(en): the English words, written separately once the Italian is approved. Until
-// then the Italian ones stand in, so the structure is there to fill.
-$words = ['it' => $it, 'en' => $it];
+$en = [
+    'home' => 'Home',
+    'hero' => [
+        'cut' => 'platforms, apps and integrations',
+        'lines' => 'platforms, apps|and integrations',
+        'lines_n' => 'platforms,|apps and|integrations',
+        'rest' => 'from architecture to release',
+        'where' => 'Taranto · CET · remote',
+        'lede' => 'I’m a freelance software engineer based in Taranto, working on projects for companies, agencies and startups. I come from telemedicine, where I worked with health data under GDPR. Today I work on the game engines behind online casino platforms, where the money is real and the services can’t go down.',
+        'button' => 'Contact →',
+    ],
+    'services' => [
+        'label' => 'Services',
+        'title' => 'What I do.',
+        'items' => [
+            ['platforms', 'Websites and web platforms', 'I build websites in WordPress or from scratch, without a CMS. For more complex platforms I also design the server side, with APIs, databases and authentication, and split it into microservices when that makes sense.'],
+            ['apps', 'Mobile and web apps', 'iOS and Android apps in Flutter, web apps in React or Nuxt. I build them together with the server side, or connect them to the one already in place.'],
+            ['integrations', 'Integrations and AI', 'I connect ERPs, CRMs, payment systems and third-party services so that data moves from one to the next without anyone copying it by hand, with error handling and a log of every exchange. I also integrate LLMs and agents into existing software and connect them to the company’s own data.'],
+        ],
+    ],
+    'works' => ['cut' => 'work', 'label' => 'Work', 'title' => 'Three recent projects.'],
+    'bio' => [
+        'cut' => 'about',
+        'title' => 'I like building the things I use.',
+        'text' => [
+            'Many of my projects start from a need of my own, when a tool doesn’t exist or doesn’t do what I need. Using them every day means I also have to get right what a demo never shows, such as response times, edge cases and what happens when something fails. Right now I’m focusing on AI in software, agents and knowledge graphs in particular, and on getting them to work with real data rather than sample data.',
+            'As a freelancer I work on my own, so you talk directly to the person who writes the code. Outside work I go to the gym and design tattoos in Procreate.',
+        ],
+        'facts' => [['CET', 'remote, other time zones included'], ['NDA', 'signed before I see the project'], ['2 working days', 'to get back to you']],
+    ],
+    'contact' => [
+        'cut' => 'contact',
+        'lede' => 'Tell me what you need, what already exists and when you need it by. A few lines are enough; we can go through the details on a call.',
+        'or' => 'or',
+        'email' => 'emanuele@frascella.dev',
+    ],
+    'menu' => [['services', '#services'], ['work', '#work'], ['about', '#about']],
+    'ids' => ['services' => 'services', 'works' => 'work', 'bio' => 'about', 'contact' => 'contact'],
+    'privacy' => 'Privacy notice',
+    'privacyExcerpt' => 'What this site does with its visitors’ data: the contact form, a single technical cookie, no statistics and no third-party services.',
+    'projects' => [
+        ['seveninktattoo-it', 'seveninktattoo.it', 'client', 'Website for a tattoo studio in Taranto, built with WordPress and Elementor. It handles appointment requests, reviews, the newsletter and the FAQ without relying on external services, so the data stays on the studio’s own server.', 'WordPress · Elementor', 'live', 'https://seveninktattoo.it', 'sevenink-home.webp', 'The seveninktattoo.it home page'],
+        ['skeda-fit', 'skeda.fit', 'co-founder', 'An app for freelance personal trainers, with workout plans, set logging at the gym, chat, check-ins and a public profile on a map. It hasn’t launched yet, and the waitlist is open.', '', 'in development', 'https://skeda.fit', 'skeda-home.webp', 'The skeda.fit home page'],
+        ['vitrine', 'vitrine', 'personal', 'A transparent overlay that sits behind the Windows desktop icons, with themes written as React pages. On Ubuntu I used Conky, and Windows had nothing like it. It starts with the PC and I use it every day.', 'C# · WPF · WebView2', 'public on GitHub', 'https://github.com/manuto276/vitrine', 'vitrine-hero.webp', 'vitrine on the Windows desktop'],
+    ],
+];
+$words = ['it' => $it, 'en' => $en];
 
 /* The privacy notice: written from the code (docs/guidelines/08-privacy.md) ----------------- */
 
@@ -154,9 +199,42 @@ $privacy = [
 <p>Ai sensi degli articoli da 15 a 22 del GDPR l’interessato può chiedere l’accesso ai dati che lo riguardano, la loro rettifica o cancellazione, la limitazione del trattamento o una copia in formato portabile, e può opporsi al trattamento. Le richieste possono essere inviate a <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> oppure tramite il <a href="/#contatti">modulo di contatto</a>. Ai sensi dell’art. 77 è possibile proporre reclamo al Garante per la protezione dei dati personali, <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
 HTML,
 ];
-// TODO(en): written separately once the Italian is approved; the Italian notice stands in,
-// with the addresses of the English pages.
-$privacy['en'] = str_replace('href="/#contatti"', 'href="/en/#contatti"', $privacy['it']);
+$privacy['en'] = <<<'HTML'
+<p class="note">Updated on 1 October 2026.</p>
+<p>This notice describes what this site does with its visitors’ data. It is written from the site’s code and changes with it.</p>
+<h2>Data controller</h2>
+<p>The data controller is Emanuele Frascella, software engineer, Taranto (Italy), VAT no. 03462650734. The site is run by a single natural person. Requests about this notice can be sent to <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> or through the <a href="/en/#contact">contact form</a>.</p>
+<h2>The contact form</h2>
+<p>The «contact» form collects <strong>name</strong>, <strong>email address</strong> and <strong>message</strong>, which are required, and the <strong>company</strong> name, which is optional. With them the site records the date and time of sending, the language of the page and the address of the page it was sent from.</p>
+<ul>
+<li><strong>Purpose and legal basis:</strong> replying to the message and, where relevant, preparing a quote; pre-contractual measures taken at the data subject’s request (Art. 6(1)(b) GDPR). No consent is required.</li>
+<li><strong>Where:</strong> in the site’s database, on the server that hosts it. A copy of the message is sent by email to the controller’s address, emanuele@frascella.dev.</li>
+<li><strong>Who reads it:</strong> the controller only.</li>
+<li><strong>How long:</strong> the message and the data that come with it are deleted automatically after <strong>12 months</strong>; the copy of the notification email kept in the site’s sending log after <strong>90 days</strong>. They can be deleted earlier on request.</li>
+<li>The site sends no automatic email to the sender: the reply is written by the controller.</li>
+</ul>
+<p>To protect the form from automated submissions the site uses a hidden field, a check on the time taken to fill it in and a limit on the number of submissions. The limit is based on the IP address, which is never stored: it is turned into a code (a hash with a key that changes every day) kept for one hour at most. To avoid duplicates, a second message from the same email address within the following 15 minutes is not accepted.</p>
+<h2>The vinyl crackle</h2>
+<p>The sound of the record player on the desk («audio on / off») is generated by the browser, on the spot: the site downloads no audio file, records nothing and receives nothing.</p>
+<h2 id="cookies">Cookies</h2>
+<p>The site uses a single cookie for its visitors. It is a technical cookie, set only for someone who sends the form, and therefore needs neither consent nor a banner (Art. 122 of the Italian Privacy Code; Garante, cookie guidelines of 10 June 2021).</p>
+<table>
+<thead><tr><th scope="col">Name</th><th scope="col">Purpose</th><th scope="col">Duration</th></tr></thead>
+<tbody><tr><td><code>agenda_draft</code></td><td>Links the sending of the form to the confirmation that follows. It holds a random code; the server keeps only a hash of it.</td><td>Until the sending is confirmed, or the browser is closed.</td></tr></tbody>
+</table>
+<p>Whoever signs in to the administration panel also receives WordPress’s sign-in cookies; visitors do not.</p>
+<h2>What the site does not do</h2>
+<ul>
+<li>It does not measure visits: there are no statistics and no analytics tools.</li>
+<li>It loads nothing from other sites: typefaces, scripts and images are served from this domain. No advertising, no social buttons, no third-party videos or maps.</li>
+<li>It uses no profiling or third-party cookies, and stores nothing else in the browser.</li>
+<li>It does not pass on or sell data to anyone.</li>
+</ul>
+<h2>The server</h2>
+<p>[To be completed by the controller: the provider that hosts the server, the country it is in and how long the server keeps its own access logs, which, as for every website, contain the IP address, the page requested and the time.]</p>
+<h2>Rights of the data subject</h2>
+<p>Under Articles 15 to 22 GDPR the data subject can request access to the data concerning them, their rectification or erasure, the restriction of processing or a copy in a portable format, and can object to the processing. Requests can be sent to <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> or through the <a href="/en/#contact">contact form</a>. Under Art. 77 a complaint can be lodged with the Italian data protection authority (Garante per la protezione dei dati personali), <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
+HTML;
 
 /* The facts: the business's own --------------------------------------------------------------- */
 
@@ -214,7 +292,7 @@ $post = static function (string $type, string $slug, string $title, string $lang
 /* The screenshots ----------------------------------------------------------------------------- */
 
 require_once ABSPATH . 'wp-admin/includes/image.php';
-$image = static function (string $file, string $alt) use ($say): int {
+$image = static function (string $file) use ($say): int {
     $found = get_posts(['post_type' => 'attachment', 'meta_key' => '_frascella_seed', 'meta_value' => $file, 'fields' => 'ids', 'numberposts' => 1, 'post_status' => 'any', 'lang' => '']);
     if ($found) {
         return (int) $found[0];
@@ -228,9 +306,6 @@ $image = static function (string $file, string $alt) use ($say): int {
     }
     $attachment = (int) wp_insert_attachment(['post_mime_type' => 'image/webp', 'post_title' => pathinfo($file, PATHINFO_FILENAME), 'post_status' => 'inherit'], $bits['file']);
     wp_update_attachment_metadata($attachment, wp_generate_attachment_metadata($attachment, $bits['file']));
-    update_post_meta($attachment, '_wp_attachment_image_alt', $alt);
-    // TODO(en): the English alt text, written with the rest of the English.
-    update_post_meta($attachment, '_frascella_alt_en', $alt);
     update_post_meta($attachment, '_frascella_seed', $file);
     $say("  + image $file");
 
@@ -249,9 +324,11 @@ foreach ($words as $lang => $w) {
             update_post_meta($pid, '_frascella_stack', $stack);
             update_post_meta($pid, '_frascella_status', $status);
             update_post_meta($pid, '_frascella_url', $url);
-            $img = $image($file, $alt);
+            $img = $image($file);
             if ($img > 0) {
                 set_post_thumbnail($pid, $img);
+                // One file for every language; its alt text per language (the plugin's media.php).
+                update_post_meta($img, $lang === 'it' ? '_wp_attachment_image_alt' : '_frascella_alt_' . $lang, $alt);
             }
         }
         $projects[$slug][$lang] = $pid;
@@ -290,7 +367,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
             $box('band pane', [
                 $heading($w['hero']['where'], 'p', 'rh'),
                 $text('<p>' . $w['hero']['lede'] . '</p>', 'txt'),
-                $button($w['hero']['button'], '#contatti', 'cta cta--big'),
+                $button($w['hero']['button'], '#' . $w['ids']['contact'], 'cta cta--big'),
             ], ['inner' => true]),
         ], ['tag' => 'section', 'stop' => 'hero']),
 
@@ -304,7 +381,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
                 $heading($w['services']['title'], 'h2', 'intro-title'),
             ], ['inner' => true]),
             ...$services,
-        ], ['tag' => 'section', 'id' => 'servizi']),
+        ], ['tag' => 'section', 'id' => $w['ids']['services']]),
 
         // 4. Work.
         $box('work', [
@@ -316,7 +393,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
                 ], ['inner' => true]),
             ], ['inner' => true, 'stop' => 'w0']),
             $widget('frascella-works', ['count' => 0]),
-        ], ['tag' => 'section', 'id' => 'lavori']),
+        ], ['tag' => 'section', 'id' => $w['ids']['works']]),
 
         // 5. Bio.
         $box('poster bio', [
@@ -326,7 +403,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
                 $text(implode('', array_map(static fn (string $p): string => "<p>$p</p>", $w['bio']['text'])), 'txt'),
                 $text($facts, 'bio-facts'),
             ], ['inner' => true]),
-        ], ['tag' => 'section', 'id' => 'chi-sono', 'stop' => 'bio']),
+        ], ['tag' => 'section', 'id' => $w['ids']['bio'], 'stop' => 'bio']),
 
         // 6. Contact.
         $box('poster contact', [
@@ -338,7 +415,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
                 ], ['inner' => true]),
                 $widget('agenda-form', ['form' => 'contatti']),
             ], ['inner' => true]),
-        ], ['tag' => 'section', 'id' => 'contatti', 'stop' => 'contact']),
+        ], ['tag' => 'section', 'id' => $w['ids']['contact'], 'stop' => 'contact']),
     ];
 };
 

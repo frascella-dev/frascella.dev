@@ -93,7 +93,7 @@ export function initSheet(): void {
     // The cue goes on: from the opening to the bare desk, from the desk to the services.
     cue?.addEventListener("click", () => {
         const behavior: ScrollBehavior = RM.matches ? "auto" : "smooth";
-        const next = (window.__lift ?? 0) > 0.9 ? document.getElementById("servizi") : null;
+        const next = (window.__lift ?? 0) > 0.9 ? document.querySelector<HTMLElement>(".services") : null;
         if (next) {
             scrollTo({ top: next.getBoundingClientRect().top + scrollY, behavior });
         } else if (deskEl) {

@@ -80,7 +80,8 @@ if ( php( "echo defined('ELEMENTOR_PRO_VERSION') ? 'pro' : 'free';" ) === 'pro' 
 	try {
 		setWidget( copy, 'frascella-footer', { t__footer__role: 'Engineer {name}, test' } );
 		const enPage = await text( '/en/' );
-		check( 'footer: a word typed in the English copy shows under /en/, {name} filled', enPage.includes( 'Engineer Emanuele Frascella, test' ) );
+		check( 'footer: the English copy speaks English', ( await text( '/en/' ) ).includes( 'VAT no. 03462650734' ) && ( await text( '/' ) ).includes( 'P. IVA 03462650734' ) );
+	check( 'footer: a word typed in the English copy shows under /en/, {name} filled', enPage.includes( 'Engineer Emanuele Frascella, test' ) );
 		check( 'footer: … and not on the Italian pages', ! ( await text( '/' ) ).includes( 'Engineer Emanuele Frascella, test' ) );
 	} finally {
 		restoreCopy();
@@ -95,7 +96,7 @@ check( 'restored', ( await text( '/' ) ).includes( 'id="cue" type="button" aria-
 const browser = await launch();
 try {
 	const page = await login( browser );
-	for ( const [ id, lang ] of [ [ it, 'it' ], [ en, 'en' ] ] ) {
+	for ( const [ id, lang, expected ] of [ [ it, 'it', 'scorri' ], [ en, 'en', 'scroll' ] ] ) {
 		if ( ! id ) {
 			continue;
 		}
@@ -104,8 +105,7 @@ try {
 			const find = ( c ) => ( c.model?.get?.( 'widgetType' ) === 'frascella-desk' ? c : ( c.children || [] ).map( find ).find( Boolean ) );
 			return find( window.elementor.getPreviewContainer() )?.settings?.get( 't__desk__cue' );
 		} );
-		// TODO(en): the English page's words are the Italian placeholders until written.
-		check( `editor (${ lang }): the field starts from the page's words`, value === 'scorri', String( value ) );
+		check( `editor (${ lang }): the field starts from the page's words`, value === expected, String( value ) );
 	}
 } finally {
 	await browser.close();
