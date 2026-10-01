@@ -1,68 +1,36 @@
-# frascella.dev — portfolio monorepo
+# frascella.dev
 
-Personal portfolio of **Emanuele Frascella**, software engineer (Taranto, Italy).
+The website of frascella.dev, on WordPress with Elementor and Polylang, built from
+[Bottega](https://github.com/frascella-dev/bottega).
 
-Independent services:
+| | |
+|---|---|
+| `wp-content/themes/frascella` | **The look.** Templates, CSS and motion (built with Vite), the words per language in `inc/content/`. |
+| `wp-content/plugins/frascella` | **The rest.** The facts (Settings → frascella.dev), the Elementor widgets, the dynamic tags, the Kit, the e2e tests. |
+| `wp-content/mu-plugins/local-mail.php` | Locally, no email leaves: everything goes to Mailpit. |
+| `docs/guidelines/` | How the site is built, and why. |
+| `.claude/` | The Claude Code skills and agents for working on it. |
 
-| Path              | Stack              | Role                                                                 |
-| ----------------- | ------------------ | ------------------------------------------------------------------- |
-| `services/site`| Astro (static) + vanilla TS | The public portfolio site. Static HTML; WebGL, three.js and GSAP layered on as plain ES modules. |
-| `services/api`    | PHP 8 (no framework) | Contact email, plus first-party analytics (SQLite or MySQL).        |
-| `services/builder` | bash              | Packages site + API into one CloudPanel-ready tarball.              |
+## Local site
 
-No framework runtime on the page. The portfolio posts the contact form to
-`/api/contact` and — only once the visitor has accepted the cookie banner —
-beacons events to `/api/track`; `/admin` reads them back behind a password.
-Same-origin in the deployed layout, CORS in dev.
-
-Nothing is shared with a third party: there is no analytics vendor, no
-advertising network, and no IP address is ever stored. `/privacy` says so in
-detail, and is meant to stay true — change what is collected, change that page.
-
-## Quick start
-
-Run each service in its own terminal:
-
-```bash
-# API — http://localhost:3000/api  (needs php-sqlite3, or php-mysql)
-cd services/api    && cp .env.example .env && composer install && composer migrate && composer dev
-
-# Public site — http://localhost:5173
-cd services/site && cp .env.example .env && npm install && npm run dev
+```sh
+bin/setup                                    # → http://localhost:8110 (admin / admin), mail → http://localhost:8135
+bin/wp <command>                             # WP-CLI
+cd wp-content/themes/frascella && npm run build   # after CSS or TypeScript changes
+cd wp-content/plugins/frascella && npm test       # widgets, editor, languages, accessibility
 ```
 
-The API logs contact messages to the console instead of sending them until
-`MAIL_HOST` is configured, so the form works end-to-end with no mail server.
-For the dashboard at `/admin`, run `composer admin-user create you@example.com`.
-It prints a TOTP secret and eight recovery codes, once — two-factor is required
-and cannot be skipped.
+## Release
 
-## Build
+See [`docs/guidelines/10-release-and-deploy.md`](docs/guidelines/10-release-and-deploy.md):
+1. the version in three places;
+2. `CHANGELOG.md`;
+3. `bin/build-zips`;
+4. a GitHub release;
+5. install on production with WP-CLI.
 
-```bash
-cd services/site && npm run build       # static site → dist/
-services/builder/build.sh               # full deploy tarball for CloudPanel
+## Two rules
 
-# the deployed shape, running: CloudPanel layout + nginx proxy hop + MySQL
-docker compose -f infra/docker-compose.yml up --build     # → localhost:8080
-```
-
-## Layout
-
-```
-services/site     Astro static site + vanilla TS motion layer (portfolio)
-services/api      PHP API (contact email + analytics; bin/ holds the CLI jobs)
-services/builder  build.sh → CloudPanel deploy tarball
-infra             docker compose: the deployed layout + MySQL, for verification
-.claude           agents (architect/frontend/backend) + /ship command
-briefs            one brief per planned feature (_template.md)
-docs              living documentation (_template.md)
-```
-
-## Working in this repo
-
-- Read **`CLAUDE.md`** for the architecture and conventions, **`AGENTS.md`** for
-  the agent roster.
-- Git flow (AVH edition): features branch off `develop`; `main` is the release
-  line.
-- `/ship [--push]` commits (and optionally pushes) the current work.
+- **`/privacy` says what the code does.** When what the site collects changes, that page
+  changes in the same release.
+- **No invented facts about the business.**

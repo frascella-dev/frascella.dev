@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emanuele Frascella · siti WordPress, app e microservizi · Taranto</title>
+<!-- the prototype's faces and reset (the theme will have its own); the desk's tags come from the manifest -->
+<link rel="stylesheet" href="/.impeccable/mocks/sketches/assets/base.css">
+<!--DESK-HEAD-->
+<style>
+/* Variant A: "il manifesto traforato". The page is a near-opaque Ink sheet laid over the desk;
+   the giant words are cut out of it (an SVG luminance mask), so the scene is seen only through
+   the letterforms. The words in the DOM are real and transparent; the SVG mirrors their boxes.
+
+   TYPE SCALE
+   ----------
+   Text and UI (--t-1 … --t7): a modular scale, fluid in two straight segments and still between
+   the anchors, capped above 2560 px:
+       width    base (--t0)   ratio
+        390 px   16.0 px      1.200   (phone: tighter steps, so big steps do not swamp the screen)
+       1440 px   17.5 px      1.250
+       2560 px   22.0 px      1.250   (large displays keep growing: 19.4 px at 1920)
+   Each token is clamp(min, max(min(segment 390→1440, value@1440), segment 1440→2560), max).
+       step   390    1440   1920   2560   line-height   use
+       --t-1  13.3   14.0   15.5   17.6   1.45          captions, labels, nav, buttons, pills, scroll cue
+       --t0   16.0   17.5   19.4   22.0   1.55          body, hero lede, form fields, big buttons
+       --t1   19.2   21.9   24.3   27.5   1.4           contact lede, logo, screen label
+       --t2   23.0   27.3   30.4   34.4   1.25          (unused)
+       --t3   27.6   34.2   37.9   43.0   1.08          band headings (h2/h3), facts
+       --t4   33.2   42.7   47.4   53.7   1.02          hero second line (phone), project names (phone)
+       --t5   39.8   53.4   59.3   67.1   1.0           project names, services heading (phone)
+       --t6   47.8   66.8   74.1   83.9   .98           hero second line
+       --t7   57.3   83.4   92.6  104.9   .96           services heading
+   Measure: running text is held to --measure (68ch) or its column, whichever is narrower.
+
+   Cut-out words (--cut-s … --cut-xl): a separate display scale, ratio 4:3, in viewport heights.
+   The script wraps each word at its spaces (and at &shy; break points), fits the longest line to
+   96% of its column, and caps the whole block's height (lines × size × line-height) at its step:
+       --cut-s 24svh   --cut-m 32svh   --cut-l 43svh   --cut-xl 57svh
+   (xl: the single-word posters; l: the hero, which shares its screen with a line and a band) */
+:root{
+  --desk-veil:#8A857C;--desk-progress:#FF4A1C;--desk-ground:#09090a;
+  --ink:#0E0E11;--gr:#1C1C21;--paper:#F3EFE7;--stone:#8A857C;--v:#FF4A1C;
+  --stone-t:#A7A197;             /* stone lifted for small text on the sheet: 6.4:1 */
+  --text:#DDD8CF;                /* running text on the sheet */
+  --line:rgba(243,239,231,.16);
+
+  --t-1: clamp(0.8333rem, max(min(0.8179rem + 0.0635vw, 0.875rem), 0.5857rem + 0.3214vw), 1.1rem);
+  --t0:  clamp(1rem, max(min(0.9652rem + 0.1429vw, 1.0938rem), 0.7321rem + 0.4018vw), 1.375rem);
+  --t1:  clamp(1.2rem, max(min(1.1379rem + 0.2548vw, 1.3672rem), 0.9152rem + 0.5022vw), 1.7188rem);
+  --t2:  clamp(1.44rem, max(min(1.3401rem + 0.4099vw, 1.709rem), 1.144rem + 0.6278vw), 2.1484rem);
+  --t3:  clamp(1.728rem, max(min(1.5764rem + 0.6221vw, 2.1362rem), 1.43rem + 0.7847vw), 2.6855rem);
+  --t4:  clamp(2.0736rem, max(min(1.852rem + 0.9092vw, 2.6703rem), 1.7875rem + 0.9809vw), 3.3569rem);
+  --t5:  clamp(2.4883rem, max(min(2.1728rem + 1.2945vw, 3.3379rem), 2.2343rem + 1.2262vw), 4.1962rem);
+  --t6:  clamp(2.986rem, max(min(2.5453rem + 1.8078vw, 4.1723rem), 2.7929rem + 1.5327vw), 5.2452rem);
+  --t7:  clamp(3.5832rem, max(min(2.9769rem + 2.4872vw, 5.2154rem), 3.4911rem + 1.9159vw), 6.5565rem);
+  --lh-1:1.45;--lh0:1.55;--lh1:1.4;--lh2:1.25;--lh3:1.08;--lh4:1.02;--lh5:1;--lh6:.98;--lh7:.96;
+  --measure:68ch;
+  --cut-s:24svh;--cut-m:32svh;--cut-l:43svh;--cut-xl:57svh;
+
+  --g:clamp(16px,4.4vw,112px);
+  --hh:calc(var(--t0) * 3.9);    /* the header grows with the type: 68 px at 1440, 86 px at 2560 */
+  --ease:cubic-bezier(.16,1,.3,1);
+  --lift:0;                      /* 0 → 1 while the sheet lifts off the desk (set by the sheet script) */
+}
+html{scroll-behavior:smooth;scrollbar-color:#3a3934 var(--ink);scrollbar-width:thin}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--ink);color:var(--paper);font-family:"Schibsted Grotesk",sans-serif;font-size:var(--t0);line-height:var(--lh0);
+  font-kerning:normal;text-rendering:optimizeLegibility;caret-color:var(--v)}
+::selection{background:var(--v);color:var(--ink)}
+::placeholder{color:#8f8a81;opacity:1}
+a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
+h1,h2,h3{font-family:Gloock,serif;font-weight:400;margin:0}
+p{margin:0}
+:focus-visible{outline:2px solid var(--v);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* the desk, then the perforated sheet over it */
+.sheet{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;transition:opacity .45s ease}
+main,footer{position:relative;z-index:2}
+
+/* the cut words: laid out by the browser, drawn by the mask. The .cut's own font-size is its cap
+   (a step of the cut scale); the script breaks it into .ln lines and sets their size inline.
+   Tracking lives on the lines, so it scales with each line's own size */
+.cut{display:block;font-family:Gloock,serif;font-weight:400;line-height:.86;color:transparent;font-size:var(--cut-xl);
+  user-select:none;-webkit-user-select:none;font-kerning:normal;font-feature-settings:"kern","liga"}
+.cut.l{font-size:var(--cut-l)}
+.cut .ln{display:block;white-space:nowrap;letter-spacing:-.022em}
+.cut .bl{display:inline-block;width:0;height:0;vertical-align:baseline}
+.cut.r{text-align:right}
+/* before the fonts arrive (or with scripts off) the words are simply set in Paper, at a safe size */
+html:not(.cutting) .cut{color:var(--paper);font-size:min(var(--cut-m),14vw);overflow-wrap:anywhere}
+
+/* header: sits on the sheet, which the mask keeps solid under it */
+.top{position:fixed;inset:0 0 auto;z-index:10;height:var(--hh);display:flex;align-items:center;justify-content:space-between;gap:1em;
+  padding:0 var(--g);border-bottom:1px solid var(--line);background:var(--ink)}
+.logo{display:flex;align-items:center;gap:.6em;text-decoration:none;font-size:var(--t1)}
+.logo svg{width:1.5em;height:1.5em;flex:none}
+.logo span{font-family:Gloock,serif;font-weight:400;line-height:1;letter-spacing:-.005em}
+.top nav{display:flex;align-items:center;gap:1.9em;font-size:var(--t-1);line-height:var(--lh-1);font-weight:500}
+.top nav a{text-decoration:none;color:var(--text)}
+.top nav a:hover{color:var(--paper);text-decoration:underline}
+.top nav .lang{color:var(--stone-t)}
+.btn{display:inline-flex;align-items:center;gap:.65em;background:var(--v);color:var(--ink)!important;text-decoration:none!important;
+  font-family:"Schibsted Grotesk",sans-serif;font-size:var(--t-1);line-height:1;font-weight:700;padding:.85em 1.25em;border-radius:0;border:0;cursor:pointer;transition:background .2s}
+.btn:hover{background:#ff6a42}
+.btn:active{background:#e8431a}
+.btn.big{font-size:var(--t0);padding:1.05em 1.4em}
+.btn .arr{transition:transform .3s var(--ease)}
+.btn:hover .arr{transform:translateX(4px)}
+
+/* the crackle switch: an icon, a speaker with waves while the record plays and struck through when it stops.
+   Its box is the height of the "scrivimi" button, so the nav's row keeps one line */
+.snd{display:inline-grid;place-items:center;width:2.7em;height:2.7em;margin:0 -.5em;padding:0;border:0;border-radius:0;
+  background:transparent;color:var(--text);font:inherit;cursor:pointer;transition:color .2s,background .2s}
+.snd svg{width:1.45em;height:1.45em}
+.snd .wv,.snd .sl{transition:opacity .25s}
+.snd .sl{opacity:0}
+.snd[aria-pressed="false"]{color:var(--stone-t)}
+.snd[aria-pressed="false"] .wv{opacity:0}
+.snd[aria-pressed="false"] .sl{opacity:1}
+.snd:hover{color:var(--paper);background:rgba(243,239,231,.07)}
+
+/* a poster: one station, one viewport */
+.poster{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;
+  gap:4vh;padding:calc(var(--hh) + 3.2vh) var(--g) 4.5vh}
+.band{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr) minmax(0,3fr);gap:1em 2.75em;align-items:start;
+  border-top:1px solid var(--line);padding-top:1.15em}
+.rh{font-size:var(--t-1);line-height:var(--lh-1);letter-spacing:.02em;color:var(--stone-t);display:flex;gap:.6em;align-items:baseline}
+.no{font-family:Gloock,serif;font-weight:400;font-size:var(--t0);line-height:1;color:var(--v);font-variant-numeric:lining-nums tabular-nums}
+.txt{color:var(--text);max-width:var(--measure);text-wrap:pretty}
+.band h3,.band h2{font-size:var(--t3);line-height:var(--lh3);letter-spacing:-.008em;text-wrap:balance}
+
+/* opening */
+.hero{padding-bottom:calc(max(48px,6svh) + 4.9 * var(--t-1))}  /* room for the scroll cue under the band (3.55em) */
+.hero h1{display:block}
+.hero .rest{display:block;text-align:right;font-size:var(--t6);line-height:var(--lh6);letter-spacing:-.012em;margin-top:.28em;text-wrap:balance}
+.hero .band{align-items:end}
+.hero .sub{color:var(--text);max-width:var(--measure);text-wrap:pretty}
+.hero .band .btn{justify-self:end}
+
+/* intermezzo: the sheet lifts off and the desk is all there is */
+.desk-int{position:relative;height:200vh;height:200svh}
+.hold{height:100vh;height:100svh}
+/* the hotspots: dots only, projected from the objects every frame the camera moves (scene/main.js) */
+.hotspots{position:fixed;inset:0;z-index:4;pointer-events:none}
+.hs{position:absolute;left:0;top:0;width:2.75em;height:2.75em;margin:-1.375em 0 0 -1.375em;padding:0;border:0;border-radius:50%;background:none;
+  font-size:var(--t-1);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s}
+.hotspots.on .hs.vis{opacity:1;pointer-events:auto}
+.hs:focus-visible{outline:none;opacity:1}
+.hs .dot{position:absolute;left:50%;top:50%;width:1em;height:1em;margin:-.5em 0 0 -.5em;border-radius:50%;background:var(--v);opacity:.72;
+  animation:breathe 2.6s ease-in-out infinite;transition:opacity .2s}
+.hs:nth-of-type(2n) .dot{animation-delay:-.9s}
+.hs:nth-of-type(3n) .dot{animation-delay:-1.7s}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.72}50%{transform:scale(1.35);opacity:.5}}
+.hs:hover .dot{opacity:1;animation-play-state:paused}
+.hs:focus-visible .dot{opacity:1;animation:none;outline:2px solid var(--v);outline-offset:4px}
+
+/* keep scrolling: a hairline that draws down into a chevron and runs out again, with "scorri" in small
+   caps beside it; in the hero and the intermezzo, on the page's right margin, in the strip the hero keeps
+   free under its band. A click goes on to the next section */
+.cue{position:fixed;right:var(--g);bottom:max(48px,6svh);z-index:3;display:flex;align-items:flex-end;gap:.75em;padding:.35em 0 .1em .5em;
+  border:0;background:none;font:inherit;font-size:var(--t-1);line-height:1;letter-spacing:.14em;font-variant-caps:all-small-caps;font-weight:500;
+  color:var(--stone-t);text-shadow:0 1px 6px rgba(14,14,17,.85);cursor:pointer;opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s,color .2s}
+.cue.on{opacity:1;visibility:visible;transition:opacity .4s,color .2s}
+.cue span{padding-bottom:.1em}
+.cue svg{display:block;width:1em;height:3.1em;overflow:visible;color:var(--paper);
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 45%);mask-image:linear-gradient(to bottom,transparent,#000 45%)}
+.cue .sh{stroke-dasharray:1 1;stroke-dashoffset:1;animation:draw 2.2s cubic-bezier(.65,0,.35,1) infinite}
+.cue:hover{color:var(--paper)}
+.cue:focus-visible{outline:2px solid var(--v);outline-offset:4px}
+@keyframes draw{0%{stroke-dashoffset:1}55%,62%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}
+html.ipad .cue{opacity:0;visibility:hidden}
+
+/* services */
+.intro{padding:14vh var(--g) 10vh;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:2.75em;align-items:end}
+.intro h2{font-size:var(--t7);line-height:var(--lh7);letter-spacing:-.018em;max-width:14ch;text-wrap:balance}
+.intro .rh{padding-bottom:.8em}
+.svc.flip{flex-direction:column-reverse}
+
+/* work: each project is on the laptop's screen, seen through a window cut to the screen's shape
+   (scene/main.js); its name and words sit beside it */
+.plate{position:relative;min-height:100vh;min-height:100svh;padding:calc(var(--hh) + 4vh) var(--g) 6vh;display:grid;
+  grid-template-columns:minmax(0,4fr) minmax(0,8fr);align-items:center}
+.pl{display:flex;flex-direction:column;gap:1.1em;border-top:1px solid var(--line);padding-top:1.15em}
+.pname{font-size:min(var(--t5),3.3vw);line-height:var(--lh5);letter-spacing:-.012em;overflow-wrap:anywhere}
+.plate .meta{font-size:var(--t-1);line-height:var(--lh-1);color:var(--stone-t)}
+
+/* bio */
+.bio .txt+.txt{margin-top:.75em}
+.facts{display:grid;gap:.85em;margin:0}
+.facts div{display:flex;justify-content:space-between;align-items:baseline;gap:.75em;border-bottom:1px solid var(--line);padding-bottom:.6em}
+.facts b{font-family:Gloock,serif;font-weight:400;font-size:var(--t3);line-height:1;color:var(--v);font-variant-numeric:lining-nums;white-space:nowrap}
+.facts span{font-size:var(--t-1);line-height:var(--lh-1);color:var(--stone-t);text-align:right}
+.bio .cut{align-self:stretch}
+
+/* contact */
+.contact{justify-content:flex-start;gap:5vh;padding-top:calc(var(--hh) + 3.2vh + 5.5em)}
+.contact .band{grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:1.5em 2.75em;align-items:start}
+.contact .lede{font-size:var(--t1);line-height:var(--lh1);color:var(--text);max-width:34ch;margin-top:.5em;text-wrap:pretty}
+.contact .where{margin-top:1.6em;font-size:var(--t-1);line-height:var(--lh-1);color:var(--stone-t)}
+form{display:grid;grid-template-columns:1fr 1fr;gap:1.6em 2em}
+form .wide{grid-column:1/-1}
+label{display:grid;gap:.5em;font-size:var(--t-1);line-height:var(--lh-1);letter-spacing:.02em;color:var(--stone-t)}
+input,textarea{font-family:"Schibsted Grotesk",sans-serif;font-size:var(--t0);line-height:1.4;color:var(--paper);background:transparent;
+  border:0;border-bottom:1px solid rgba(243,239,231,.4);padding:.45em 0 .55em;border-radius:0;transition:border-color .2s}
+input:hover,textarea:hover{border-bottom-color:rgba(243,239,231,.7)}
+input:focus,textarea:focus{outline:none;border-bottom:2px solid var(--v);padding-bottom:calc(.55em - 1px)}
+input:focus-visible,textarea:focus-visible{outline:none}
+textarea{min-height:5.5em;resize:vertical}
+form .btn{justify-self:start}
+
+/* the colophon: the last poster, the wordmark cut through the sheet, and its band on the same three
+   tracks as every other band; the second and third tracks each hold two lists */
+.colophon .band{align-items:start}
+.colophon .brand{display:grid;gap:.75em;align-content:start;font-size:var(--t-1);line-height:var(--lh-1);color:var(--stone-t)}
+.colophon .logo{font-size:var(--t1)}
+.colophon .brand p{color:var(--text)}
+.colophon .brand small{font-size:inherit;margin-top:1.6em;font-variant-numeric:lining-nums tabular-nums}
+.colophon .pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1em 2.75em}
+.colophon h2{font-family:"Schibsted Grotesk",sans-serif;font-weight:500;letter-spacing:.12em;font-variant-caps:all-small-caps;margin:0 0 .55em}
+.colophon ul{list-style:none;margin:0;padding:0;display:grid;gap:.3em;font-size:var(--t0);line-height:var(--lh0)}
+.colophon ul a{display:inline-flex;align-items:center;gap:.3em;color:var(--paper);text-decoration:none;border-radius:0}
+.colophon ul a:hover{color:var(--v);text-decoration:underline}
+.colophon ul a svg{width:.7em;height:.7em;flex:none;color:var(--stone-t);transition:transform .25s var(--ease),color .2s}
+.colophon ul a:hover svg{color:var(--v);transform:translate(2px,-2px)}
+.colophon [aria-current]{color:var(--stone-t)}
+.colophon [aria-current]:hover{color:var(--stone-t);text-decoration:none}
+
+@media (max-width:900px){
+  .top nav .n{display:none}
+  .top nav{gap:1.1em}
+  .band,.hero .band,.bio .band,.contact .band{grid-template-columns:1fr;gap:.9em}
+  .hero .band .btn{justify-self:start}
+  .intro{grid-template-columns:1fr;gap:1.1em;padding:12vh var(--g) 8vh}
+  .intro h2{font-size:var(--t5);line-height:var(--lh5)}
+  form{grid-template-columns:1fr;gap:1.4em}
+  .facts{grid-template-columns:repeat(3,1fr);gap:.75em}
+  .facts div{flex-direction:column;align-items:flex-start;gap:.35em}
+  .facts span{text-align:left}
+  .colophon .pair{gap:1em 1.5em}
+  .colophon .band{gap:2em}
+  /* phone: the screen sits in the top half, the project's words in the bottom half */
+  .plate{grid-template-columns:1fr;align-items:end;padding-bottom:4.5vh}
+  .pname{font-size:var(--t4);line-height:var(--lh4)}
+}
+@media (max-width:760px){
+  .cut{line-height:.92}
+  .hero .cut{line-height:1.02}
+  .poster{gap:3vh;padding-bottom:4vh}
+  .hero{padding-bottom:calc(max(48px,6svh) + 4.9 * var(--t-1))}
+  .hero .rest{text-align:left;font-size:var(--t4);line-height:var(--lh4)}
+}
+@media (max-width:420px){.snd{width:2.5em;height:2.5em}.top nav{gap:.8em}.top .btn{padding:.75em .9em}.logo{font-size:var(--t0)}}
+
+/* the desk's switches (lamp, turntable, plant, phone, tablet): visually hidden, like a skip link, until the
+   keyboard reaches one; then a small pill group floats under the header, top left */
+.scene-ctl{position:absolute;top:calc(100% + 10px);left:var(--g);display:flex;flex-wrap:wrap;gap:.5em;max-width:calc(100vw - 2 * var(--g));font-size:var(--t-1)}
+.scene-ctl:not(:focus-within){width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.lampbtn{display:inline-flex;align-items:center;gap:.55em;height:2.7em;padding:0 1em 0 .8em;border-radius:0;border:1px solid rgba(243,239,231,.22);
+  background:rgba(14,14,17,.8);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.4);
+  color:var(--paper);font-family:"Schibsted Grotesk",sans-serif;font-size:var(--t-1);line-height:1;font-weight:500;cursor:pointer}
+.lampbtn svg{width:1.3em;height:1.3em;flex:none}
+.lampbtn[aria-pressed="true"] svg .ray{opacity:1}
+.lampbtn svg .ray{opacity:.25;transition:opacity .25s}
+.lampbtn:hover{background:rgba(28,28,33,.9)}
+.lampbtn:focus-visible{outline:2px solid var(--v);outline-offset:2px}
+.lampbtn .st{color:var(--stone-t)}
+.lampbtn:focus-visible .st{color:var(--paper)}
+
+/* tablet mode: the page steps aside, the desk canvas takes the pointer */
+.top,main,footer{transition:opacity .45s ease}
+html.ipad,html.ipad body{overflow:hidden}
+html.inspect .top,html.inspect main,html.inspect footer,html.inspect .cue{visibility:hidden}
+html.ipad .top,html.ipad main,html.ipad footer{opacity:0;pointer-events:none}
+.pad-ui{position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));z-index:32;display:flex;align-items:center;gap:.9em;pointer-events:none}
+.pad-ui[hidden]{display:none}
+.pad-done{display:inline-flex;align-items:center;gap:.4em;height:2.8em;padding:0 1.2em 0 .8em;border-radius:0;border:1px solid rgba(243,239,231,.22);
+  background:rgba(14,14,17,.78);color:var(--paper);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-family:"Schibsted Grotesk",sans-serif;font-size:var(--t-1);line-height:1;font-weight:600;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.pad-done svg{width:1.35em;height:1.35em}
+.pad-done:hover{background:rgba(28,28,33,.9)}
+.pad-done:focus-visible{outline:2px solid var(--v);outline-offset:3px}
+.pad-hint{margin:0;font-size:var(--t-1);line-height:var(--lh-1);color:var(--stone-t);background:rgba(14,14,17,.6);padding:.5em .8em;border-radius:999px}
+@media (max-width:640px){.pad-hint{display:none}}
+
+/* tablet mode and inspection: the sheet steps aside with the page */
+html.ipad .sheet{opacity:0}
+html.inspect .sheet{visibility:hidden}
+@media (prefers-reduced-motion: reduce){
+  .sheet,.top,main,footer,.hs,.cue,.btn .arr{transition:none}
+  .hs .dot,.cue .sh{animation:none}
+  .cue .sh{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<canvas id="desk" aria-hidden="true"></canvas>
+
+<svg class="sheet" id="sheet" aria-hidden="true" focusable="false">
+  <defs>
+    <mask id="knock" maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+      <rect x="0" y="0" width="100%" height="100%" fill="#fff"/>
+      <g id="holes"></g>
+      <!-- the window cut to the laptop's screen at each project (scene/main.js) -->
+      <path id="scrwin" d="" fill="#fff" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+      <!-- the intermezzo: the sheet opens from the middle until the desk is bare (the sheet script) -->
+      <rect id="iris" x="0" y="0" width="0" height="0" rx="24" fill="#000"/>
+      <rect id="headcover" x="0" y="0" width="100%" height="68" fill="#fff"/>
+    </mask>
+  </defs>
+  <rect x="0" y="0" width="100%" height="100%" fill="#0E0E11" fill-opacity=".935" mask="url(#knock)"/>
+  <clipPath id="belowhead"><rect id="headclip" x="0" y="68" width="100%" height="100%"/></clipPath>
+  <!-- inside each word a faint Paper wash and round it a hairline, so a word still reads where the
+       desk behind it is dark (the laptop's black screen, the felt mat) -->
+  <g clip-path="url(#belowhead)">
+    <g id="wash" fill="#F3EFE7"></g>
+    <g id="rims" fill="none" stroke="#F3EFE7" stroke-width="1.25"></g>
+    <path id="scrrim" d="" fill="none" stroke="#F3EFE7" stroke-width="1" stroke-opacity="0" stroke-linejoin="round"/>
+  </g>
+</svg>
+
+<header class="top">
+  <a class="logo" href="#" aria-label="frascella.dev, torna all'inizio">
+    <svg viewBox="0 0 128 128" aria-hidden="true"><path fill="#F3EFE7" d="M80.928 22.8718C96.9442 28.9201 107.794 43.4431 109.665 59.8326L98.1755 56.751C96.5179 50.0425 92.8522 43.9552 87.6777 39.3544L81.2455 63.3829L109.595 70.9865L106.805 81.4107L78.455 73.8071L68.1458 112.319L57.7316 109.526L80.928 22.8718Z"/><path fill="#FF4A1C" d="M96.7848 120L86.3706 117.207L89.161 106.783L99.5752 109.576L96.7848 120Z"/><path fill="#F3EFE7" d="M63.2076 47.3724L52.7934 44.5792L57.3279 27.6399L40.8388 23.2174L33.5138 50.5809L60.4171 57.7966L57.6266 68.2208L31.0879 61.1029C29.4431 75.5617 37.2165 89.5095 50.2575 95.7492L47.4304 106.31C27.1331 97.6967 15.7579 75.2138 21.6269 53.2894L33.2151 10L70.5326 20.0088L63.2076 47.3724Z"/></svg>
+    <span>frascella.dev</span>
+  </a>
+  <nav aria-label="principale">
+    <a class="n" href="#servizi">servizi</a>
+    <a class="n" href="#lavori">lavori</a>
+    <a class="n" href="#chi-sono">chi sono</a>
+    <!-- the record's crackle: the same switch as the turntable on the desk (scene/main.js keeps them in step) -->
+    <button class="snd" id="snd-btn" type="button" aria-pressed="true" aria-label="fruscio del vinile" title="fruscio del vinile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5h3.2L11.5 5.5v13l-4.8-4H3.5z"/><path class="wv" d="M15 9.2a4 4 0 0 1 0 5.6M17.7 6.8a7.4 7.4 0 0 1 0 10.4"/><path class="sl" d="M3 3.5l17.5 17"/></svg></button>
+    <a class="lang" href="#" lang="en">en</a>
+    <a class="btn" href="#contatti">scrivimi</a>
+  </nav>
+  <!-- the desk's switches: off screen until a keyboard reaches them (the mouse uses the desk itself) -->
+  <div class="scene-ctl" role="group" aria-label="oggetti della scrivania">
+    <button class="lampbtn" id="lamp-btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20h8"/><path d="M9 20V12l7-5"/><path d="M13.5 5.2l5 3.4-1 1.5-5-3.4z"/><path class="ray" d="M16.2 12.4l1 2.2M19 11l1.9 1.4"/></svg><span class="sr">luce della lampada: </span><span class="st" id="lamp-state">piena</span></button>
+    <button class="lampbtn" id="tt-btn" type="button" aria-pressed="false" aria-label="giradischi: fruscio del vinile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="12" r="7"/><circle cx="10" cy="12" r="1.6"/><path class="ray" d="M19.5 4.5v9l-3 3"/></svg><span class="st" aria-hidden="true">giradischi</span></button>
+    <button class="lampbtn" id="plant-btn" type="button" aria-label="pianta: fai scintillare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 15h11l-1.4 5.5H7.9z"/><path d="M12 15c-1.6-1.8-1.6-4.2 0-6.2 1.6 2 1.6 4.4 0 6.2z"/><path d="M12 15c-2.8 0-4.9-1.5-5.6-4 2.8-.2 4.8 1.3 5.6 4zM12 15c2.8 0 4.9-1.5 5.6-4-2.8-.2-4.8 1.3-5.6 4z"/><path class="ray" d="M17.5 4.5v1.6M16.7 5.3h1.6"/></svg><span class="st" aria-hidden="true">pianta</span></button>
+    <button class="lampbtn" id="mug-btn" type="button" aria-label="tazza: fai ondeggiare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/></svg><span class="st" aria-hidden="true">tazza</span></button>
+    <button class="lampbtn" id="phone-btn" type="button" aria-label="telefono: incrina lo schermo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.8 5.4h2.4"/><path class="ray" d="M10 11l2 2-1.2 1.6 2.2 2"/></svg><span class="st" aria-hidden="true">telefono</span></button>
+    <button class="lampbtn" id="pad-btn" type="button" aria-label="tablet: disegna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5l4 4L9 19H5v-4z"/><path d="M13 7l4 4"/></svg><span class="st" aria-hidden="true">tablet</span></button>
+  </div>
+</header>
+
+<!-- keep scrolling: in the hero and in the intermezzo (the sheet script shows it and moves on with it) -->
+<button class="cue" id="cue" type="button" aria-label="scorri"><span aria-hidden="true">scorri</span><svg viewBox="0 0 16 50" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sh" pathLength="1" d="M8 1v47"/><path d="M3 43l5 5 5-5"/></svg></button>
+
+<main>
+  <!-- the cut words (.cut) are plain text: the script wraps them at spaces, or at &shy; inside a word -->
+  <section class="poster hero" data-stop="hero">
+    <h1>
+      <span class="sr">siti, app e microservizi, dal repository al deploy</span>
+      <span class="cut l" aria-hidden="true" data-lines="siti, app|e microservizi" data-lines-n="siti,|app e|microservizi">siti, app e microservizi</span>
+      <span class="rest" aria-hidden="true">dal repository al deploy</span>
+    </h1>
+    <div class="band pane">
+      <p class="rh">Taranto · CET</p>
+      <p class="sub">Sono Emanuele Frascella, software engineer freelance a Taranto. Vengo da settori regolati e ad alto traffico, dove il software non può fermarsi; oggi porto lo stesso metodo nei progetti di piccole imprese e professionisti.</p>
+      <a class="btn big" href="#contatti">Scrivimi <span class="arr" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <!-- intermezzo: two holds at the same camera station, so the bare desk stays for a screenful -->
+  <section class="desk-int" id="scrivania" aria-label="la scrivania">
+    <div class="hold" data-stop="desk"></div>
+    <div class="hold" data-stop="desk"></div>
+    <!-- a dot on each thing you can touch; what it does is in its accessible name -->
+    <div class="hotspots" id="hotspots" role="group" aria-label="oggetti della scrivania">
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="lamp" aria-label="Lampada: tre intensità di luce"><span class="dot"></span></button>
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="turntable" aria-label="Giradischi: avvia e ferma il fruscio"><span class="dot"></span></button>
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="mug" aria-label="Tazza: ondeggia se la tocchi"><span class="dot"></span></button>
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="ipad" aria-label="Tablet: ci si può disegnare"><span class="dot"></span></button>
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="phone" aria-label="Telefono: lo schermo si incrina"><span class="dot"></span></button>
+      <button class="hs" type="button" aria-hidden="true" tabindex="-1" data-hs="plant" aria-label="Pianta: manda qualche scintilla"><span class="dot"></span></button>
+    </div>
+  </section>
+
+  <section id="servizi" aria-labelledby="svc-h">
+    <div class="intro pane">
+      <p class="rh">Servizi</p>
+      <h2 id="svc-h">Cosa faccio.</h2>
+    </div>
+    <div class="poster svc" data-stop="s1">
+      <span class="cut" aria-hidden="true">siti</span>
+      <div class="band pane">
+        <h3><span class="no">01</span><br>Siti WordPress</h3>
+        <p class="txt">Siti WordPress con Elementor, in una o più lingue, che poi modifichi da solo. Per prenotazioni, recensioni e newsletter uso anche plugin che ho scritto io, così quei dati restano sul tuo sito invece che su un servizio esterno.</p>
+      </div>
+    </div>
+    <div class="poster svc flip" data-stop="s2">
+      <span class="cut r" aria-hidden="true">app</span>
+      <div class="band pane">
+        <h3><span class="no">02</span><br>Web app e app mobile</h3>
+        <p class="txt">App per iOS e Android in Flutter, web app in React o Nuxt. Scrivo anche il server che c'è dietro: API, database, login.</p>
+      </div>
+    </div>
+    <div class="poster svc" data-stop="s3">
+      <span class="cut" aria-hidden="true" data-lines="microservizi" data-lines-n="micro|servizi">microservizi</span>
+      <div class="band pane">
+        <h3><span class="no">03</span><br>Microservizi e integrazioni</h3>
+        <p class="txt">Divido le applicazioni in servizi piccoli e indipendenti, in PHP, Python o JavaScript, ognuno nel suo container Docker. Se un servizio si ferma, gli altri continuano a funzionare. Collego anche i programmi che usi già, così i dati passano dall'uno all'altro senza ricopiarli a mano.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="lavori" aria-labelledby="work-h">
+    <div class="poster window" data-stop="w0">
+      <span class="cut" aria-hidden="true">lavori</span>
+      <div class="band pane">
+        <p class="rh">Lavori</p>
+        <h2 id="work-h">Tre progetti recenti.</h2>
+      </div>
+    </div>
+    <!-- each card: the camera frames the laptop, whose screen shows the project (data-screen) -->
+    <div class="works">
+      <article class="card plate" data-stop="w1" data-screen="0" aria-labelledby="p1-h">
+        <div class="pl pane">
+          <p class="rh"><span class="no">01</span> · cliente</p>
+          <h3 class="pname" id="p1-h">seveninktattoo.it</h3>
+          <p class="txt">Il sito di uno studio di tatuaggi, in italiano e in inglese. WordPress ed Elementor Pro, con i miei plugin per richieste di appuntamento, recensioni con consenso, newsletter e FAQ. Nessun servizio esterno.</p>
+          <p class="meta">WordPress · Elementor Pro<br>online</p>
+        </div>
+      </article>
+      <article class="card plate" data-stop="w2" data-screen="1" aria-labelledby="p2-h">
+        <div class="pl pane">
+          <p class="rh"><span class="no">02</span> · cofondatore</p>
+          <h3 class="pname" id="p2-h">skeda.fit</h3>
+          <p class="txt">Un'app per personal trainer freelance: schede, registrazione delle serie durante l'allenamento, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita; la lista d'attesa è aperta.</p>
+          <p class="meta">Flutter · Nuxt · Symfony<br>in sviluppo</p>
+        </div>
+      </article>
+      <article class="card plate" data-stop="w3" data-screen="2" aria-labelledby="p3-h">
+        <div class="pl pane">
+          <p class="rh"><span class="no">03</span> · mio</p>
+          <h3 class="pname" id="p3-h">vitrine</h3>
+          <p class="txt">Un overlay trasparente dietro le icone del desktop di Windows; i temi sono pagine React. Su Ubuntu usavo Conky, su Windows mi mancava. Parte con il PC e lo uso tutti i giorni.</p>
+          <p class="meta">C# · WPF · WebView2<br>codice pubblico su GitHub</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="chi-sono" class="poster bio" data-stop="bio" aria-labelledby="bio-h">
+    <span class="cut" aria-hidden="true">chi sono</span>
+    <div class="band pane">
+      <h2 id="bio-h">Scrivo codice dal 2013.</h2>
+      <div>
+        <p class="txt">Sono nato a Taranto. Ho iniziato con le app Android; alle superiori programmavo in C++. Ho lavorato alla progettazione di impianti fotovoltaici, poi in telemedicina, dove ho imparato a trattare i dati sanitari e il GDPR. Oggi lavoro anche sui backend e sui motori di gioco di casinò online: lì girano soldi veri, e i servizi non devono andare giù.</p>
+        <p class="txt">Da freelance lavoro da solo: mi scrivi, ti rispondo io, e il codice lo scrivo io. Nel tempo libero disegno tatuaggi su Procreate.</p>
+      </div>
+      <div class="facts">
+        <div><b>2013</b><span>la prima app Android</span></div>
+        <div><b>CET</b><span>Taranto</span></div>
+        <div><b>2 giorni</b><span>lavorativi per risponderti</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contatti" class="poster contact" data-stop="contact" aria-labelledby="ct-h">
+    <h2 id="ct-h"><span class="sr">scrivimi</span><span class="cut" aria-hidden="true">scrivimi</span></h2>
+    <div class="band pane">
+      <div>
+        <p class="lede">Scrivi cosa ti serve e cosa c'è già, anche in due righe. Rispondo entro due giorni lavorativi.</p>
+        <p class="where">Taranto · CET</p>
+      </div>
+      <form onsubmit="return false">
+        <label>Nome<input name="nome" autocomplete="name"></label>
+        <label>Email<input name="email" type="email" autocomplete="email"></label>
+        <label class="wide">Messaggio<textarea name="messaggio" placeholder="Cosa ti serve, cosa c'è già, entro quando"></textarea></label>
+        <button class="btn big" type="submit">Invia il messaggio <span class="arr" aria-hidden="true">→</span></button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="poster colophon">
+  <span class="cut" aria-hidden="true">frascella.dev</span>
+  <div class="band pane">
+    <div class="brand">
+    <a class="logo" href="#" aria-label="frascella.dev, torna all'inizio">
+    <svg viewBox="0 0 128 128" aria-hidden="true"><path fill="#F3EFE7" d="M80.928 22.8718C96.9442 28.9201 107.794 43.4431 109.665 59.8326L98.1755 56.751C96.5179 50.0425 92.8522 43.9552 87.6777 39.3544L81.2455 63.3829L109.595 70.9865L106.805 81.4107L78.455 73.8071L68.1458 112.319L57.7316 109.526L80.928 22.8718Z"/><path fill="#FF4A1C" d="M96.7848 120L86.3706 117.207L89.161 106.783L99.5752 109.576L96.7848 120Z"/><path fill="#F3EFE7" d="M63.2076 47.3724L52.7934 44.5792L57.3279 27.6399L40.8388 23.2174L33.5138 50.5809L60.4171 57.7966L57.6266 68.2208L31.0879 61.1029C29.4431 75.5617 37.2165 89.5095 50.2575 95.7492L47.4304 106.31C27.1331 97.6967 15.7579 75.2138 21.6269 53.2894L33.2151 10L70.5326 20.0088L63.2076 47.3724Z"/></svg>
+    <span>frascella.dev</span>
+  </a>
+      <p>Software engineer · Taranto, CET</p>
+      <small>© <span id="year">2026</span> Emanuele Frascella · P. IVA 03462650734</small>
+    </div>
+    <div class="pair">
+    <nav aria-labelledby="f-idx"><h2 class="rh" id="f-idx">Indice</h2><ul>
+    <li><a href="#servizi">servizi</a></li><li><a href="#lavori">lavori</a></li><li><a href="#chi-sono">chi sono</a></li><li><a href="#contatti">scrivimi</a></li>
+  </ul></nav>
+    <nav aria-labelledby="f-alt"><h2 class="rh" id="f-alt">Altrove</h2><ul>
+    <li><a href="https://github.com/manuto276" rel="noopener" target="_blank">github<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a></li>
+    <li><a href="https://www.linkedin.com/in/efrascella256/" rel="noopener" target="_blank">linkedin<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a></li>
+  </ul></nav>
+    </div>
+    <div class="pair">
+    <nav aria-labelledby="f-leg"><h2 class="rh" id="f-leg">Legale</h2><ul>
+    <li><a href="/privacy">privacy</a></li><li><a href="/privacy#cookie">cookie</a></li>
+  </ul></nav>
+    <nav aria-labelledby="f-lng"><h2 class="rh" id="f-lng">Lingua</h2><ul>
+    <li><a href="#" aria-current="page" lang="it">Italiano</a></li><li><a href="/en/" lang="en" hreflang="en">English</a></li>
+  </ul></nav>
+    </div>
+  </div>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</footer>
+
+
+
+<div class="pad-ui" id="pad-ui" hidden>
+  <p class="pad-hint" role="status">Disegna sullo schermo del tablet. «fatto» o Esc per tornare.</p>
+</div>
+
+<script>
+/* the perforation: break each cut word into lines and fit it to its column, mirror it into the
+   mask, and on scroll move the holes with the page; a word arriving at the middle of the screen
+   opens (its letters go from almost closed to clear) and settles its tracking. In the intermezzo
+   the whole sheet opens from the middle (#iris) and closes again after it. */
+(() => {
+  const NS = 'http://www.w3.org/2000/svg', SHY = '­';
+  const html = document.documentElement, holes = document.getElementById('holes'), rims = document.getElementById('rims'), wash = document.getElementById('wash'), cover = document.getElementById('headcover'), clip = document.getElementById('headclip');
+  const iris = document.getElementById('iris'), deskEl = document.getElementById('scrivania'), cue = document.getElementById('cue');
+  const head = document.querySelector('.top');
+  // the cue goes on: from the hero to the bare desk, from the desk to the services
+  cue.addEventListener('click', () => {
+    const r = deskEl.getBoundingClientRect(), to = window.__lift > .9 ? document.getElementById('servizi') : null;
+    scrollTo({ top: to ? to.getBoundingClientRect().top + scrollY : r.top + scrollY + H * .5, behavior: RM.matches ? 'auto' : 'smooth' });
+  });
+  const RM = matchMedia('(prefers-reduced-motion: reduce)');
+  const still = () => RM.matches || location.search.includes('shot');
+  const TRACK = -0.022, LOOSE = 0.05, FILL = .96, MAX_LINES = 4;
+  let blocks = [], W = 0, H = 0, t0 = performance.now(), queued = false, liftWas = -1;
+
+  // every way to break a text into lines: at its spaces, and at soft hyphens inside a word
+  // (broken there without a hyphen, as a poster would)
+  function splits(text) {
+    const parts = [], joins = [];
+    text.trim().split(/\s+/).forEach(w => w.split(SHY).forEach((p, j) => { if (parts.length) joins.push(j ? '' : ' '); parts.push(p); }));
+    const out = [];
+    for (let m = 0; m < 1 << joins.length; m++) {
+      const lines = [parts[0]];
+      joins.forEach((j, k) => { if (m & 1 << k) lines.push(parts[k + 1]); else lines[lines.length - 1] += j + parts[k + 1]; });
+      if (lines.length <= MAX_LINES) out.push(lines);
+    }
+    return out;
+  }
+  // widths at 100 px with the lines' own tracking, in the real font (measured, so kerning counts)
+  const probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font:400 100px/1 Gloock,serif;letter-spacing:' + TRACK + 'em;font-kerning:normal;font-feature-settings:"kern","liga"';
+  const widths = new Map();
+  const w100 = t => { if (!widths.has(t)) { probe.textContent = t; widths.set(t, probe.getBoundingClientRect().width); } return widths.get(t); };
+
+  function layout() {
+    W = innerWidth; H = innerHeight;
+    if (!probe.isConnected) document.body.append(probe);
+    const cuts = [...document.querySelectorAll('.cut')];
+    const rg = document.createRange();
+    const byCut = [];
+    for (const c of cuts) {
+      if (!c.dataset.src) c.dataset.src = c.textContent;
+      const avail = c.clientWidth * FILL, cap = parseFloat(getComputedStyle(c).fontSize), lh = parseFloat(getComputedStyle(c).lineHeight) / parseFloat(getComputedStyle(c).fontSize) || .86;
+      // the break that gives the biggest type, a little against every extra line (and, at a tie, the evenest)
+      let best = null;
+      // a block may fix its own breaks ("|" between lines): data-lines above 760 px, data-lines-n below
+      const fx = W > 760 ? c.dataset.lines : c.dataset.linesN, fixed = fx ? [fx.split('|')] : null;
+      for (const lines of fixed || splits(c.dataset.src)) {
+        const ws = lines.map(w100), wmax = Math.max(...ws);
+        const fs = Math.min(avail / wmax * 100, cap / (lines.length * lh));
+        const score = fs * (1 - .07 * (lines.length - 1)) * (1 - .015 * (wmax / Math.min(...ws) - 1));
+        if (!best || score > best.score) best = { lines, fs, score };
+      }
+      c.replaceChildren(...best.lines.map(t => { const l = document.createElement('span'); l.className = 'ln'; l.textContent = t; l.insertAdjacentHTML('beforeend', '<i class="bl"></i>'); l.style.fontSize = best.fs.toFixed(2) + 'px'; return l; }));
+      // check the result as laid out, and shrink if any line still runs past its column
+      let wmax = 0;
+      for (const l of c.children) { rg.selectNodeContents(l.firstChild); wmax = Math.max(wmax, rg.getBoundingClientRect().width); }
+      let fs = best.fs;
+      if (wmax > c.clientWidth * .985) { fs *= c.clientWidth * .985 / wmax; for (const l of c.children) l.style.fontSize = fs.toFixed(2) + 'px'; wmax *= fs / best.fs; }
+      byCut.push({ c, fs, slack: Math.max(0, c.clientWidth - wmax), chars: Math.max(...best.lines.map(t => t.length)) });
+    }
+    // read the boxes, in page coordinates
+    const y = scrollY;
+    holes.replaceChildren(); rims.replaceChildren(); wash.replaceChildren();
+    blocks = byCut.map(({ c, fs, slack, chars }) => {
+      const right = getComputedStyle(c).textAlign === 'right';
+      const g = document.createElementNS(NS, 'g'); g.setAttribute('font-family', 'Gloock, serif'); g.setAttribute('font-size', fs.toFixed(2));
+      const bases = [];
+      for (const l of c.children) {
+        rg.selectNodeContents(l.firstChild); const r = rg.getBoundingClientRect();
+        const base = l.querySelector('.bl').getBoundingClientRect().top + y; bases.push(base);
+        const t = document.createElementNS(NS, 'text');
+        t.textContent = l.firstChild.textContent;
+        t.setAttribute('x', (right ? r.right : r.left).toFixed(1)); t.setAttribute('y', base.toFixed(1));
+        t.setAttribute('text-anchor', right ? 'end' : 'start');
+        g.append(t);
+      }
+      holes.append(g);
+      const rim = g.cloneNode(true); rim.removeAttribute('fill'); rims.append(rim);
+      const wsh = g.cloneNode(true); wsh.removeAttribute('fill'); wash.append(wsh);
+      const top = Math.min(...bases) - fs, bot = Math.max(...bases) + fs * .3;
+      // the opening's extra tracking never takes a line past its column
+      const loose = Math.min(LOOSE, slack / (chars * fs));
+      return { g, rim, wsh, top, bot, mid: (top + bot) / 2, a: -1, on: null, loose };
+    });
+    cover.setAttribute('height', head.offsetHeight); clip.setAttribute('y', head.offsetHeight);
+    html.classList.add('cutting');
+    liftWas = -1;
+    paint();
+  }
+
+  const smooth = x => x * x * (3 - 2 * x);
+  const clamp01 = x => Math.min(1, Math.max(0, x));
+  // the intermezzo: 0 → 1 as its top climbs from 55% of the screen to the top, 1 while it fills the
+  // screen, 1 → 0 as its bottom goes from the foot of the screen to 45%. Reduced motion: a cut.
+  function lift() {
+    if (!deskEl) return 0;
+    const r = deskEl.getBoundingClientRect();
+    const k = Math.min(clamp01((H * .55 - r.top) / (H * .55)), clamp01((r.bottom - H * .45) / (H * .55)));
+    return RM.matches ? (k > .5 ? 1 : 0) : smooth(k);
+  }
+  window.__lift = 0;
+  function paintLift() {
+    const e = Math.round(lift() * 1000) / 1000;
+    window.__lift = e;
+    // keep scrolling: at the top of the page, and while the desk is bare
+    cue.classList.toggle('on', scrollY < H * .3 || e > .9);
+    if (e === liftWas) return; liftWas = e;
+    html.style.setProperty('--lift', e);
+    // an eye opening: a slit across the middle that widens and grows to past the edges
+    const hw = (W / 2 + 60) * (.4 + .6 * e), hh = (H / 2 + 60) * e;
+    iris.setAttribute('x', (W / 2 - hw).toFixed(1)); iris.setAttribute('width', (2 * hw).toFixed(1));
+    iris.setAttribute('y', (H / 2 - hh).toFixed(1)); iris.setAttribute('height', (2 * hh).toFixed(1));
+    iris.setAttribute('rx', Math.min(hh, 28).toFixed(1));
+  }
+  function paint() {
+    queued = false;
+    const y = scrollY;
+    for (const el of [holes, rims, wash]) el.setAttribute('transform', `translate(0 ${-y})`);
+    paintLift();
+    // the opening word on arrival (once, at load)
+    const intro = still() ? 1 : Math.min(1, (performance.now() - t0) / 1400);
+    for (const b of blocks) {
+      const on = b.bot > y - 40 && b.top < y + H + 40;
+      if (on !== b.on) { b.g.style.display = b.rim.style.display = b.wsh.style.display = on ? '' : 'none'; b.on = on; }
+      if (!on) continue;
+      // 0 while the word is still low on the screen, 1 once its middle reaches 55% of the height
+      let a = still() ? 1 : 1 - smooth(Math.min(1, Math.max(0, ((b.mid - y) / H - .55) / .45)));
+      if (b === blocks[0]) a = Math.min(a, 1 - Math.pow(1 - intro, 3));
+      a = Math.round(a * 100) / 100;
+      if (a === b.a) continue; b.a = a;
+      const v = Math.round((1 - a) * 205);
+      b.g.setAttribute('fill', `rgb(${v},${v},${v})`);
+      b.g.style.letterSpacing = b.rim.style.letterSpacing = b.wsh.style.letterSpacing = (TRACK + (1 - a) * b.loose).toFixed(4) + 'em';
+      b.rim.setAttribute('stroke-opacity', (.18 + a * .32).toFixed(3));
+      b.wsh.setAttribute('fill-opacity', (a * .11).toFixed(3));
+    }
+    if (intro < 1) queue();
+  }
+  function queue() { if (!queued) { queued = true; requestAnimationFrame(paint); } }
+  addEventListener('scroll', queue, { passive: true });
+  let rz = 0;
+  const relayout = () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(layout); };
+  addEventListener('resize', relayout);
+  window.__relayout = layout;
+  document.fonts.ready.then(() => { t0 = performance.now(); layout(); new ResizeObserver(relayout).observe(document.querySelector('main')); });
+})();
+</script>
+<!--DESK-BODY-->
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+    "name": "@frascella/plugin",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "description": "frascella.dev — the plugin's end-to-end tests (Playwright, axe) against the local site.",
+    "scripts": {
+        "test": "node tests/e2e/widgets.mjs && node tests/e2e/editor-preview.mjs && node tests/e2e/languages.mjs && node tests/e2e/contact.mjs && node tests/e2e/a11y.mjs",
+        "test:widgets": "node tests/e2e/widgets.mjs",
+        "test:editor": "node tests/e2e/editor-preview.mjs",
+        "test:languages": "node tests/e2e/languages.mjs",
+        "test:contact": "node tests/e2e/contact.mjs",
+        "test:a11y": "node tests/e2e/a11y.mjs"
+    },
+    "devDependencies": {
+        "axe-core": "^4.10.0",
+        "playwright": "^1.55.0"
+    }
+}

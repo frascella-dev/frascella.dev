@@ -1,0 +1,87 @@
+/* The desk's own layers (CONTRACT.md §5). The page owns the sheet over them (z-index 1) and
+   main/footer (2); colours come from the page's tokens through --desk-* properties. */
+
+#desk {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    background: var(--desk-ground, var(--dark));
+}
+
+/* the warm grey seen through the cut-out letters until the first frame; then it fades and the
+   desk shows through them. Without WebGL it holds the station stills. */
+.desk-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--desk-veil, var(--meta));
+    transition: opacity 1s ease;
+}
+html.desk-ready.desk-webgl .desk-veil {
+    opacity: 0;
+}
+.desk-still {
+    position: absolute;
+    inset: 0;
+    background: center / cover no-repeat;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+.desk-still.on {
+    opacity: 1;
+}
+
+/* loading: a hairline under the header that fills as the scene arrives, then fades */
+.desk-progress {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--desk-top, 0);
+    z-index: 11;
+    height: 2px;
+    pointer-events: none;
+    background: var(--desk-progress, var(--accent));
+    transform: scaleX(var(--p, 0));
+    transform-origin: 0 50%;
+    transition: transform 0.3s ease, opacity 0.5s ease 0.2s;
+}
+html.desk-ready .desk-progress {
+    opacity: 0;
+}
+
+/* the tablet's drawing app: laid on the glass in 3D while the camera comes down, then flat */
+.pad-css {
+    position: fixed !important;
+    inset: 0;
+    z-index: 31;
+    pointer-events: none;
+    visibility: hidden;
+}
+.pad-css.on {
+    visibility: visible;
+}
+.pad-flat {
+    position: fixed;
+    inset: 0;
+    z-index: 31;
+    pointer-events: none;
+    visibility: hidden;
+}
+.pad-flat.on {
+    visibility: visible;
+}
+html.ipad #desk {
+    touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .desk-veil,
+    .desk-still,
+    .desk-progress {
+        transition: none;
+    }
+}

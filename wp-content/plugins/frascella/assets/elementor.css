@@ -1,0 +1,84 @@
+/* Elementor's own layout, taken back off.
+ *
+ * Every section of the site is a full-bleed block that draws its own gutters and its own
+ * vertical rhythm — that is what the theme's design is. Elementor wraps each widget in a
+ * container that is `display: flex`, has a `max-width` from the kit and padding of its
+ * own, and the three of them together re-lay-out a page that was already laid out.
+ *
+ * So the wrapper is made transparent: block, full width, no box of its own. What is left
+ * is the theme's markup, in the order the builder put it in.
+ *
+ * Scoped to `.elementor` so nothing here reaches a page the builder never touched, and
+ * deliberately not in the theme's stylesheet: this is a fact about Elementor rather than
+ * about the design, and it stays true whatever the theme looks like.
+ *
+ * **One class of weight, and no more.** A section built from native widgets is a
+ * container carrying the theme's classes (`sheet contact`, `measure`)
+ * and those have to win: `:where(.elementor)` keeps these rules at the weight of a single
+ * class, and the stylesheets load in the order Elementor → this file → the theme, so a
+ * container with no class of the theme's is transparent and one with a class is exactly
+ * what the class says. */
+
+:where(.elementor) .e-con,
+:where(.elementor) .e-con > .e-con-inner,
+:where(.elementor) .elementor-section,
+:where(.elementor) .elementor-container,
+:where(.elementor) .elementor-column,
+:where(.elementor) .elementor-widget-wrap {
+    display: block;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    gap: 0;
+}
+
+/* Elementor's own cap on a top-level container, `min(100%, var(--width))`. */
+:where(.elementor) [data-elementor-id] > .e-con {
+    max-width: none;
+}
+
+:where(.elementor) .elementor-widget,
+:where(.elementor) .elementor-widget-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* A widget's measure and margins. Elementor holds every widget in a container to
+   `max-width: 100%` and to no vertical margin, at a weight no class of the theme can
+   reach; the theme says a widget's measure in `--frascella-max` and its margins in
+   `--frascella-margin`, next to its own `max-width` and `margin` (`.prose`, `.contact-lede`…), and
+   this is where Elementor is told. */
+.elementor.elementor .e-con > .elementor-widget,
+.e-con.e-con > .e-con-inner > .elementor-widget {
+    max-width: var(--frascella-max, 100%);
+}
+
+.elementor .e-con .elementor-widget.elementor-widget {
+    margin: var(--frascella-margin, 0);
+}
+
+/* A native Heading is its wrapper: the theme's class (`display`, `eyebrow`, …) is on the
+   wrapper, and the `<h1>` Elementor prints inside it would otherwise be the browser's —
+   twice the size, its own weight — instead of the class's. */
+.elementor-widget-heading > .elementor-heading-title,
+.elementor-widget-heading > .elementor-widget-container > .elementor-heading-title {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    text-wrap: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+/* If a photograph in a frame of the theme's must fill it, restate the theme's rule here at
+   a specificity Elementor's `.elementor img { height: auto }` cannot beat, naming the
+   component only to stop Elementor changing it:  .elementor .card-frame img { height: 100%; } */
+
+/* The document wrapper itself. Elementor gives it nothing, but a theme or a kit can. */
+.elementor.elementor-page {
+    margin: 0;
+    padding: 0;
+}
