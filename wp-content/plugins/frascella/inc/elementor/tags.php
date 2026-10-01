@@ -3,7 +3,7 @@
 /**
  * Dynamic tags: the business's facts inside Elementor's own widgets — a heading with the
  * address, a button that calls, a text with the email — so a section built by hand says
- * what Settings → frascella.dev says, and follows it.
+ * what Portfolio → Settings says, and follows it.
  *
  * Two shapes cover almost everything: a text fact, and a link. Add a fact to
  * frascella_fact_fields() (inc/facts.php) and it is a choice in both.

@@ -69,7 +69,7 @@ return [
 
     'works' => [
         // Only in Elementor's editor, where an empty widget must still say what it is.
-        'empty' => 'Nessun progetto ancora: si aggiungono da Progetti, nel pannello.',
+        'empty' => 'Nessun progetto ancora: si aggiungono da Portfolio → Progetti.',
     ],
 
     'footer' => [

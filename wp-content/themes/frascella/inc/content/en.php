@@ -65,7 +65,7 @@ return array_replace($base, [
     ],
 
     'works' => [
-        'empty' => 'No projects yet: they are added under Projects, in the dashboard.',
+        'empty' => 'No projects yet: they are added in Portfolio → Projects.',
     ],
 
     'footer' => [

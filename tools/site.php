@@ -6,7 +6,7 @@
  *   bin/wp eval-file /var/www/html/tools/site.php [rebuild]
  *
  * - the facts (Settings → frascella.dev): the business's own, never invented;
- * - the projects (Projects), each in Italian and in English, with its screenshot;
+ * - the projects (Portfolio → Projects), each in Italian and in English, with its screenshot;
  * - the home page in Elementor: native containers and widgets with the theme's classes for
  *   the words, the plugin's widgets where there is data or behaviour (the cut-out words,
  *   the desk, the work), Agenda's widget for the form;
@@ -362,31 +362,37 @@ $image = static function (string $file) use ($say): int {
     return $attachment;
 };
 
-/* The projects --------------------------------------------------------------------------------- */
+/* The projects (the plugin's table: Portfolio → Projects) ----------------------------------------- */
 
-$projects = [];
-foreach ($words as $lang => $w) {
-    foreach ($w['projects'] as $order => [$slug, $title, $role, $body, $stack, $status, $url, $file, $alt]) {
-        $pid = $post('frascella_project', $slug, $title, $lang);
-        if ($rebuild || get_post_meta($pid, '_frascella_role', true) === '') {
-            wp_update_post(['ID' => $pid, 'post_title' => $title, 'post_content' => $body, 'menu_order' => $order + 1]);
-            update_post_meta($pid, '_frascella_role', $role);
-            update_post_meta($pid, '_frascella_stack', $stack);
-            update_post_meta($pid, '_frascella_status', $status);
-            update_post_meta($pid, '_frascella_url', $url);
+if (function_exists('frascella_project_save')) {
+    global $wpdb;
+    $table = frascella_table('projects');
+    $tgroups = [];
+    foreach ($words as $lang => $w) {
+        foreach ($w['projects'] as $order => [$slug, $title, $role, $body, $stack, $state, $url, $file, $alt]) {
             $img = $image($file);
             if ($img > 0) {
-                set_post_thumbnail($pid, $img);
                 // One file for every language; its alt text per language (the plugin's media.php).
                 update_post_meta($img, $lang === 'it' ? '_wp_attachment_image_alt' : '_frascella_alt_' . $lang, $alt);
             }
+            $fields = ['title' => $title, 'role' => $role, 'body' => $body, 'stack' => $stack, 'state' => $state, 'url' => $url, 'image_id' => $img, 'sort' => $order + 1, 'status' => 'published'];
+            $row = $wpdb->get_row($wpdb->prepare("SELECT id, tgroup FROM $table WHERE slug = %s AND lang = %s", $slug, $lang), ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fixed table name.
+            if ($row) {
+                $tgroups[$slug] ??= (string) $row['tgroup'];
+                if ($rebuild) {
+                    frascella_project_update((int) $row['id'], $fields);
+                }
+                continue;
+            }
+            $tgroups[$slug] ??= (string) ($wpdb->get_var($wpdb->prepare("SELECT tgroup FROM $table WHERE slug = %s LIMIT 1", $slug)) ?: ''); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fixed table name.
+            $saved = frascella_project_save($fields + ['lang' => $lang, 'slug' => $slug], $tgroups[$slug] !== '' ? $tgroups[$slug] : null);
+            if (is_wp_error($saved)) {
+                $say("! project $slug ($lang): " . $saved->get_error_message());
+                continue;
+            }
+            $tgroups[$slug] = (string) $saved['tgroup'];
+            $say("  + project $slug ($lang)");
         }
-        $projects[$slug][$lang] = $pid;
-    }
-}
-if (function_exists('pll_save_post_translations')) {
-    foreach ($projects as $pair) {
-        pll_save_post_translations($pair);
     }
 }
 $say('✓ projects');
