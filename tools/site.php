@@ -66,46 +66,48 @@ $cut = static fn (string $word, array $o = [], string $classes = '') => $widget(
 $it = [
     'home' => 'Home',
     'hero' => [
-        'cut' => 'siti, app e microservizi',
-        'lines' => 'siti, app|e microservizi',
-        'lines_n' => 'siti,|app e|microservizi',
-        'rest' => 'dal repository al deploy',
-        'where' => 'Taranto · CET',
-        'lede' => 'Sono Emanuele Frascella, software engineer freelance a Taranto. Vengo da settori regolati e ad alto traffico, dove il software non può fermarsi; oggi porto lo stesso metodo nei progetti di piccole imprese e professionisti.',
+        'cut' => 'piattaforme, app e integrazioni',
+        'lines' => 'piattaforme,|app e integrazioni',
+        'lines_n' => 'piattaforme,|app e|integrazioni',
+        'rest' => 'dall’architettura al rilascio',
+        'where' => 'Taranto · CET · da remoto',
+        'lede' => 'Sono un software engineer freelance di Taranto e seguo progetti per aziende, agenzie e startup. Vengo dalla telemedicina, dove ho lavorato con dati sanitari e GDPR; oggi mi occupo dei motori di gioco di casinò online, dove girano soldi veri e i servizi non possono andare giù.',
         'button' => 'Scrivimi →',
     ],
     'services' => [
         'label' => 'Servizi',
         'title' => 'Cosa faccio.',
         'items' => [
-            ['siti', 'Siti WordPress', 'Siti WordPress con Elementor, in una o più lingue, che poi modifichi da solo. Per prenotazioni, recensioni e newsletter uso anche plugin che ho scritto io, così quei dati restano sul tuo sito invece che su un servizio esterno.'],
-            ['app', 'Web app e app mobile', 'App per iOS e Android in Flutter, web app in React o Nuxt. Scrivo anche il server che c’è dietro: API, database, login.'],
-            ['microservizi', 'Microservizi e integrazioni', 'Divido le applicazioni in servizi piccoli e indipendenti, in PHP, Python o JavaScript, ognuno nel suo container Docker. Se un servizio si ferma, gli altri continuano a funzionare. Collego anche i programmi che usi già, così i dati passano dall’uno all’altro senza ricopiarli a mano.'],
+            ['piattaforme', 'Siti e piattaforme web', 'Sviluppo siti in WordPress oppure da zero, senza CMS. Per le piattaforme più complesse progetto anche la parte server, con API, database e autenticazione, e quando ha senso la divido in microservizi.'],
+            ['app', 'App mobile e web app', 'App per iOS e Android in Flutter, web app in React o Nuxt. Le sviluppo insieme alla parte server, oppure le collego a quella che c’è già.'],
+            ['integrazioni', 'Integrazioni e IA', 'Collego gestionali, CRM, sistemi di pagamento e servizi esterni, in modo che i dati passino da uno all’altro senza ricopiarli a mano, con gestione degli errori e un registro di ogni scambio. Integro anche modelli linguistici e agenti nel software esistente, collegandoli ai dati dell’azienda.'],
         ],
     ],
     'works' => ['cut' => 'lavori', 'label' => 'Lavori', 'title' => 'Tre progetti recenti.'],
     'bio' => [
         'cut' => 'chi sono',
-        'title' => 'Scrivo codice dal 2013.',
+        'title' => 'Mi piace costruire le cose che uso.',
         'text' => [
-            'Sono nato a Taranto. Ho iniziato con le app Android; alle superiori programmavo in C++. Ho lavorato alla progettazione di impianti fotovoltaici, poi in telemedicina, dove ho imparato a trattare i dati sanitari e il GDPR. Oggi lavoro anche sui backend e sui motori di gioco di casinò online: lì girano soldi veri, e i servizi non devono andare giù.',
-            'Da freelance lavoro da solo: mi scrivi, ti rispondo io, e il codice lo scrivo io. Nel tempo libero disegno tatuaggi su Procreate.',
+            'Molti dei miei progetti nascono da un’esigenza mia, quando uno strumento non esiste o non fa quello che mi serve. Usarli tutti i giorni mi obbliga a curare anche quello che in una demo non si vede, come i tempi di risposta, i casi limite e cosa succede quando qualcosa va storto. In questo periodo mi sto concentrando sull’IA applicata al software, in particolare su agenti e knowledge graph, e su come farli lavorare con dati reali invece che con esempi di prova.',
+            'Da freelance lavoro da solo, quindi parli direttamente con chi scrive il codice. Nel tempo libero vado in palestra e progetto tatuaggi su Procreate.',
         ],
-        'facts' => [['2013', 'la prima app Android'], ['CET', 'Taranto'], ['2 giorni', 'lavorativi per risponderti']],
+        'facts' => [['CET', 'da remoto, anche su fusi diversi'], ['NDA', 'lo firmo prima di vedere il progetto'], ['2 giorni', 'lavorativi per risponderti']],
     ],
     'contact' => [
         'cut' => 'scrivimi',
-        'lede' => 'Scrivi cosa ti serve e cosa c’è già, anche in due righe. Rispondo entro due giorni lavorativi.',
-        'where' => 'Taranto · CET',
+        'lede' => 'Raccontami cosa ti serve, cosa esiste già ed entro quando. Bastano poche righe, i dettagli li vediamo insieme in una call.',
+        'or' => 'oppure',
+        'email' => 'emanuele@frascella.dev',
     ],
     'menu' => [['servizi', '#servizi'], ['lavori', '#lavori'], ['chi sono', '#chi-sono']],
     'privacy' => 'Informativa privacy',
     // The notice's own description (search results), instead of its first lines.
     'privacyExcerpt' => 'Cosa fa questo sito con i dati di chi lo visita: il modulo di contatto, un solo cookie tecnico, nessuna statistica e nessun servizio di terze parti.',
     'projects' => [
-        ['seveninktattoo-it', 'seveninktattoo.it', 'cliente', 'Il sito di uno studio di tatuaggi, in italiano e in inglese. WordPress ed Elementor Pro, con i miei plugin per richieste di appuntamento, recensioni con consenso, newsletter e FAQ. Nessun servizio esterno.', 'WordPress · Elementor Pro', 'online', 'https://seveninktattoo.it', 'sevenink-home.webp', 'La home page di seveninktattoo.it'],
-        ['skeda-fit', 'skeda.fit', 'cofondatore', 'Un’app per personal trainer freelance: schede, registrazione delle serie durante l’allenamento, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita; la lista d’attesa è aperta.', 'Flutter · Nuxt · Symfony', 'in sviluppo', 'https://skeda.fit', 'skeda-home.webp', 'La home page di skeda.fit'],
-        ['vitrine', 'vitrine', 'mio', 'Un overlay trasparente dietro le icone del desktop di Windows; i temi sono pagine React. Su Ubuntu usavo Conky, su Windows mi mancava. Parte con il PC e lo uso tutti i giorni.', 'C# · WPF · WebView2', 'codice pubblico su GitHub', 'https://github.com/manuto276/vitrine', 'vitrine-hero.webp', 'vitrine sul desktop di Windows'],
+        ['seveninktattoo-it', 'seveninktattoo.it', 'cliente', 'Sito per uno studio di tatuaggi di Taranto, in WordPress ed Elementor. Gestisce richieste di appuntamento, recensioni, newsletter e FAQ senza appoggiarsi a servizi esterni, quindi i dati restano sul server dello studio.', 'WordPress · Elementor', 'online', 'https://seveninktattoo.it', 'sevenink-home.webp', 'La home page di seveninktattoo.it'],
+        // A proprietary project: no technologies (COPY.md, Registro); the card leaves the line out.
+        ['skeda-fit', 'skeda.fit', 'cofondatore', 'App per personal trainer freelance, con schede di allenamento, registrazione delle serie in palestra, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita e la lista d’attesa è aperta.', '', 'in sviluppo', 'https://skeda.fit', 'skeda-home.webp', 'La home page di skeda.fit'],
+        ['vitrine', 'vitrine', 'mio', 'Un overlay trasparente che sta dietro le icone del desktop di Windows, con i temi scritti come pagine React. Su Ubuntu usavo Conky e su Windows non c’era niente di simile. Parte con il PC e lo uso tutti i giorni.', 'C# · WPF · WebView2', 'codice pubblico su GitHub', 'https://github.com/manuto276/vitrine', 'vitrine-hero.webp', 'vitrine sul desktop di Windows'],
     ],
 ];
 // TODO(en): the English words, written separately once the Italian is approved. Until
@@ -119,12 +121,12 @@ $privacy = [
 <p class="note">Aggiornata il 1° ottobre 2026.</p>
 <p>La presente informativa descrive quello che questo sito fa con i dati di chi lo visita. È scritta a partire dal codice del sito e cambia insieme a esso.</p>
 <h2>Titolare del trattamento</h2>
-<p>Il titolare del trattamento è Emanuele Frascella, software engineer, Taranto (Italia), P. IVA 03462650734. Il sito è gestito da una sola persona fisica. Le richieste relative alla presente informativa possono essere inoltrate tramite il <a href="/#contatti">modulo di contatto</a>; la risposta rende noto l’indirizzo del titolare.</p>
+<p>Il titolare del trattamento è Emanuele Frascella, software engineer, Taranto (Italia), P. IVA 03462650734. Il sito è gestito da una sola persona fisica. Le richieste relative alla presente informativa possono essere inviate a <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> oppure tramite il <a href="/#contatti">modulo di contatto</a>.</p>
 <h2>Il modulo di contatto</h2>
-<p>Il modulo «scrivimi» raccoglie tre dati, tutti necessari: <strong>nome</strong>, <strong>indirizzo email</strong> e <strong>messaggio</strong>. Insieme a essi il sito registra la data e l’ora dell’invio, la lingua della pagina e l’indirizzo della pagina dalla quale è stato inviato.</p>
+<p>Il modulo «scrivimi» raccoglie <strong>nome</strong>, <strong>indirizzo email</strong> e <strong>messaggio</strong>, necessari, e il nome dell’<strong>azienda</strong>, facoltativo. Insieme a essi il sito registra la data e l’ora dell’invio, la lingua della pagina e l’indirizzo della pagina dalla quale è stato inviato.</p>
 <ul>
 <li><strong>Finalità e base giuridica:</strong> rispondere al messaggio ed eventualmente preparare un preventivo; misure precontrattuali adottate su richiesta dell’interessato (art. 6, par. 1, lett. b) GDPR). Non è richiesto alcun consenso.</li>
-<li><strong>Dove:</strong> nel database del sito, sul server che lo ospita. Una copia del messaggio è inviata per email alla casella del titolare.</li>
+<li><strong>Dove:</strong> nel database del sito, sul server che lo ospita. Una copia del messaggio è inviata per email all’indirizzo del titolare, emanuele@frascella.dev.</li>
 <li><strong>Chi li legge:</strong> soltanto il titolare.</li>
 <li><strong>Per quanto tempo:</strong> il messaggio e i dati che lo accompagnano sono cancellati automaticamente dopo <strong>12 mesi</strong>; la copia dell’email di notifica conservata nel registro di invio del sito dopo <strong>90 giorni</strong>. Possono essere cancellati prima, su richiesta.</li>
 <li>Il sito non invia email automatiche a chi scrive: la risposta è scritta dal titolare.</li>
@@ -149,7 +151,7 @@ $privacy = [
 <h2>Il server</h2>
 <p>[Da completare dal titolare: il fornitore che ospita il server, il paese in cui si trova e per quanto tempo il server conserva i propri registri di accesso, che come per ogni sito web contengono l’indirizzo IP, la pagina richiesta e l’ora.]</p>
 <h2>Diritti dell’interessato</h2>
-<p>Ai sensi degli articoli da 15 a 22 del GDPR l’interessato può chiedere l’accesso ai dati che lo riguardano, la loro rettifica o cancellazione, la limitazione del trattamento o una copia in formato portabile, e può opporsi al trattamento. Le richieste possono essere inoltrate tramite il <a href="/#contatti">modulo di contatto</a>. Ai sensi dell’art. 77 è possibile proporre reclamo al Garante per la protezione dei dati personali, <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
+<p>Ai sensi degli articoli da 15 a 22 del GDPR l’interessato può chiedere l’accesso ai dati che lo riguardano, la loro rettifica o cancellazione, la limitazione del trattamento o una copia in formato portabile, e può opporsi al trattamento. Le richieste possono essere inviate a <a href="mailto:emanuele@frascella.dev">emanuele@frascella.dev</a> oppure tramite il <a href="/#contatti">modulo di contatto</a>. Ai sensi dell’art. 77 è possibile proporre reclamo al Garante per la protezione dei dati personali, <a href="https://www.garanteprivacy.it" rel="noopener noreferrer">garanteprivacy.it</a>.</p>
 HTML,
 ];
 // TODO(en): written separately once the Italian is approved; the Italian notice stands in,
@@ -166,9 +168,9 @@ update_option('frascella_facts', [
     'region' => '',
     'country' => 'IT',
     'phone' => '',
-    // Who receives the requests is still to be confirmed (CLAUDE.md): empty, Agenda falls
-    // back to the site admin's address — on this machine, Mailpit.
-    'email' => '',
+    // Who receives the requests (inc/agenda.php). On this machine local-mail.php sends it
+    // to Mailpit, whatever the address.
+    'email' => 'emanuele@frascella.dev',
     'vat' => '03462650734',
     'github' => 'https://github.com/manuto276',
     'linkedin' => 'https://www.linkedin.com/in/efrascella256/',
@@ -269,7 +271,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
     foreach ($w['services']['items'] as $i => [$word, $title, $body]) {
         $n = sprintf('%02d', $i + 1);
         $services[] = $box('poster svc' . ($i === 1 ? ' poster--flip' : ''), [
-            $cut($word, $word === 'microservizi' ? ['lines' => 'microservizi', 'lines_n' => 'micro|servizi'] : [], $i === 1 ? 'cut-r' : ''),
+            $cut($word, [], $i === 1 ? 'cut-r' : ''),
             $box('band pane frascella-reveal', [
                 $heading('<span class="no">' . $n . '</span><br>' . $title, 'h3', 'display'),
                 $text('<p>' . $body . '</p>', 'txt'),
@@ -332,7 +334,7 @@ $layout = static function (array $w, string $lang) use ($box, $widget, $heading,
             $box('band band--wide pane', [
                 $box('contact-text', [
                     $text('<p>' . $w['contact']['lede'] . '</p>', 'contact-lede'),
-                    $text('<p>' . $w['contact']['where'] . '</p>', 'contact-where'),
+                    $text('<p>' . $w['contact']['or'] . ' <a href="mailto:' . $w['contact']['email'] . '">' . $w['contact']['email'] . '</a></p>', 'contact-where'),
                 ], ['inner' => true]),
                 $widget('agenda-form', ['form' => 'contatti']),
             ], ['inner' => true]),

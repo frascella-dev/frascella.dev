@@ -26,7 +26,7 @@ const browser = await launch();
 try {
 	// A short window, so the revealed section starts below the fold.
 	const visitor = await ( await browser.newContext( { viewport: { width: 1280, height: 480 } } ) ).newPage();
-	await visitor.goto( `${ BASE }/`, { waitUntil: 'networkidle' } );
+	await visitor.goto( `${ BASE }/`, { waitUntil: 'load' } );
 	const before = await visitor.evaluate( () => getComputedStyle( document.querySelector( '.frascella-reveal > .e-con-inner > .elementor-element, .frascella-reveal > .elementor-element' ) ).opacity );
 	for ( let y = 0; y < 12000; y += 300 ) {
 		await visitor.mouse.wheel( 0, 300 );
@@ -37,7 +37,7 @@ try {
 	check( 'visitor: a container marked frascella-reveal holds its widgets back, then brings them in', before === '0' && after.length > 0 && after.every( Boolean ), `${ before } → ${ JSON.stringify( after ) }` );
 
 	const calm = await ( await browser.newContext( { reducedMotion: 'reduce' } ) ).newPage();
-	await calm.goto( `${ BASE }/`, { waitUntil: 'networkidle' } );
+	await calm.goto( `${ BASE }/`, { waitUntil: 'load' } );
 	check( 'reduced motion: nothing held back', ( await visible( calm ) ).every( Boolean ) );
 
 	const page = await login( browser );

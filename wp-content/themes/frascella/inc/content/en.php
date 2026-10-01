@@ -24,12 +24,12 @@ return array_replace($base, [
 
     // TODO(en): placeholder, Italian.
     'meta' => [
-        'title' => 'Emanuele Frascella · siti WordPress, app e microservizi · Taranto',
-        'description' => fn (array $who): string => "Sono {$who['name']}, software engineer freelance a Taranto: siti WordPress, app e microservizi, dal repository al deploy.",
+        'title' => 'Emanuele Frascella · Software engineer freelance, Taranto',
+        'description' => 'Software engineer freelance a Taranto. Piattaforme web, app e integrazioni con IA e agenti per aziende, agenzie e startup, anche da remoto.',
     ],
 
     'schema' => [
-        'jobTitle' => 'Software engineer',
+        'jobTitle' => 'Software engineer freelance',
     ],
 
     // TODO(en): placeholder, Italian (except the skip link, already English).
@@ -43,7 +43,7 @@ return array_replace($base, [
         'sound' => 'audio',
         'soundOn' => 'on',
         'soundOff' => 'off',
-        'soundLabel' => ', fruscio del vinile',
+        'soundLabel' => 'audio: fruscio del vinile',
         'cta' => 'scrivimi',
         'ctaAnchor' => '#contatti',
         'open' => 'menu',
@@ -53,28 +53,21 @@ return array_replace($base, [
     // TODO(en): placeholder, Italian.
     'desk' => [
         'label' => 'la scrivania',
-        'group' => 'oggetti della scrivania',
         'controls' => 'oggetti della scrivania',
         'cue' => 'scorri',
-        'hs' => [
-            'lamp' => 'Lampada: tre intensità di luce',
-            'turntable' => 'Giradischi: avvia e ferma il fruscio',
-            'mug' => 'Tazza: ondeggia se la tocchi',
-            'ipad' => 'Tablet: ci si può disegnare',
-            'phone' => 'Telefono: lo schermo si incrina',
-            'plant' => 'Pianta: manda qualche scintilla',
-        ],
         'lamp' => 'luce della lampada:',
         'lampFull' => 'piena',
         'turntable' => 'giradischi: fruscio del vinile',
         'turntableShort' => 'giradischi',
+        'mug' => 'tazza: fai ondeggiare',
+        'mugShort' => 'tazza',
         'plant' => 'pianta: fai scintillare',
         'plantShort' => 'pianta',
         'phone' => 'telefono: incrina lo schermo',
         'phoneShort' => 'telefono',
         'pad' => 'tablet: disegna',
         'padShort' => 'tablet',
-        'padHint' => 'Disegna sullo schermo del tablet. «fatto» o Esc per tornare.',
+        'padHint' => 'Disegna sullo schermo del tablet. Premi «fatto» o Esc per tornare.',
     ],
 
     'works' => [
@@ -83,7 +76,7 @@ return array_replace($base, [
 
     // TODO(en): placeholder, Italian.
     'footer' => [
-        'role' => fn (array $who): string => $who['city'] !== '' ? "Software engineer · {$who['city']}, CET" : 'Software engineer · CET',
+        'role' => fn (array $who): string => $who['city'] !== '' ? "Software engineer freelance · {$who['city']}, CET" : 'Software engineer freelance · CET',
         'legal' => fn (array $who): string => '© ' . gmdate('Y') . " {$who['name']}" . ($who['vat'] !== '' ? " · P. IVA {$who['vat']}" : ''),
         'index' => 'Indice',
         'elsewhere' => 'Altrove',

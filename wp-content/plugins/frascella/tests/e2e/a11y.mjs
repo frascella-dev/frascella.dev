@@ -15,14 +15,14 @@ try {
 	for ( const [ width, label ] of [ [ 1440, 'desktop' ], [ 390, 'phone' ] ] ) {
 		const page = await ( await browser.newContext( { viewport: { width, height: 900 }, reducedMotion: 'reduce' } ) ).newPage();
 		for ( const url of [ '/', '/en/', '/privacy/', '/en/privacy/', '/not-a-page/' ] ) {
-			await page.goto( BASE + url, { waitUntil: 'networkidle' } );
+			await page.goto( BASE + url, { waitUntil: 'load' } );
 			await audit( page, `${ url } (${ label })` );
 		}
 	}
 
 	// The phone's menu, open: the drawer, and the page behind it out of reach.
 	const phone = await ( await browser.newContext( { viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' } ) ).newPage();
-	await phone.goto( `${ BASE }/`, { waitUntil: 'networkidle' } );
+	await phone.goto( `${ BASE }/`, { waitUntil: 'load' } );
 	await phone.click( '.menu-btn' );
 	const open = await phone.evaluate( () => ( {
 		expanded: document.querySelector( '.menu-btn' ).getAttribute( 'aria-expanded' ),
@@ -41,14 +41,15 @@ try {
 
 	// The form, refused: the lines under the fields.
 	const desk = await ( await browser.newContext( { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' } ) ).newPage();
-	await desk.goto( `${ BASE }/#contatti`, { waitUntil: 'networkidle' } );
+	await desk.goto( `${ BASE }/#contatti`, { waitUntil: 'load' } );
 	await desk.waitForTimeout( 2300 );
 	await desk.click( '.contact-form button[type="submit"]' );
 	await desk.waitForSelector( '.field-error' );
 	await audit( desk, '/ form refused (desktop)' );
 
 	// The keyboard's way to the desk: Tab from the menu reaches the desk's switches.
-	await desk.goto( `${ BASE }/`, { waitUntil: 'networkidle' } );
+	await desk.goto( `${ BASE }/`, { waitUntil: 'load' } );
+	await desk.waitForFunction( () => document.documentElement.classList.contains( 'desk-ready' ), null, { timeout: 30000 } );
 	await desk.evaluate( () => document.querySelector( '.top-cta' ).focus() );
 	await desk.keyboard.press( 'Tab' );
 	const next = await desk.evaluate( () => document.activeElement?.id || document.activeElement?.className );

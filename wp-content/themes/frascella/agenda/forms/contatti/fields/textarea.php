@@ -13,8 +13,8 @@ $agenda_key = (string) $field['key'];
 $agenda_rules = (array) ($field['rules'] ?? []);
 ?>
 <label class="field-name" for="<?php echo esc_attr($agenda->id($field)); ?>">
+    <?php /* An optional field says so in its own label («Azienda (facoltativo)», COPY.md), not in Agenda's suffix. */ ?>
     <?php echo esc_html($agenda->label($field)); ?>
-    <?php if (empty($field['required'])) : ?><span class="field-optional"><?php esc_html_e('(optional)', 'agenda'); ?></span><?php endif ?>
 </label>
 <textarea class="input" id="<?php echo esc_attr($agenda->id($field)); ?>" name="<?php echo esc_attr($agenda_key); ?>" rows="<?php echo esc_attr((string) (int) ($field['rows'] ?? 4)); ?>"
     <?php if ($agenda->placeholder($field) !== '') : ?>placeholder="<?php echo esc_attr($agenda->placeholder($field)); ?>"<?php endif ?>

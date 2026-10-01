@@ -27,22 +27,24 @@ const count = ( html, needle ) => html.split( needle ).length - 1;
 
 try {
 	// The desk's words.
-	setWidget( it, 'frascella-desk', { t__desk__hs__lamp: 'Lampada di prova', t__desk__label: 'Ciao <script>alert(1)</script><em>scrivania</em>' } );
+	setWidget( it, 'frascella-desk', { t__desk__cue: 'Scendi di prova', t__desk__label: 'Ciao <script>alert(1)</script><em>scrivania</em>' } );
 	const itPage = await text( '/' );
-	check( 'desk: a typed field is what the page says', itPage.includes( 'aria-label="Lampada di prova"' ) );
-	check( 'desk: the other language keeps its own words', ! ( await text( '/en/' ) ).includes( 'Lampada di prova' ) );
+	check( 'desk: a typed field is what the page says', itPage.includes( 'aria-label="Scendi di prova"' ) );
+	check( 'desk: the other language keeps its own words', ! ( await text( '/en/' ) ).includes( 'Scendi di prova' ) );
 	check( 'desk: no markup in a one-line field', ! itPage.includes( '<script>alert(1)' ) && ! itPage.includes( '&lt;script' ) && itPage.includes( 'aria-label="Ciao alert(1)scrivania"' ) );
-	setWidget( it, 'frascella-desk', { t__desk__hs__lamp: '', t__desk__label: '' } );
-	check( 'desk: an empty field says the site’s words', ( await text( '/' ) ).includes( 'aria-label="Lampada: tre intensità di luce"' ) );
+	setWidget( it, 'frascella-desk', { t__desk__cue: '', t__desk__label: '' } );
+	const fallback = await text( '/' );
+	check( 'desk: an empty field says the site’s words', fallback.includes( 'id="cue" type="button" aria-label="scorri"' ) );
+	check( 'desk: the dots are decorative, the keyboard has the switches', fallback.includes( 'id="hotspots" aria-hidden="true"' ) && count( fallback, 'class="hs" type="button"' ) === 6 && count( fallback, 'tabindex="-1"><span class="dot">' ) === 6 && fallback.includes( 'id="mug-btn"' ) );
 
 	// The cut-out word.
 	const page = await text( '/' );
-	check( 'cut: the opening is the page’s one h1, with its words for screen readers', count( page, '<h1' ) === 1 && /<h1 class="cut-h"><span class="sr">siti, app e microservizi<\/span>/.test( page ) );
-	check( 'cut: the word is hidden from screen readers, with its fixed lines', page.includes( 'class="cut" aria-hidden="true" data-lines="siti, app|e microservizi" data-lines-n="siti,|app e|microservizi"' ) );
+	check( 'cut: the opening is the page’s one h1, with its words for screen readers', count( page, '<h1' ) === 1 && /<h1 class="cut-h"><span class="sr">piattaforme, app e integrazioni<\/span>/.test( page ) );
+	check( 'cut: the word is hidden from screen readers, with its fixed lines', page.includes( 'class="cut" aria-hidden="true" data-lines="piattaforme,|app e integrazioni" data-lines-n="piattaforme,|app e|integrazioni"' ) );
 	check( 'cut: a soft hyphen typed as an entity becomes a break point', ( () => {
-		setWidget( it, 'frascella-cut', { word: 'micro&shy;servizi', tag: '', lines: '', lines_n: '' } );
+		setWidget( it, 'frascella-cut', { word: 'piatta&shy;forme', tag: '', lines: '', lines_n: '' } );
 		return true;
-	} )() && ( await text( '/' ) ).includes( 'micro­servizi' ) );
+	} )() && ( await text( '/' ) ).includes( 'piatta\u00ADforme' ) );
 	restoreIt();
 
 	// The works.
@@ -50,6 +52,7 @@ try {
 	const stops = [ ...works.matchAll( /data-stop="(w\d)" data-screen="(\d)"/g ) ].map( ( m ) => m[ 1 ] + m[ 2 ] );
 	check( 'works: one card per project, a station each, in order', JSON.stringify( stops ) === '["w10","w21","w32"]', JSON.stringify( stops ) );
 	check( 'works: each card carries its screenshot for the scene', count( works, 'data-screen-src="' ) === 3 );
+	check( 'works: a project with no stack has no stack line', /skeda\.fit<\/a>[\s\S]*?<p class="meta">\s*in sviluppo\s*<\/p>/.test( works ) );
 	check( 'works: the name links to the project', works.includes( 'href="https://seveninktattoo.it"' ) && works.includes( 'href="https://github.com/manuto276/vitrine"' ) );
 	setWidget( it, 'frascella-works', { count: 2 } );
 	check( 'works: «How many» shows that many', count( await text( '/' ), 'class="card plate"' ) === 2 );
@@ -86,7 +89,7 @@ if ( php( "echo defined('ELEMENTOR_PRO_VERSION') ? 'pro' : 'free';" ) === 'pro' 
 	check( 'header and footer: one landmark each, the Theme Builder’s', count( home, '<header' ) === 1 && count( home, '<footer' ) === 1 && home.includes( 'elementor-location-header' ) && home.includes( 'elementor-location-footer' ) );
 	check( 'footer: the facts — VAT number and profiles from the settings', home.includes( 'P. IVA 03462650734' ) && home.includes( 'href="https://github.com/manuto276"' ) && home.includes( 'href="https://www.linkedin.com/in/efrascella256/"' ) );
 }
-check( 'restored', ( await text( '/' ) ).includes( 'aria-label="Lampada: tre intensità di luce"' ) );
+check( 'restored', ( await text( '/' ) ).includes( 'id="cue" type="button" aria-label="scorri"' ) );
 
 // The editor: the fields start from the page's own words, in its language.
 const browser = await launch();

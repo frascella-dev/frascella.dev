@@ -38,9 +38,10 @@ $home = frascella_home_url();
             <span class="top-divider" aria-hidden="true"></span>
         <?php endif; ?>
         <?php if ($desk) : ?>
-            <button class="top-sound" id="snd-btn" type="button" aria-pressed="true">
+            <?php /* Named by its label, which starts with the visible word; on/off is aria-pressed. */ ?>
+            <button class="top-sound" id="snd-btn" type="button" aria-pressed="true" aria-label="<?= esc_attr(frascella_s('nav.soundLabel')) ?>">
                 <?= frascella_e(frascella_s('nav.sound')) ?>
-                <span class="on" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOn')) ?></span><span class="off" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOff')) ?></span><span class="sr"><?= frascella_e(frascella_s('nav.soundLabel')) ?></span>
+                <span class="on" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOn')) ?></span><span class="off" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOff')) ?></span>
             </button>
         <?php endif; ?>
         <?php foreach ($others as $language) : ?>
@@ -58,6 +59,7 @@ $home = frascella_home_url();
         <div class="scene-ctl" role="group" aria-label="<?= esc_attr(frascella_s('desk.controls')) ?>">
             <button class="lampbtn" id="lamp-btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20h8"/><path d="M9 20V12l7-5"/><path d="M13.5 5.2l5 3.4-1 1.5-5-3.4z"/><path class="ray" d="M16.2 12.4l1 2.2M19 11l1.9 1.4"/></svg><span class="sr"><?= frascella_e(frascella_s('desk.lamp')) ?> </span><span class="st" id="lamp-state"><?= frascella_e(frascella_s('desk.lampFull')) ?></span></button>
             <button class="lampbtn" id="tt-btn" type="button" aria-pressed="false" aria-label="<?= esc_attr(frascella_s('desk.turntable')) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="12" r="7"/><circle cx="10" cy="12" r="1.6"/><path class="ray" d="M19.5 4.5v9l-3 3"/></svg><span class="st" aria-hidden="true"><?= frascella_e(frascella_s('desk.turntableShort')) ?></span></button>
+            <button class="lampbtn" id="mug-btn" type="button" aria-label="<?= esc_attr(frascella_s('desk.mug')) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path class="ray" d="M9 3.5c-.8 1 .8 1.8 0 3M12.5 3.5c-.8 1 .8 1.8 0 3"/></svg><span class="st" aria-hidden="true"><?= frascella_e(frascella_s('desk.mugShort')) ?></span></button>
             <button class="lampbtn" id="plant-btn" type="button" aria-label="<?= esc_attr(frascella_s('desk.plant')) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 15h11l-1.4 5.5H7.9z"/><path d="M12 15c-1.6-1.8-1.6-4.2 0-6.2 1.6 2 1.6 4.4 0 6.2z"/><path d="M12 15c-2.8 0-4.9-1.5-5.6-4 2.8-.2 4.8 1.3 5.6 4zM12 15c2.8 0 4.9-1.5 5.6-4-2.8-.2-4.8 1.3-5.6 4z"/><path class="ray" d="M17.5 4.5v1.6M16.7 5.3h1.6"/></svg><span class="st" aria-hidden="true"><?= frascella_e(frascella_s('desk.plantShort')) ?></span></button>
             <button class="lampbtn" id="phone-btn" type="button" aria-label="<?= esc_attr(frascella_s('desk.phone')) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.8 5.4h2.4"/><path class="ray" d="M10 11l2 2-1.2 1.6 2.2 2"/></svg><span class="st" aria-hidden="true"><?= frascella_e(frascella_s('desk.phoneShort')) ?></span></button>
             <button class="lampbtn" id="pad-btn" type="button" aria-label="<?= esc_attr(frascella_s('desk.pad')) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5l4 4L9 19H5v-4z"/><path d="M13 7l4 4"/></svg><span class="st" aria-hidden="true"><?= frascella_e(frascella_s('desk.padShort')) ?></span></button>
@@ -74,9 +76,9 @@ $home = frascella_home_url();
             </ul>
             <div class="drawer-row">
                 <?php if ($desk) : ?>
-                    <button class="top-sound" type="button" aria-pressed="true" data-sound-mirror>
+                    <button class="top-sound" type="button" aria-pressed="true" aria-label="<?= esc_attr(frascella_s('nav.soundLabel')) ?>" data-sound-mirror>
                         <?= frascella_e(frascella_s('nav.sound')) ?>
-                        <span class="on" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOn')) ?></span><span class="off" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOff')) ?></span><span class="sr"><?= frascella_e(frascella_s('nav.soundLabel')) ?></span>
+                        <span class="on" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOn')) ?></span><span class="off" aria-hidden="true"><?= frascella_e(frascella_s('nav.soundOff')) ?></span>
                     </button>
                     <span class="top-divider" aria-hidden="true"></span>
                 <?php endif; ?>

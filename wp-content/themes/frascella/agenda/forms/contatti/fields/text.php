@@ -18,8 +18,8 @@ $agenda_min = $agenda_rules['min'] ?? (isset($agenda_rules['date_min']) ? agenda
 $agenda_max = $agenda_rules['max'] ?? (isset($agenda_rules['date_max']) ? agenda_relative_date((string) $agenda_rules['date_max']) : null);
 ?>
 <label class="field-name" for="<?php echo esc_attr($agenda->id($field)); ?>">
+    <?php /* An optional field says so in its own label («Azienda (facoltativo)», COPY.md), not in Agenda's suffix. */ ?>
     <?php echo esc_html($agenda->label($field)); ?>
-    <?php if (empty($field['required'])) : ?><span class="field-optional"><?php esc_html_e('(optional)', 'agenda'); ?></span><?php endif ?>
 </label>
 <input class="input" type="<?php echo esc_attr($agenda_type); ?>"
     id="<?php echo esc_attr($agenda->id($field)); ?>"

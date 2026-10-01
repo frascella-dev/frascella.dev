@@ -51,7 +51,7 @@ const browser = await launch();
 try {
 	// Refused, in place.
 	const page = await ( await browser.newContext( { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' } ) ).newPage();
-	await page.goto( `${ BASE }/#contatti`, { waitUntil: 'networkidle' } );
+	await page.goto( `${ BASE }/#contatti`, { waitUntil: 'load' } );
 	await page.waitForTimeout( 2300 );
 	await page.click( '.contact-form button[type="submit"]' );
 	await page.waitForSelector( '.field-error', { timeout: 10000 } );
@@ -97,7 +97,7 @@ try {
 
 	// The English page's form.
 	const en = await ( await browser.newContext( { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' } ) ).newPage();
-	await en.goto( `${ BASE }/en/#contatti`, { waitUntil: 'networkidle' } );
+	await en.goto( `${ BASE }/en/#contatti`, { waitUntil: 'load' } );
 	check( 'en: the form posts to the English page', ( await en.locator( '.contact-form form' ).getAttribute( 'action' ) ).includes( '/en/' ) );
 	await send( en, 'Prova Inglese', people[ 2 ], 'The English page sends too.' );
 	await en.waitForSelector( '[data-agenda-done]', { timeout: 15000 } );

@@ -53,6 +53,9 @@ export const text = ( url ) => fetch( BASE + url ).then( ( r ) => r.text() );
  * Without WebGL the desk shows its still pictures (`html.desk-fallback`), which is a state
  * a visitor can be in too. The desk's own tests (themes/frascella/assets/src/desk/test)
  * run with WebGL.
+ *
+ * Pages are awaited until `load`, not `networkidle`: the desk's texture workers can keep a
+ * connection open past the point where the page is complete.
  */
 export const launch = () => chromium.launch( { args: [ '--disable-3d-apis' ] } );
 
