@@ -101,7 +101,7 @@ function frascella_elementor_sections(): array
                     'default' => 0,
                 ],
             ],
-            'note' => __('One card per project, from Projects in the dashboard, in this page’s language and in their order. On the desk each one is shown on the laptop’s screen.', 'frascella'),
+            'note' => __('One card per project, from Portfolio → Projects, in this page’s language and in their order. On the desk each one is shown on the laptop’s screen.', 'frascella'),
         ],
         'header' => [
             'title' => __('Header', 'frascella'),
@@ -129,7 +129,7 @@ function frascella_elementor_sections(): array
             'entry' => 'site',
             'args' => ['tag' => 'div'],
             'keywords' => ['footer', 'colophon'],
-            'note' => __('The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Settings → frascella.dev), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts.', 'frascella'),
+            'note' => __('The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Portfolio → Settings), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts.', 'frascella'),
             'texts' => [
                 'footer.role' => [__('Under the mark', 'frascella'), 't'],
                 'footer.legal' => [__('The small print', 'frascella'), 't'],

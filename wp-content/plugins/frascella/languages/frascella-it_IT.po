@@ -1,0 +1,697 @@
+# Copyright (C) 2026 
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: frascella.dev 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/frascella\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-01T10:55:08+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: frascella\n"
+
+#. Plugin Name of the plugin
+#: frascella.php
+#: inc/elementor.php:25
+#: inc/elementor.php:65
+msgid "frascella.dev"
+msgstr ""
+
+#. Description of the plugin
+#: frascella.php
+msgid "The frascella.dev site's content and composition: the business's facts, the Elementor widgets for the parts of the site that have data or behaviour, the dynamic tags and the Kit. The theme draws; this plugin remembers and composes."
+msgstr ""
+
+#: inc/admin-app.php:39
+#: src/components.js:11
+#: src/views/Projects.js:67
+msgid "Projects"
+msgstr "Progetti"
+
+#: inc/admin-app.php:40
+#: inc/admin-app.php:94
+#: src/components.js:12
+#: src/views/Settings.js:51
+#: src/views/Settings.js:61
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: inc/admin-app.php:44
+msgid "Portfolio"
+msgstr "Portfolio"
+
+#: inc/elementor/languages.php:85
+msgid "Not an Elementor template."
+msgstr ""
+
+#: inc/elementor/sections.php:36
+msgid "Cut-out word"
+msgstr ""
+
+#: inc/elementor/sections.php:43
+msgid "The word (one to three, lowercase)"
+msgstr ""
+
+#: inc/elementor/sections.php:49
+msgid "Is it the section’s heading?"
+msgstr ""
+
+#: inc/elementor/sections.php:51
+msgid "No: the band says it"
+msgstr ""
+
+#: inc/elementor/sections.php:51
+msgid "Yes, the page’s (h1)"
+msgstr ""
+
+#: inc/elementor/sections.php:51
+msgid "Yes, the section’s (h2)"
+msgstr ""
+
+#: inc/elementor/sections.php:55
+msgid "What a screen reader hears (the word, if empty)"
+msgstr ""
+
+#: inc/elementor/sections.php:62
+msgid "Fixed lines on a desktop (optional): «siti, app|e microservizi»"
+msgstr ""
+
+#: inc/elementor/sections.php:68
+msgid "Fixed lines on a phone (optional): «micro|servizi»"
+msgstr ""
+
+#: inc/elementor/sections.php:74
+msgid "The word is cut out of the sheet over the desk and fitted to its column. Its size and side are the classes of the widget (Advanced → CSS Classes): cut-l for the opening’s smaller step, cut-r to set it right."
+msgstr ""
+
+#: inc/elementor/sections.php:77
+msgid "Desk (intermezzo)"
+msgstr ""
+
+#: inc/elementor/sections.php:82
+msgid "Two screens of bare desk, with a dot on each object (decorative: the keyboard reaches the objects through the header’s desk switches). Its presence puts the 3D desk on the page; once per page."
+msgstr ""
+
+#: inc/elementor/sections.php:84
+msgid "The section’s name"
+msgstr ""
+
+#: inc/elementor/sections.php:85
+msgid "The scroll cue"
+msgstr ""
+
+#: inc/elementor/sections.php:86
+msgid "The hint while drawing on the tablet"
+msgstr ""
+
+#: inc/elementor/sections.php:90
+msgid "Works"
+msgstr ""
+
+#: inc/elementor/sections.php:97
+msgid "How many (0 = all)"
+msgstr ""
+
+#: inc/elementor/sections.php:104
+msgid "One card per project, from Portfolio → Projects, in this page’s language and in their order. On the desk each one is shown on the laptop’s screen."
+msgstr ""
+
+#: inc/elementor/sections.php:107
+msgid "Header"
+msgstr ""
+
+#: inc/elementor/sections.php:113
+msgid "The mark, the menu (Appearance → Menus, «Primary», one per language), the other language and «scrivimi»; on a phone, the drawer. For a Theme Builder header. Each field starts from the site’s words in this language; empty, it says them."
+msgstr ""
+
+#: inc/elementor/sections.php:115
+msgid "The mark’s name for screen readers"
+msgstr ""
+
+#: inc/elementor/sections.php:116
+msgid "The button"
+msgstr ""
+
+#: inc/elementor/sections.php:117
+msgid "The menu’s name for screen readers"
+msgstr ""
+
+#: inc/elementor/sections.php:118
+msgid "Phone: open the menu"
+msgstr ""
+
+#: inc/elementor/sections.php:119
+msgid "Phone: close the menu"
+msgstr ""
+
+#: inc/elementor/sections.php:120
+msgid "The record’s switch"
+msgstr ""
+
+#: inc/elementor/sections.php:121
+msgid "…when it plays"
+msgstr ""
+
+#: inc/elementor/sections.php:122
+msgid "…when it is off"
+msgstr ""
+
+#: inc/elementor/sections.php:126
+msgid "Footer"
+msgstr ""
+
+#: inc/elementor/sections.php:132
+msgid "The mark, who and where, the index (the «Primary» menu), the profiles and the VAT number (Portfolio → Settings), the privacy notice, the languages. For a Theme Builder footer. {name}, {city} and {vat} become the facts."
+msgstr ""
+
+#: inc/elementor/sections.php:134
+msgid "Under the mark"
+msgstr ""
+
+#: inc/elementor/sections.php:135
+msgid "The small print"
+msgstr ""
+
+#: inc/elementor/sections.php:136
+msgid "Heading: the index"
+msgstr ""
+
+#: inc/elementor/sections.php:137
+msgid "Heading: the profiles"
+msgstr ""
+
+#: inc/elementor/sections.php:138
+msgid "Heading: legal"
+msgstr ""
+
+#: inc/elementor/sections.php:139
+msgid "The privacy notice"
+msgstr ""
+
+#: inc/elementor/sections.php:140
+msgid "The cookies"
+msgstr ""
+
+#: inc/elementor/sections.php:224
+msgid "A blank line between one paragraph and the next."
+msgstr ""
+
+#: inc/elementor/stations.php:23
+msgid "None"
+msgstr ""
+
+#: inc/elementor/stations.php:24
+msgid "The opening"
+msgstr ""
+
+#: inc/elementor/stations.php:25
+msgid "Service 1"
+msgstr ""
+
+#: inc/elementor/stations.php:26
+msgid "Service 2"
+msgstr ""
+
+#: inc/elementor/stations.php:27
+msgid "Service 3"
+msgstr ""
+
+#: inc/elementor/stations.php:28
+msgid "The work’s title"
+msgstr ""
+
+#: inc/elementor/stations.php:29
+msgid "The bio"
+msgstr ""
+
+#: inc/elementor/stations.php:30
+msgid "The contact"
+msgstr ""
+
+#: inc/elementor/stations.php:36
+msgid "Desk"
+msgstr ""
+
+#: inc/elementor/stations.php:40
+msgid "Camera station"
+msgstr ""
+
+#: inc/elementor/stations.php:44
+msgid "Where the desk’s camera stands while this container is in the middle of the screen. The intermezzo and the projects have their own; the rest, once each, in page order."
+msgstr ""
+
+#: inc/elementor/tags.php:40
+msgid "Fact"
+msgstr ""
+
+#: inc/elementor/tags.php:56
+msgid "Which"
+msgstr ""
+
+#: inc/elementor/tags.php:58
+msgid "Full address"
+msgstr ""
+
+#: inc/elementor/tags.php:78
+msgid "Contact link"
+msgstr ""
+
+#: inc/elementor/tags.php:94
+msgid "Where it leads"
+msgstr ""
+
+#: inc/elementor/tags.php:96
+msgid "Call"
+msgstr ""
+
+#: inc/elementor/tags.php:96
+msgid "Write"
+msgstr ""
+
+#: inc/elementor/tags.php:96
+msgid "The map"
+msgstr ""
+
+#: inc/elementor/widgets.php:70
+msgid "Content"
+msgstr ""
+
+#: inc/elementor/widgets.php:90
+msgid "Texts"
+msgstr ""
+
+#: inc/elementor/widgets.php:93
+msgid "Each field starts from the site’s words in this language; empty, it says them. {name}, {city}, {street}, {phone} and {email} become the facts in Portfolio → Settings."
+msgstr ""
+
+#: inc/elementor/widgets.php:104
+msgid "Section"
+msgstr ""
+
+#: inc/elementor/widgets.php:107
+msgid "Nothing to set here: the content comes from the site."
+msgstr ""
+
+#: inc/facts.php:26
+#: src/views/Projects.js:282
+msgid "Name"
+msgstr "Nome"
+
+#: inc/facts.php:27
+msgid "Street and number"
+msgstr "Via e numero civico"
+
+#: inc/facts.php:28
+msgid "Postcode"
+msgstr "CAP"
+
+#: inc/facts.php:29
+msgid "City"
+msgstr "Città"
+
+#: inc/facts.php:30
+msgid "Province or region"
+msgstr "Provincia o regione"
+
+#: inc/facts.php:31
+msgid "Country (two letters)"
+msgstr "Paese (due lettere)"
+
+#: inc/facts.php:32
+msgid "Telephone"
+msgstr "Telefono"
+
+#: inc/facts.php:33
+msgid "Email"
+msgstr "Email"
+
+#: inc/facts.php:34
+msgid "VAT number"
+msgstr "Partita IVA"
+
+#: inc/facts.php:35
+msgid "GitHub profile (address)"
+msgstr "Profilo GitHub (indirizzo)"
+
+#: inc/facts.php:36
+msgid "LinkedIn profile (address)"
+msgstr "Profilo LinkedIn (indirizzo)"
+
+#. translators: %s: language code, e.g. EN.
+#: inc/media.php:44
+#, php-format
+msgid "Alternative text (%s)"
+msgstr ""
+
+#: inc/projects.php:141
+#: inc/projects.php:144
+msgid "A project needs a name."
+msgstr "Un progetto ha bisogno di un nome."
+
+#: inc/projects.php:152
+msgid "The address must start with https://, or stay empty."
+msgstr "L’indirizzo deve iniziare con https://, oppure restare vuoto."
+
+#: inc/projects.php:159
+msgid "The screenshot must be an image from the media library."
+msgstr "L’immagine deve venire dalla libreria media."
+
+#: inc/projects.php:173
+msgid "Check the highlighted fields."
+msgstr "Controlla i campi segnati."
+
+#: inc/projects.php:188
+msgid "Unknown language."
+msgstr "Lingua sconosciuta."
+
+#: inc/projects.php:198
+#: inc/projects.php:232
+#: inc/rest-admin.php:41
+#: inc/rest-admin.php:122
+msgid "That project does not exist."
+msgstr "Questo progetto non esiste."
+
+#: inc/projects.php:201
+msgid "This language of the project exists already."
+msgstr "Il progetto ha già questa lingua."
+
+#: inc/projects.php:220
+msgid "The project could not be saved."
+msgstr "Non è stato possibile salvare il progetto."
+
+#: src/api.js:17
+msgid "Something went wrong. Please try again."
+msgstr "Qualcosa non ha funzionato. Riprova."
+
+#. translators: %s: site name.
+#: src/components.js:29
+#, js-format
+msgid "Portfolio · %s"
+msgstr "Portfolio · %s"
+
+#: src/components.js:38
+msgid "Portfolio sections"
+msgstr "Sezioni del Portfolio"
+
+#: src/components.js:71
+msgid "Loading…"
+msgstr "Caricamento…"
+
+#: src/components.js:92
+msgid "Draft"
+msgstr "Bozza"
+
+#: src/components.js:93
+msgid "Published"
+msgstr "Pubblicato"
+
+#: src/components.js:98
+msgctxt "projects in a list"
+msgid "Drafts"
+msgstr "Bozze"
+
+#: src/components.js:99
+msgctxt "projects in a list"
+msgid "Published"
+msgstr "Pubblicati"
+
+#: src/components.js:112
+msgid "Not translated yet"
+msgstr "Non ancora tradotto"
+
+#: src/views/Projects.js:67
+#: src/views/Projects.js:249
+msgid "New project"
+msgstr "Nuovo progetto"
+
+#: src/views/Projects.js:70
+#: src/views/Projects.js:97
+#: src/views/Projects.js:307
+msgid "Status"
+msgstr "Stato"
+
+#: src/views/Projects.js:73
+msgid "All"
+msgstr "Tutti"
+
+#: src/views/Projects.js:79
+msgid "Search"
+msgstr "Cerca"
+
+#: src/views/Projects.js:79
+msgid "Search…"
+msgstr "Cerca…"
+
+#: src/views/Projects.js:86
+msgid "Nothing here"
+msgstr "Niente qui"
+
+#: src/views/Projects.js:86
+msgid "No projects yet"
+msgstr "Ancora nessun progetto"
+
+#: src/views/Projects.js:86
+msgid "Add the first one"
+msgstr "Aggiungi il primo"
+
+#: src/views/Projects.js:87
+msgid "Each project is a card on the home page: its name, your role, a few lines, the stack and a screenshot."
+msgstr "Ogni progetto è una scheda della home page: il nome, il tuo ruolo, qualche riga, le tecnologie e un’immagine."
+
+#: src/views/Projects.js:93
+msgid "Order"
+msgstr "Ordine"
+
+#: src/views/Projects.js:94
+#: src/views/Projects.js:249
+msgid "Project"
+msgstr "Progetto"
+
+#: src/views/Projects.js:95
+#: src/views/Projects.js:260
+msgid "Languages"
+msgstr "Lingue"
+
+#: src/views/Projects.js:96
+#: src/views/Projects.js:308
+msgid "Changed"
+msgstr "Modificato"
+
+#. translators: %s: project name.
+#: src/views/Projects.js:114
+#, js-format
+msgid "Move %s up"
+msgstr "Sposta %s in su"
+
+#. translators: %s: project name.
+#: src/views/Projects.js:115
+#, js-format
+msgid "Move %s down"
+msgstr "Sposta %s in giù"
+
+#: src/views/Projects.js:138
+msgid "Drag a row, or use the arrows, to change the order of the cards on the home page: every language follows."
+msgstr "Trascina una riga, o usa le frecce, per cambiare l’ordine delle schede nella home page: tutte le lingue seguono."
+
+#: src/views/Projects.js:148
+msgid "The project’s screenshot"
+msgstr "L’immagine del progetto"
+
+#: src/views/Projects.js:149
+msgid "Use this image"
+msgstr "Usa questa immagine"
+
+#: src/views/Projects.js:164
+msgid "No screenshot"
+msgstr "Nessuna immagine"
+
+#: src/views/Projects.js:166
+msgid "Replace"
+msgstr "Sostituisci"
+
+#: src/views/Projects.js:166
+msgid "Choose an image"
+msgstr "Scegli un’immagine"
+
+#: src/views/Projects.js:167
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: src/views/Projects.js:169
+msgid "1440 × 900. The desk shows it on the laptop’s screen. Its alternative text is the media library’s, in each language."
+msgstr "1440 × 900. La scrivania la mostra sullo schermo del portatile. Il testo alternativo è quello della libreria media, in ogni lingua."
+
+#: src/views/Projects.js:218
+#: src/views/Projects.js:222
+msgid "Saved."
+msgstr "Salvato."
+
+#: src/views/Projects.js:237
+msgid "Delete this project in every language?"
+msgstr "Eliminare questo progetto in tutte le lingue?"
+
+#: src/views/Projects.js:237
+msgid "Delete this language of the project?"
+msgstr "Eliminare questa lingua del progetto?"
+
+#: src/views/Projects.js:252
+msgid "← All projects"
+msgstr "← Tutti i progetti"
+
+#: src/views/Projects.js:266
+msgid "published"
+msgstr "pubblicato"
+
+#: src/views/Projects.js:266
+msgid "draft"
+msgstr "bozza"
+
+#: src/views/Projects.js:266
+msgid "to translate"
+msgstr "da tradurre"
+
+#. translators: %s: language code.
+#: src/views/Projects.js:275
+#, js-format
+msgid "Translating from %s:"
+msgstr "Traduzione da %s:"
+
+#: src/views/Projects.js:283
+msgid "Role"
+msgstr "Ruolo"
+
+#: src/views/Projects.js:283
+msgid "Yours in the project: client, co-founder, personal."
+msgstr "Il tuo nel progetto: cliente, cofondatore, mio."
+
+#: src/views/Projects.js:285
+msgid "Text"
+msgstr "Testo"
+
+#: src/views/Projects.js:285
+msgid "A few lines: what it is, and what you did."
+msgstr "Qualche riga: che cos’è, e che cosa hai fatto."
+
+#: src/views/Projects.js:287
+msgid "Stack"
+msgstr "Tecnologie"
+
+#: src/views/Projects.js:287
+msgid "Leave it empty for a proprietary project: the card then has no stack line."
+msgstr "Lascialo vuoto per un progetto proprietario: la scheda non avrà la riga delle tecnologie."
+
+#: src/views/Projects.js:288
+msgid "State"
+msgstr "Stato del progetto"
+
+#: src/views/Projects.js:288
+msgid "Live, in development, public on GitHub…"
+msgstr "Online, in sviluppo, codice pubblico su GitHub…"
+
+#: src/views/Projects.js:293
+msgid "Save"
+msgstr "Salva"
+
+#: src/views/Projects.js:293
+msgid "Publish"
+msgstr "Pubblica"
+
+#: src/views/Projects.js:294
+msgid "Save as draft"
+msgstr "Salva come bozza"
+
+#: src/views/Projects.js:295
+msgid "Unpublish"
+msgstr "Ritira"
+
+#: src/views/Projects.js:299
+msgid "In every language"
+msgstr "In tutte le lingue"
+
+#: src/views/Projects.js:299
+msgid "The address and the screenshot are the same for every language."
+msgstr "L’indirizzo e l’immagine sono gli stessi per tutte le lingue."
+
+#: src/views/Projects.js:301
+msgid "Address"
+msgstr "Indirizzo"
+
+#: src/views/Projects.js:301
+msgid "Optional. The project’s name links to it."
+msgstr "Facoltativo. Il nome del progetto porta lì."
+
+#: src/views/Projects.js:306
+msgid "This language"
+msgstr "Questa lingua"
+
+#: src/views/Projects.js:309
+msgid "See it on the home page"
+msgstr "Vedilo nella home page"
+
+#. translators: %s: language code.
+#: src/views/Projects.js:314
+#, js-format
+msgid "Delete the %s version"
+msgstr "Elimina la versione %s"
+
+#: src/views/Projects.js:315
+msgid "Delete in every language"
+msgstr "Elimina in tutte le lingue"
+
+#: src/views/Projects.js:315
+msgid "Delete"
+msgstr "Elimina"
+
+#: src/views/Settings.js:15
+msgid "The business"
+msgstr "L’attività"
+
+#: src/views/Settings.js:15
+msgid "Who the site belongs to. The footer, the privacy notice and the search engines’ data read them from here."
+msgstr "A chi appartiene il sito. Il piè di pagina, l’informativa privacy e i dati per i motori di ricerca li leggono da qui."
+
+#: src/views/Settings.js:16
+msgid "Where"
+msgstr "Dove"
+
+#: src/views/Settings.js:16
+msgid "Only what you want on the site: an empty field is left out everywhere."
+msgstr "Solo quello che vuoi sul sito: un campo vuoto viene omesso ovunque."
+
+#: src/views/Settings.js:17
+msgid "Contact"
+msgstr "Contatti"
+
+#: src/views/Settings.js:17
+msgid "The email receives the contact form’s requests."
+msgstr "L’email riceve le richieste del modulo di contatto."
+
+#: src/views/Settings.js:18
+msgid "Elsewhere"
+msgstr "Altrove"
+
+#: src/views/Settings.js:18
+msgid "The profiles the footer links to. https addresses only."
+msgstr "I profili a cui porta il piè di pagina. Solo indirizzi https."
+
+#: src/views/Settings.js:42
+msgid "Settings saved."
+msgstr "Impostazioni salvate."
+
+#: src/views/Settings.js:61
+msgid "Save changes"
+msgstr "Salva le modifiche"
+
+#: src/views/Settings.js:61
+msgid "Saved"
+msgstr "Salvato"
+
+#: src/views/Settings.js:64
+msgid "Settings sections"
+msgstr "Sezioni delle impostazioni"

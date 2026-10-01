@@ -4,9 +4,9 @@
  * and shows the project's screenshot on its screen (`.card[data-screen]`,
  * assets/src/desk/CONTRACT.md §3).
  *
- * Printed by the plugin's «Works» widget. The projects are the plugin's (Projects in the
- * admin, one per language through Polylang): title, role, text, stack, status, address and
- * a screenshot as the featured image. The screenshot is also in the card, for whoever does
+ * Printed by the plugin's «Works» widget. The projects are the plugin's (Portfolio →
+ * Projects, each in every language): name, role, text, stack, state, address and a
+ * screenshot. A project with no stack has no stack line. The screenshot is also in the card, for whoever does
  * not get the scene; while the scene shows it, it is not drawn twice (sections.css).
  *
  * No projects yet: nothing is printed, except in the editor, where the empty widget says so.

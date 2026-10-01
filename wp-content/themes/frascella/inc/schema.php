@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Structured data: one JSON-LD graph per page, built from the facts in Settings → frascella.dev.
+ * Structured data: one JSON-LD graph per page, built from the facts in Portfolio → Settings.
  *
  * The business is a person: Emanuele Frascella, a freelance software engineer, with his VAT
  * number, his city and his profiles — what the footer shows. Hence `Person`, not

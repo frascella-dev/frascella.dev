@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       frascella.dev
  * Description:       The frascella.dev site's content and composition: the business's facts, the Elementor widgets for the parts of the site that have data or behaviour, the dynamic tags and the Kit. The theme draws; this plugin remembers and composes.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Requires Plugins:  elementor
@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('FRASCELLA_VERSION', '0.1.0');
+define('FRASCELLA_VERSION', '1.0.0');
 define('FRASCELLA_FILE', __FILE__);
 define('FRASCELLA_DIR', plugin_dir_path(__FILE__));
 define('FRASCELLA_URL', plugin_dir_url(__FILE__));
@@ -43,13 +43,27 @@ if (!defined('PLL_COOKIE')) {
 }
 
 require FRASCELLA_DIR . 'inc/facts.php';      // the business's facts, in one option
+require FRASCELLA_DIR . 'inc/capabilities.php'; // who may edit the projects, who the settings
+require FRASCELLA_DIR . 'inc/schema.php';     // the plugin's tables, and their upgrades
 require FRASCELLA_DIR . 'inc/projects.php';   // the projects the home page shows
+require FRASCELLA_DIR . 'inc/admin-app.php';  // Portfolio: the dashboard (React, build/)
+require FRASCELLA_DIR . 'inc/rest-admin.php'; // the dashboard's API, frascella/v1/admin
 require FRASCELLA_DIR . 'inc/agenda.php';     // Agenda: where a request's email goes
 require FRASCELLA_DIR . 'inc/analytics.php';  // the statistics service: is it on the page, and its referrer policy
 require FRASCELLA_DIR . 'inc/media.php';      // a photograph's alt text in every language
 require FRASCELLA_DIR . 'inc/polylang.php';   // the languages: what is translatable, and its addresses
 require FRASCELLA_DIR . 'inc/elementor.php';  // the widgets, the dynamic tags, the Kit
 require FRASCELLA_DIR . 'inc/cli.php';        // wp frascella …
+
+// The plugin's words in the admin's language (languages/, built by bin/make-i18n.sh). Loaded
+// by its file and not by load_plugin_textdomain(): the theme shares the `frascella` domain and
+// registers a folder of its own for it first, and WordPress would then look only there.
+add_action('init', static function (): void {
+    $mo = FRASCELLA_DIR . 'languages/frascella-' . determine_locale() . '.mo';
+    if (is_file($mo)) {
+        load_textdomain('frascella', $mo);
+    }
+}, 0);
 
 /**
  * Activation: the addresses, and Elementor's own look off.
@@ -71,6 +85,7 @@ register_activation_hook(__FILE__, static function (): void {
         delete_transient('pll_languages_list');
     }
     flush_rewrite_rules();
+    frascella_upgrade();
     update_option('elementor_disable_color_schemes', 'yes');
     update_option('elementor_disable_typography_schemes', 'yes');
     update_option('elementor_container_width', '');

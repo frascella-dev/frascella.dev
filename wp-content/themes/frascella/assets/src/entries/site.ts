@@ -8,10 +8,12 @@ import "../css/site.css";
 import { initReveal } from "../lib/reveal.ts";
 import { initSheet } from "../lib/sheet.ts";
 import { initHeader } from "../lib/header.ts";
+import { initConsentLink } from "../lib/consent-link.ts";
 import { initForm } from "../lib/form.ts";
 import { onElementorRender } from "../lib/editor.ts";
 
 initHeader();
+initConsentLink();
 initSheet();
 initForm();
 initReveal();

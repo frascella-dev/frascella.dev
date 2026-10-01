@@ -1,0 +1,834 @@
+// Portfolio. The same panel as the owner's other plugins (Chiaro's stylesheet, by name and by
+// rule): it sits on @wordpress/components and adds only what is missing — the header, the
+// cards, the tables, the filters, the editor's layout. Only the brand colour is this site's:
+// its vermilion, darkened until text in it reads on white (4.5:1).
+
+.frascella-screen {
+	--frascella-ink: #1e1e1e;
+	--frascella-muted: #5f6368;
+	--frascella-faint: #646970;
+	--frascella-line: #e2e4e7;
+	--frascella-soft: #f6f7f9;
+	--frascella-card: #fff;
+	--frascella-brand: #b5300e;
+	--frascella-brand-soft: #fdece6;
+	--frascella-green: #107a3d;
+	--frascella-green-soft: #e6f4ea;
+	--frascella-amber: #8a5a00;
+	--frascella-amber-soft: #fff4d6;
+	--frascella-radius: 12px;
+
+	background: #f3f4f6;
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 48px;
+	}
+
+	// Notices from WordPress and other plugins stay, but within the right margin.
+	#wpbody-content > .notice,
+	#wpbody-content > .update-nag {
+		margin: 16px 32px 0;
+	}
+}
+
+.frascella-wrap {
+	margin: 0;
+
+	> .wp-header-end {
+		display: none;
+	}
+
+	> .notice,
+	> .update-nag {
+		margin: 16px 32px 0;
+	}
+}
+
+.frascella-app {
+	color: var(--frascella-ink);
+	font-size: 14px;
+	line-height: 1.5;
+
+	> .components-notice,
+	.frascella-notice {
+		margin: 0 32px 20px;
+	}
+
+	> :not(.frascella-header):not(.components-notice):not(.frascella-notice) {
+		margin-left: 32px;
+		margin-right: 32px;
+	}
+
+	@media (max-width: 782px) {
+		> :not(.frascella-header):not(.components-notice):not(.frascella-notice) {
+			margin-left: 12px;
+			margin-right: 12px;
+		}
+	}
+}
+
+/* Header ------------------------------------------------------------------- */
+
+.frascella-header {
+	background: #fff;
+	border-bottom: 1px solid var(--frascella-line);
+	margin-bottom: 28px;
+	padding: 20px 32px 0;
+
+	@media (max-width: 782px) {
+		padding: 16px 12px 0;
+	}
+
+	&__top {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		justify-content: space-between;
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+}
+
+.frascella-brand {
+	align-items: center;
+	display: flex;
+	gap: 14px;
+	min-width: 0;
+
+	img {
+		border-radius: 10px;
+		box-shadow: 0 4px 12px rgba(14, 14, 17, 0.25);
+		display: block;
+		flex: none;
+		height: 44px;
+		width: 44px;
+	}
+
+	> div {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		min-height: 44px;
+		min-width: 0;
+	}
+
+	&__kicker {
+		color: var(--frascella-muted);
+		display: block;
+		font-size: 12px;
+		letter-spacing: 0.02em;
+		line-height: 16px;
+	}
+
+	// WordPress's `.wrap h1` is more specific than a single class and adds 13px of
+	// padding: win it with specificity here, not with !important.
+	.frascella-wrap &__title {
+		font-size: 22px;
+		font-weight: 600;
+		line-height: 28px;
+		margin: 0;
+		overflow: hidden;
+		padding: 0;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.frascella-tabs {
+	display: flex;
+	gap: 4px;
+	// The first tab's text on the icon's axis, not its border.
+	margin: 16px 0 0 -12px;
+	overflow-x: auto;
+}
+
+.frascella-tab {
+	border-bottom: 2px solid transparent;
+	color: var(--frascella-muted);
+	font-weight: 500;
+	padding: 10px 12px 12px;
+	text-decoration: none;
+	white-space: nowrap;
+
+	&:hover {
+		color: var(--frascella-ink);
+	}
+
+	&:focus {
+		box-shadow: none;
+		outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+		outline-offset: -2px;
+	}
+
+	&.is-active {
+		border-bottom-color: var(--frascella-brand);
+		color: var(--frascella-ink);
+	}
+}
+
+/* Cards -------------------------------------------------------------------- */
+
+.frascella-card {
+	background: var(--frascella-card);
+	border: 1px solid var(--frascella-line);
+	border-radius: var(--frascella-radius);
+	margin-bottom: 20px;
+	transition: opacity 0.15s;
+
+	&.is-loading {
+		opacity: 0.55;
+	}
+
+	&__head {
+		align-items: flex-start;
+		display: flex;
+		gap: 16px;
+		justify-content: space-between;
+		padding: 18px 22px 0;
+	}
+
+	&__title {
+		font-size: 15px;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	&__subtitle {
+		color: var(--frascella-muted);
+		margin: 4px 0 0;
+		text-wrap: pretty;
+	}
+
+	&__body {
+		padding: 18px 22px 22px;
+
+		&.is-flush {
+			padding: 12px 0 0;
+		}
+	}
+
+	> .frascella-card__body.is-flush:first-child {
+		padding-top: 0;
+	}
+}
+
+.frascella-loading {
+	align-items: center;
+	color: var(--frascella-muted);
+	display: flex;
+	gap: 8px;
+	padding: 40px 0;
+
+	.components-spinner {
+		margin: 0;
+	}
+}
+
+.frascella-empty {
+	padding: 48px 24px;
+	text-align: center;
+
+	&__title {
+		font-size: 15px;
+		font-weight: 600;
+		margin: 0 0 6px;
+	}
+
+	&__text {
+		color: var(--frascella-muted);
+		margin: 0 auto 16px;
+		max-width: 46ch;
+	}
+}
+/* Lists -------------------------------------------------------------------- */
+
+.frascella-mini-list {
+	list-style: none;
+	margin: 0;
+
+	li {
+		border-top: 1px solid var(--frascella-line);
+		margin: 0;
+	}
+
+	a {
+		color: inherit;
+		display: block;
+		padding: 12px 22px;
+		text-decoration: none;
+
+		&:hover {
+			background: var(--frascella-soft);
+		}
+	}
+
+	&__title {
+		display: block;
+		font-weight: 500;
+		margin-bottom: 4px;
+	}
+
+	&__meta {
+		align-items: center;
+		color: var(--frascella-muted);
+		display: flex;
+		font-size: 13px;
+		gap: 8px;
+	}
+
+	.frascella-progress {
+		margin-top: 8px;
+	}
+}
+
+.frascella-badge {
+	border-radius: 999px;
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 20px;
+	padding: 0 9px;
+	vertical-align: middle;
+	white-space: nowrap;
+
+	&.is-draft {
+		background: #eef0f2;
+		color: #50575e;
+	}
+
+	&.is-sending {
+		background: var(--frascella-amber-soft);
+		color: var(--frascella-amber);
+	}
+
+	&.is-sent {
+		background: var(--frascella-green-soft);
+		color: var(--frascella-green);
+	}
+
+	&.is-cancelled {
+		background: #fcebea;
+		color: #b32d2e;
+	}
+}
+
+.frascella-progress {
+	background: #eef0f2;
+	border-radius: 999px;
+	height: 6px;
+	margin-top: 6px;
+	max-width: 220px;
+	overflow: hidden;
+
+	&__bar {
+		background: var(--frascella-brand);
+		border-radius: inherit;
+		height: 100%;
+		transition: width 0.6s ease;
+	}
+}
+
+.frascella-table {
+	border-collapse: collapse;
+	width: 100%;
+
+	th {
+		border-bottom: 1px solid var(--frascella-line);
+		color: var(--frascella-muted);
+		font-size: 12px;
+		font-weight: 500;
+		padding: 12px 22px;
+		text-align: left;
+	}
+
+	td {
+		border-bottom: 1px solid var(--frascella-line);
+		height: 24px;
+		padding: 14px 22px;
+		vertical-align: middle;
+	}
+
+	th,
+	td {
+		line-height: 20px;
+		white-space: nowrap;
+
+		&:first-child {
+			white-space: normal;
+			width: 100%;
+		}
+	}
+
+	.frascella-badge,
+	.components-button {
+		vertical-align: middle;
+	}
+
+	tbody tr:last-child td {
+		border-bottom: 0;
+	}
+
+	tbody tr:hover td {
+		background: var(--frascella-soft);
+	}
+
+	.is-num {
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+	}
+
+	.is-actions {
+		text-align: right;
+		width: 1%;
+	}
+
+	&__primary {
+		color: var(--frascella-ink);
+		display: block;
+		overflow-wrap: anywhere;
+		font-weight: 500;
+		text-decoration: none;
+
+		&:hover {
+			color: var(--frascella-brand);
+		}
+	}
+
+	&__secondary {
+		color: var(--frascella-faint);
+		display: block;
+		font-size: 13px;
+		margin-top: 2px;
+	}
+
+	@media (max-width: 782px) {
+		th:nth-child(n + 3),
+		td:nth-child(n + 3):not(.is-actions) {
+			display: none;
+		}
+
+		th,
+		td {
+			padding-left: 14px;
+			padding-right: 14px;
+		}
+	}
+}
+
+.frascella-app .is-mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 13px;
+}
+
+.frascella-toolbar {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.frascella-filters {
+	background: #e9ebee;
+	border-radius: 10px;
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+}
+
+.frascella-filter {
+	align-items: center;
+	background: transparent;
+	border: 0;
+	border-radius: 8px;
+	color: var(--frascella-muted);
+	cursor: pointer;
+	display: inline-flex;
+	font: inherit;
+	font-weight: 500;
+	gap: 6px;
+	height: 32px;
+	line-height: 1;
+	padding: 0 12px;
+
+	&:hover {
+		color: var(--frascella-ink);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+	}
+
+	&.is-active {
+		background: #fff;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+		color: var(--frascella-ink);
+	}
+
+	&__count {
+		background: rgba(0, 0, 0, 0.06);
+		border-radius: 999px;
+		// Darker than the muted text: on the grey of the filters it must still read (4.5:1).
+		color: #43474b;
+		display: inline-block;
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+		font-weight: 600;
+		line-height: 18px;
+		min-width: 18px;
+		padding: 0 6px;
+		text-align: center;
+	}
+
+	&.is-active .frascella-filter__count {
+		background: var(--frascella-brand-soft);
+		color: var(--frascella-brand);
+	}
+}
+
+.frascella-search {
+	max-width: 320px;
+	width: 100%;
+}
+
+.frascella-pager {
+	align-items: center;
+	border-top: 1px solid var(--frascella-line);
+	color: var(--frascella-muted);
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 22px;
+
+	> div {
+		display: flex;
+		gap: 8px;
+	}
+}
+
+
+/* Editors and settings ------------------------------------------------------ */
+
+.frascella-detail {
+	align-items: start;
+	display: grid;
+	gap: 20px;
+	grid-template-columns: minmax(0, 1fr) 320px;
+
+	@media (max-width: 1100px) {
+		grid-template-columns: 1fr;
+	}
+
+	&__side > .components-button {
+		margin-top: -4px;
+	}
+}
+
+.frascella-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	&--grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+
+		@media (max-width: 782px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&.is-disabled {
+		opacity: 0.55;
+	}
+}
+
+.frascella-editor-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.frascella-danger {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.frascella-langs {
+	display: inline-flex;
+	flex-wrap: nowrap;
+	gap: 4px;
+}
+
+.frascella-lang {
+	border: 1px solid var(--frascella-line);
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	line-height: 18px;
+	padding: 0 5px;
+
+	&.is-published {
+		background: var(--frascella-brand-soft);
+		border-color: transparent;
+		color: var(--frascella-brand);
+	}
+
+	&.is-draft {
+		background: #f0f0f1;
+		border-color: transparent;
+		color: #50575e;
+	}
+
+	&.is-missing {
+		border-style: dashed;
+		color: #646970;
+	}
+}
+
+.frascella-order {
+	display: inline-flex;
+	gap: 2px;
+
+	.components-button.has-icon {
+		min-width: 28px;
+		padding: 2px;
+	}
+}
+
+.frascella-hint {
+	color: var(--frascella-muted);
+	font-size: 13px;
+}
+
+.frascella-muted {
+	color: var(--frascella-muted);
+}
+
+.frascella-link {
+	background: none;
+	border: 0;
+	color: var(--wp-admin-theme-color, #2271b1);
+	cursor: pointer;
+	font: inherit;
+	padding: 0;
+	text-align: left;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.frascella-settings {
+	align-items: start;
+	display: grid;
+	gap: 24px;
+	grid-template-columns: 200px minmax(0, 1fr);
+
+	@media (max-width: 960px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.frascella-side {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	position: sticky;
+	top: 52px;
+
+	@media (max-width: 960px) {
+		flex-direction: row;
+		overflow-x: auto;
+		position: static;
+	}
+
+	&__item {
+		background: transparent;
+		border: 0;
+		border-radius: 8px;
+		color: var(--frascella-muted);
+		cursor: pointer;
+		font: inherit;
+		font-weight: 500;
+		padding: 9px 12px;
+		text-align: left;
+		white-space: nowrap;
+
+		&:hover {
+			background: #e9ebee;
+			color: var(--frascella-ink);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+		}
+
+		&.is-active {
+			background: #fff;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+			color: var(--frascella-brand);
+		}
+	}
+}
+
+.frascella-settings__main {
+	max-width: 880px;
+	min-width: 0;
+}
+
+.frascella-lang-tabs {
+	margin-bottom: 16px;
+
+	.frascella-filter__count {
+		font-weight: 400;
+	}
+}
+
+.frascella-translate-from {
+	background: #f6f7f7;
+	border-radius: 4px;
+	margin-bottom: 20px;
+	max-height: 220px;
+	overflow: auto;
+	padding: 12px 16px;
+
+	p {
+		margin: 0 0 6px;
+	}
+}
+
+.frascella-modal-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 24px;
+}
+
+/* Projects ------------------------------------------------------------------ */
+
+.frascella-toolbar__side {
+	display: flex;
+	gap: 8px;
+}
+
+.frascella-table--projects {
+	.is-order {
+		padding-right: 0;
+		width: 1%;
+	}
+
+	th.is-order + th,
+	td.is-order + td {
+		white-space: normal;
+		width: 100%;
+	}
+
+	tr.is-dragging td {
+		opacity: 0.5;
+	}
+
+	tbody tr[draggable="true"] {
+		cursor: grab;
+	}
+}
+
+.frascella-table th.is-order,
+.frascella-table td.is-order {
+	white-space: nowrap;
+	width: 1%;
+}
+
+.frascella-project-cell {
+	align-items: center;
+	display: flex;
+	gap: 14px;
+	min-width: 0;
+}
+
+.frascella-thumb {
+	background: #0e0e11;
+	border: 1px solid var(--frascella-line);
+	border-radius: 4px;
+	display: block;
+	flex: none;
+	height: 40px;
+	object-fit: cover;
+	width: 64px;
+
+	&.is-empty {
+		background: repeating-linear-gradient(45deg, #f0f0f1, #f0f0f1 6px, #e2e4e7 6px, #e2e4e7 12px);
+	}
+}
+
+.frascella-shot {
+	img,
+	&__empty {
+		aspect-ratio: 16 / 10;
+		border: 1px solid var(--frascella-line);
+		border-radius: 8px;
+		display: block;
+		object-fit: cover;
+		width: 100%;
+	}
+
+	&__empty {
+		align-items: center;
+		background: var(--frascella-soft);
+		color: var(--frascella-muted);
+		display: flex;
+		justify-content: center;
+	}
+
+	&__actions {
+		align-items: center;
+		display: flex;
+		gap: 12px;
+		margin: 12px 0 8px;
+	}
+
+	p {
+		font-size: 12px;
+		margin: 0;
+	}
+}
+
+.frascella-fields--grid {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+
+	@media (max-width: 782px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// A field the server refused: its line under it says why.
+.frascella-app .has-error {
+	.components-text-control__input {
+		border-color: #cc1818;
+	}
+
+	.components-base-control__help {
+		color: #cc1818;
+	}
+}
+
+.frascella-meta-row {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin: 0 0 8px;
+}

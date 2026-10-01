@@ -104,7 +104,7 @@ function frascella_s(string $path, string $fallback = ''): string
 }
 
 /**
- * The facts a sentence may wrap itself around: the plugin's (Settings → frascella.dev), or the
+ * The facts a sentence may wrap itself around: the plugin's (Portfolio → Settings), or the
  * site's name alone when the plugin is off. Every closure in the tree takes this shape,
  * so a sentence naming the business names whichever business this install belongs to.
  *
