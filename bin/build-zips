@@ -26,5 +26,5 @@ rm -f "dist/frascella-theme-$theme_version.zip" "dist/frascella-plugin-$plugin_v
     -x "frascella/node_modules/*" "frascella/assets/src/*" "frascella/package.json" "frascella/package-lock.json" \
        "frascella/vite.config.mjs" "frascella/tsconfig.json" "frascella/.gitignore" "*.DS_Store")
 (cd wp-content/plugins && zip -qr "../../dist/frascella-plugin-$plugin_version.zip" frascella \
-    -x "frascella/node_modules/*" "frascella/tests/*" "frascella/package.json" "frascella/package-lock.json" "frascella/.gitignore" "*.DS_Store")
+    -x "frascella/node_modules/*" "frascella/tests/*" "frascella/src/*" "frascella/bin/*" "frascella/languages/*.pot" "frascella/package.json" "frascella/package-lock.json" "frascella/.gitignore" "*.DS_Store")
 ls -la dist/*"$theme_version".zip

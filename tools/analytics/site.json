@@ -1,5 +1,5 @@
 {
-  "$comment": "frascella.dev on the owner's analytics service (https://analytics.frascella.dev): the site's settings and its consent banner, as the privacy notice (tools/site.php) describes them. Apply them on the service (Sites → frascella.dev → Settings; Settings → Consent: import `consent.theme`, set the texts, publish with material_change: true the first time). If one of these values changes there, the notice changes in the same release.",
+  "$comment": "frascella.dev on the owner's analytics service (https://analytics.frascella.dev): the site's settings and its consent banner, as the privacy notice (tools/site.php) describes them. Apply them on the service (Sites → frascella.dev → Settings; Settings → Consent: import `consent.theme`, set the texts, publish with material_change: true the first time). If one of these values changes there, the notice changes in the same release. Read back from the live script (window.__an_cfg) on 2026-10-01: base level on, cookie level on, cookie domain .frascella.dev, visitor cookie 395 days, DNT ignored, GPC respected, outbound/download/form events on, and no consent banner published yet (consent: null) — tools/site.php's $bannerPublished follows that.",
   "site": {
     "name": "frascella.dev",
     "domains": [
@@ -10,9 +10,9 @@
     "base_tracking_enabled": true,
     "visitor_hash_mode": "daily_hash",
     "cookie_level_enabled": true,
-    "cookie_domain": "frascella.dev",
+    "cookie_domain": ".frascella.dev",
     "visitor_cookie_days": 395,
-    "dnt_mode": "no_cookie",
+    "dnt_mode": "ignore",
     "respect_gpc": true,
     "tracker_global": "analytics",
     "allowed_query_params": [
@@ -25,7 +25,7 @@
     ],
     "auto_events": {
       "outbound": true,
-      "downloads": false,
+      "downloads": true,
       "forms": true
     },
     "consent_receipts_enabled": false,

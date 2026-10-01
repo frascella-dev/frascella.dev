@@ -5,7 +5,7 @@
  *
  * The contact form is Agenda's form `contatti` (tools/agenda/contatti.json), hosted by the
  * home page; the theme draws it. What the plugin decides is the destination: the
- * business's own address in Settings → frascella.dev, the one fact every part of the site
+ * business's own address in Portfolio → Settings, the one fact every part of the site
  * reads. Agenda's own setting, then the site admin's address, answer only while that fact
  * is empty.
  *

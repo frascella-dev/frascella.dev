@@ -7,7 +7,7 @@
  * - The cut-out word (controls): the word, its fixed lines and, as a heading, the words a
  *   screen reader hears.
  * - The works (data): one card per project of the page's language, in their order, each a
- *   station of the desk with its screenshot; the count control.
+ *   station of the desk with its screenshot; the count control (the projects: Portfolio).
  * - The stations: a container's «Camera station» is its data-stop.
  * - The header and footer (Theme Builder, one copy per language): a word typed in the
  *   English copy shows under /en/ only; {name} becomes the fact.
@@ -58,11 +58,11 @@ try {
 	check( 'works: «How many» shows that many', count( await text( '/' ), 'class="card plate"' ) === 2 );
 	restoreIt();
 	// A project's English copy is the English page's.
-	const project = Number( php( `foreach (get_posts(['post_type' => 'frascella_project', 'name' => 'vitrine', 'lang' => '', 'numberposts' => -1, 'fields' => 'ids']) as $p) { if (pll_get_post_language($p) === 'en') { echo $p; } }` ) );
-	const status = php( `echo get_post_meta(${ project }, '_frascella_status', true);` );
-	php( `update_post_meta(${ project }, '_frascella_status', 'public code on GitHub');` );
-	check( 'works: a project’s copy speaks only on its language’s page', ( await text( '/en/' ) ).includes( 'public code on GitHub' ) && ! ( await text( '/' ) ).includes( 'public code on GitHub' ) );
-	php( `update_post_meta(${ project }, '_frascella_status', ${ phpValue( status ) });` );
+	const project = Number( php( `global $wpdb; echo (int) $wpdb->get_var("SELECT id FROM {$wpdb->prefix}frascella_projects WHERE slug = 'vitrine' AND lang = 'en'");` ) );
+	const state = php( `echo frascella_project_get(${ project })['state'];` );
+	php( `frascella_project_update(${ project }, ['state' => 'state of an e2e test']);` );
+	check( 'works: a project’s language speaks only on its language’s page', ( await text( '/en/' ) ).includes( 'state of an e2e test' ) && ! ( await text( '/' ) ).includes( 'state of an e2e test' ) );
+	php( `frascella_project_update(${ project }, ['state' => ${ phpValue( state ) }]);` );
 
 	// The stations.
 	const stations = [ ...( await text( '/' ) ).matchAll( /data-stop="([a-z0-9]+)"/g ) ].map( ( m ) => m[ 1 ] );
