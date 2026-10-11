@@ -3,7 +3,7 @@
  *
  * At once (this file runs as soon as the module is parsed): `html.desk-loading`, the warm grey
  * veil the cut-out letters show while the desk loads, and the progress hairline under the
- * header. After the first paint, when the browser is idle: the texture workers start painting
+ * header. Once the words are painted in their own faces, when the browser is idle: the texture workers start painting
  * (scene/texpool.js) and the scene's chunks are imported; the scene builds itself in slices and
  * resolves on its first frame; then the veil fades and the desk shows through the letters.
  * Without WebGL 2 (or with only a software one, or Save-Data on) the veil shows the station
@@ -32,14 +32,17 @@ declare global {
 const html = document.documentElement;
 const emit = (name: string, detail: unknown) => document.dispatchEvent(new CustomEvent(name, { detail }));
 
-/** After the first paint, then when the main thread is free (or after `timeout` ms anyway). */
-function afterPaintIdle(timeout: number): Promise<void> {
-    return new Promise((resolve) => {
-        requestAnimationFrame(() => setTimeout(() => {
-            if ("requestIdleCallback" in window) requestIdleCallback(() => resolve(), { timeout });
-            else setTimeout(resolve, 1);
-        }, 0));
-    });
+/**
+ * After the words are on screen in their own faces: the fonts and the page loaded, then two
+ * frames painted, then when the main thread is free (or after `timeout` ms anyway). The scene's
+ * first seconds are long tasks (three.js, the room, the shaders); started any earlier, they hold
+ * back the paint of the opening's text, the page's largest.
+ */
+async function afterWordsIdle(timeout: number): Promise<void> {
+    const loaded = document.readyState === "complete" ? Promise.resolve() : new Promise<void>((r) => addEventListener("load", () => r(), { once: true }));
+    await Promise.all([document.fonts.ready, loaded]);
+    await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    await new Promise<void>((r) => ("requestIdleCallback" in window ? requestIdleCallback(() => r(), { timeout }) : setTimeout(r, 1)));
 }
 
 export function mountDesk(options: DeskOptions = {}): Promise<DeskMode> {
@@ -92,7 +95,7 @@ export function mountDesk(options: DeskOptions = {}): Promise<DeskMode> {
     const ready = (async (): Promise<DeskMode> => {
         if (opts.forceFallback || !("WebGL2RenderingContext" in window)) return still(opts.forceFallback ? "asked" : "no WebGL 2");
         if (conn?.saveData) return still("Save-Data");
-        await afterPaintIdle(1200);
+        await afterWordsIdle(1500);
         const pool = createPool({ shot });
         pool.prefetch();
         progress(0.05);

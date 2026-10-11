@@ -144,7 +144,7 @@ Colours come from custom properties the page may set:
 The words the desk itself says (the lamp's levels in `#lamp-state`, the drawing app's
 buttons, labels, popovers and messages, its layer names, the tablet hint in
 `#pad-ui .pad-hint`) come from `scene/words.js`, chosen by `<html lang>`: Italian (the
-default, the prototype's words unchanged) or English (after COPY.en.md: lamp "full / dim /
+default, the prototype's words unchanged) or English (lamp "full / dim /
 off", "done", "Layer 0…3", "Draw on the tablet screen. Press "done" or Esc to go back.").
 
 To feed them from `src/i18n.ts`, set before the desk entry runs:

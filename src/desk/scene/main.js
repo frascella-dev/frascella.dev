@@ -22,7 +22,6 @@ import { buildMug } from './mug.js';
 import { buildLamp, LEVELS, LAMP } from './lamp.js';
 import { words } from './words.js';
 import { buildPlant } from './plant.js';
-import { buildOwl } from './owl.js';
 import { buildTurntable } from './turntable.js';
 import { prints } from './illustration.js';
 import { cable, plug, collisions, ground } from './cables.js';
@@ -136,10 +135,10 @@ const MG = buildMug({ reduced }); MG.root.position.set(61, 0, 3); MG.root.rotati
 MG.root.userData.keep = true;
 const router = buildRouter(); router.position.set(-26, 0, -38); router.rotation.y = .25; scene.add(router);
 await tick();
-// the owl, between the plant and the router: its file loads alongside, it lands on the desk when it arrives
-// forward enough of the router and the plant that its wings open clear of them
+// the owl, between the plant and the router, forward enough of both that its wings open clear of
+// them. Its file (and the glTF loader) waits for the visitor's first scroll, touch or key: the
+// desk is complete without it, and it lands on the desk when it arrives
 const OWL_AT = V(-36, 0, -22), OWL_YAW = .45;
-const owlLoad = buildOwl({ reduced, at: OWL_AT, yaw: OWL_YAW }).catch(e => { console.warn('[owl]', e); return null; });
 let OW = null;
 const plant = await buildPlant({ reduced, seed: pool.seed('gravel') }); plant.position.set(-47.5, 0, -38.5); plant.rotation.y = .7; scene.add(plant);
 progress(.15); await tick();
@@ -498,7 +497,15 @@ const atDesk = () => padMode === 'closed' && (window.__lift || 0) > .9;
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 const BLOCK = 'a,button,input,textarea,label,.pane,.card,.copy,.window h2,.top,footer,.svc-head h2,.pad-ui,.pa';
 const targets = [['ipad', IP.ipad], ['mug', MG.root], ['lamp', LP.lamp], ['turntable', TTB.hit], ['plant', plant], ['phone', PH.phone]];
-owlLoad.then(o => { if (!o || lost) return; OW = o; scene.add(o.root); targets.push(['owl', o.root]); requestShadow(2); });
+let owlAsked = false;
+function loadOwl() {
+  if (owlAsked || lost) return; owlAsked = true;
+  for (const ev of ['scroll', 'pointerdown', 'keydown', 'touchstart']) removeEventListener(ev, loadOwl);
+  import('./owl.js').then(({ buildOwl }) => buildOwl({ reduced, at: OWL_AT, yaw: OWL_YAW }))
+    .then(o => { if (lost) return; OW = o; scene.add(o.root); targets.push(['owl', o.root]); requestShadow(2); })
+    .catch(e => console.warn('[owl]', e));
+}
+for (const ev of ['scroll', 'pointerdown', 'keydown', 'touchstart']) addEventListener(ev, loadOwl, { passive: true });
 // → { n: name } or null
 function pick(target, x, y) {
   if (!atDesk() || !target || !target.closest || target.closest(BLOCK)) return null;

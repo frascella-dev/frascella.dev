@@ -28,8 +28,7 @@ No server, no database, no forms, no cookies, no statistics: the pages, their pi
   it), the phone, the plant and a small owl answer a click: the owl flies out of the frame
   and comes back. The keyboard reaches the same objects through switches that appear on Tab.
   Under reduced motion nothing moves.
-- **Two languages.** Italian on `/`, English on `/en/`, written separately (`COPY.md`,
-  `COPY.en.md`), each page with its other language in `hreflang`.
+- **Two languages.** Italian on `/`, English on `/en/`, written separately, each page with its other language in `hreflang`.
 - **Search engines.** Titles, descriptions, canonical URLs, Open Graph and a `Person` graph,
   a sitemap with both languages, the favicon, the Apple touch icon and a web app manifest.
 - **Private by construction.** Nothing is loaded from anyone else, nothing is stored in the

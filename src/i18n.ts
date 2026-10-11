@@ -1,7 +1,7 @@
 /**
  * Every word the site says, per language, and who the site belongs to.
  *
- * The words are the owner's: COPY.md in Italian, COPY.en.md in English, written separately
+ * The words are the owner's, Italian and English written separately
  * (a line says the same thing, not the same words). Each language has its own anchors
  * (`#servizi`, `#services`…); the intermezzo keeps `#scrivania`, which the desk scene reads.
  *
@@ -106,7 +106,7 @@ const it = {
     projects: [
         { slug: "seveninktattoo-it", title: "seveninktattoo.it", role: "cliente", text: "Sito per uno studio di tatuaggi di Taranto, in WordPress ed Elementor. Gestisce richieste di appuntamento, recensioni, newsletter e FAQ senza appoggiarsi a servizi esterni, quindi i dati restano sul server dello studio.", stack: "WordPress · Elementor", state: "online", url: "https://seveninktattoo.it", image: sevenink, alt: "La home page di seveninktattoo.it" },
         { slug: "cloudground", title: "CloudGround", role: "mio", text: "Un pannello di controllo per gestire siti su un server Ubuntu: WordPress, WooCommerce, PHP, Laravel o statici. Ogni sito nasce con la sua cache di pagina, il suo PHP isolato e i backup fuori dal server, e una modifica passa prima da una copia di staging, che non va in produzione se risulta più lenta.", stack: "Go · Vue", state: "versione 0.1, codice pubblico su GitHub", url: "https://cloudground.it", image: cloudground, alt: "La home page di cloudground.it" },
-        // A proprietary project: no technologies (COPY.md, Registro); the card leaves the line out.
+        // A proprietary project: no technologies (CLAUDE.md, the words' register); the card leaves the line out.
         { slug: "skeda-fit", title: "skeda.fit", role: "cofondatore", text: "App per personal trainer freelance, con schede di allenamento, registrazione delle serie in palestra, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita e la lista d’attesa è aperta.", stack: "", state: "in sviluppo", url: "https://skeda.fit", image: skeda, alt: "La home page di skeda.fit" },
         { slug: "vitrine", title: "vitrine", role: "mio", text: "Un overlay trasparente che sta dietro le icone del desktop di Windows, con i temi scritti come pagine React. Su Ubuntu usavo Conky e su Windows non c’era niente di simile. Parte con il PC e lo uso tutti i giorni.", stack: "C# · WPF · WebView2", state: "codice pubblico su GitHub", url: "https://github.com/manuto276/vitrine", image: vitrine, alt: "vitrine sul desktop di Windows" },
     ],

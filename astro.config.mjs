@@ -9,7 +9,7 @@
  * the type as custom properties, the one place a colour is named.
  */
 import { defineConfig } from "astro/config";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const here = (p) => fileURLToPath(new URL(p, import.meta.url));
@@ -38,11 +38,38 @@ function tokens() {
     };
 }
 
+/**
+ * The desk's chunks, fetched at low priority while the page renders: the scene imports them
+ * once the words are painted (src/desk/index.ts), and by then they are here. Only on the pages
+ * that have the desk, and never the stills' chunk or the owl's, which most visitors never need.
+ */
+function preloadDesk() {
+    let base = "/";
+    return {
+        name: "frascella-preload-desk",
+        hooks: {
+            "astro:config:done": ({ config }) => { base = config.base.replace(/\/?$/, "/"); },
+            "astro:build:done": ({ dir }) => {
+                const root = fileURLToPath(dir);
+                const chunks = readdirSync(root + "assets").filter((f) => /^(main|three|gen)\.[\w-]+\.js$/.test(f));
+                const links = chunks.map((f) => `<link rel="modulepreload" href="${base}assets/${f}" fetchpriority="low">`).join("");
+                const pages = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? pages(d + e.name + "/") : e.name.endsWith(".html") ? [d + e.name] : []);
+                for (const page of pages(root)) {
+                    const html = readFileSync(page, "utf8");
+                    if (html.includes('<canvas id="desk"')) writeFileSync(page, html.replace("</head>", links + "</head>"));
+                }
+            },
+        },
+    };
+}
+
 export default defineConfig({
     site: "https://www.frascella.dev",
     base: process.env.BASE_PATH || "/",
     trailingSlash: "always",
-    build: { format: "directory", assets: "assets" },
+    // the stylesheet in the page: one round trip fewer before the first paint
+    build: { format: "directory", assets: "assets", inlineStylesheets: "always" },
+    integrations: [preloadDesk()],
     vite: {
         plugins: [tokens()],
         build: {
@@ -50,7 +77,8 @@ export default defineConfig({
                 output: {
                     // the desk's three.js on its own chunk: it changes far less often than the
                     // scene, so it stays cached across releases (src/desk/CONTRACT.md)
-                    manualChunks: (id) => (id.includes("/node_modules/three/") ? "three" : undefined),
+                    // (the glTF loader and its decoder stay with the owl, which loads later, if at all)
+                    manualChunks: (id) => (id.includes("/node_modules/three/") && !/GLTFLoader|meshopt_decoder/.test(id) ? "three" : undefined),
                 },
             },
         },

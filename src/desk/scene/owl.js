@@ -31,7 +31,7 @@ export async function buildOwl({ reduced, at, yaw }) {
   const mat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: ROUTER.roughness, specularIntensity: .5, sheen: .25, sheenRoughness: .9, sheenColor: new THREE.Color(0xffffff) });
   model.traverse(o => {
     if (!o.isMesh) return;
-    o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+    o.castShadow = true; o.receiveShadow = true;
     const src = o.geometry.getAttribute('color'), n = o.geometry.getAttribute('position').count, rgb = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) { const c = src && src.getX(i) + src.getY(i) + src.getZ(i) < 1.5 ? glass : shell; rgb[i * 3] = c.r; rgb[i * 3 + 1] = c.g; rgb[i * 3 + 2] = c.b; }
     o.geometry.setAttribute('color', new THREE.BufferAttribute(rgb, 3));
@@ -52,6 +52,10 @@ export async function buildOwl({ reduced, at, yaw }) {
   const c = box.getCenter(V(0, 0, 0));
   model.position.set(-c.x, -box.min.y, -c.z);
   body.rotation.y = yaw;
+  // out of the camera's view it is not drawn: culled by the sphere it fills sitting, which a
+  // skinned mesh has to be told; while it flies (and the sphere would be stale) it is always drawn
+  let mesh; model.traverse(o => { if (o.isSkinnedMesh) mesh = o; });
+  root.updateMatrixWorld(true); mesh.computeBoundingSphere();
 
   // the flight, in cm from its spot (world axes). The lamp's bar runs 44 cm above the spot, so it
   // leaves forwards, low, and climbs only once it is clear of it, out past the left of the frame;
@@ -68,7 +72,7 @@ export async function buildOwl({ reduced, at, yaw }) {
 
   function poke(force = false) {
     if (t >= 0 || (reduced() && !force)) return false;
-    t = 0; folding = false;
+    t = 0; folding = false; mesh.frustumCulled = false;
     fly.reset().play(); rest.crossFadeTo(fly, .3, false);
     return true;
   }
@@ -97,7 +101,7 @@ export async function buildOwl({ reduced, at, yaw }) {
       const u = ease((t - t5) / T_LAND);
       body.position.set(0, HOVER * (1 - u), 0); body.rotation.y = yaw;
     } else {
-      t = -1; fly.stop(); rest.setEffectiveWeight(1); mixer.update(0);
+      t = -1; fly.stop(); rest.setEffectiveWeight(1); mixer.update(0); mesh.frustumCulled = true;
       body.position.set(0, 0, 0); body.rotation.y = yaw; body.visible = true;
     }
     return true;

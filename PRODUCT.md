@@ -42,7 +42,7 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
 - Motion only as an enhancement, off under reduced motion; the page is complete without it.
 - Two languages, written separately rather than translated word for word.
 - **Services:** websites and web platforms, mobile and web apps, integrations and AI (see
-  `COPY.md`). No prices or packages are published.
+  `src/i18n.ts`). No prices or packages are published.
 
 ## Brand Commitments
 
@@ -52,15 +52,15 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
   #FF4A1C, Sand.
 - Fonts unchanged from the previous site: **Gloock** and **Schibsted Grotesk** (woff2 in
   `wp-content/themes/frascella/assets/fonts`).
-- Voice: see the register at the top of `COPY.md` — senior-technical, facts instead of adjectives,
+- Voice: see the words' register in `CLAUDE.md` — senior-technical, facts instead of adjectives,
   no inflated claims.
 
 ## Evidence on Hand
 
-- **The site's words:** `COPY.md` (Italian) and `COPY.en.md` (English), approved by the owner,
-  with the register rules at the top. They are the source for every visible sentence.
-- **Work shown:** seveninktattoo.it (client), skeda.fit (co-founded, not launched), vitrine
-  (own, public on GitHub). Kept in the plugin's Portfolio → Progetti.
+- **The site's words:** `src/i18n.ts` (Italian and English), approved by the owner; the
+  register rules are in `CLAUDE.md`. They are the source for every visible sentence.
+- **Work shown:** seveninktattoo.it (client), CloudGround (own, public on GitHub, cloudground.it),
+  skeda.fit (co-founded, not launched), vitrine (own, public on GitHub), in `src/i18n.ts`.
 - **The owner's other products** (not shown as work): Agenda, Voci, Voci Google, Postino,
   Chiaro, Bottega, Analytics (analytics.frascella.dev).
 - Absent, never to be fabricated: testimonials, client logos, numbers of clients or projects,

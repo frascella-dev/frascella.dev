@@ -11,7 +11,7 @@ cookies, no statistics.
 - **Hosting:** GitHub Pages, from `main` (`.github/workflows/pages.yml`); custom domain www.frascella.dev
 - **Email:** emanuele@frascella.dev (OVHcloud mail)
 - **Laws that apply:** GDPR + Italian Codice Privacy
-- **Register of the words:** first person, plain, precise; English and Italian written separately, not translated word for word (`COPY.md`, `COPY.en.md`)
+- **Register of the words:** first person, plain, precise; English and Italian written separately, not translated word for word (`src/i18n.ts`)
 - **Design:** palette and mark in the Sketch file `frascella.dev` (Ink #0E0E11, Graphite #1C1C21, Paper #F3EFE7, Stone #8A857C, Vermilion #FF4A1C); fonts Gloock + Schibsted Grotesk
 
 ## How to work here
@@ -29,6 +29,18 @@ npm run dev      # http://localhost:4321
 npm run build    # dist/
 npm test         # browser checks against dist/
 ```
+
+## The words' register
+
+The site's words are the owner's, in `src/i18n.ts`. When writing or changing one:
+- the readers are companies, agencies and startups; the tone is senior and technical;
+- "tu", without familiarity: no "ciao", no exclamation marks;
+- say it as you would to a CTO on a call: no catchphrases, puns, or a colon followed by a list;
+- facts instead of adjectives: never "soluzioni", "scalabile", "su misura", "innovativo";
+- technical terms yes, exact and unexplained; every fact once, where it is needed;
+- never: the year 2013 and the beginnings, the word "backend", "l'ho scritto io" and the like,
+  the technologies of proprietary projects;
+- "software engineer", never "ingegnere"; no claims about maintaining things after release.
 
 ## The rules that are never bent
 
