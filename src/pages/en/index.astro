@@ -1,0 +1,10 @@
+---
+import Base from "../../layouts/Base.astro";
+import Home from "../../components/Home.astro";
+import { words } from "../../i18n.ts";
+
+const w = words.en;
+---
+<Base lang="en" page="" title={w.meta.title} description={w.meta.description} desk>
+    <Home lang="en" />
+</Base>

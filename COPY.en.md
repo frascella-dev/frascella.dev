@@ -7,7 +7,7 @@ English and Italian are written separately, so a line here says the same thing, 
 Format notes:
 - **Cut-out words** (the giant ones in the sheet) are lowercase and short.
 - **aria-labels** are read by screen readers: they start with the visible word, if there is one.
-- On the real site the name, the VAT number and the city come from the settings, not from these texts.
+- On the real site the name, the VAT number and the city are typed once, in `src/i18n.ts` (`who`).
 
 ## Registro
 
@@ -30,8 +30,6 @@ Format notes:
 
 - **Logo, aria-label:** frascella.dev, back to top
 - **Menu:** services · work · about
-- **Audio, testo:** audio on / audio off
-- **Audio, aria-label:** audio: vinyl crackle
 - **Lingua:** it
 - **Pulsante:** contact
 - **Su telefono, apri / chiudi il menu:** menu / close
@@ -55,11 +53,12 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 
 - **Gruppo:** desk objects
 - **Lampada:** lamp light: full / dim / off
-- **Giradischi:** record player: vinyl crackle
+- **Giradischi:** record player: start or stop
 - **Tazza:** mug: make it wobble
 - **Pianta:** plant: make it sparkle
 - **Telefono:** phone: crack the screen
 - **Tablet:** tablet: draw
+- **Gufo:** owl: make it fly
 - **Suggerimento in modalità disegno:** Draw on the tablet screen. Press "done" or Esc to go back.
 
 ## 3. Servizi
@@ -89,7 +88,7 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 
 - **Parola traforata:** work
 - **Testatina:** Work
-- **Titolo della sezione:** Three recent projects.
+- **Titolo della sezione:** Four recent projects.
 
 ### 01 — seveninktattoo.it
 - **Ruolo:** 01 · client
@@ -99,16 +98,24 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Stato:** live
 - **Testo alternativo immagine:** The seveninktattoo.it home page
 
-### 02 — skeda.fit
-- **Ruolo:** 02 · co-founder
+### 02 — CloudGround
+- **Ruolo:** 02 · personal
+- **Testo:**
+  > A control panel for running websites on an Ubuntu server: WordPress, WooCommerce, PHP, Laravel or static. Each site starts with its own page cache, its own isolated PHP and backups off the server, and a change goes through a staging copy first, which is not promoted if it measures slower than production.
+- **Tecnologie:** Go · Vue
+- **Stato:** version 0.1, public on GitHub
+- **Testo alternativo immagine:** The cloudground.it home page
+
+### 03 — skeda.fit
+- **Ruolo:** 03 · co-founder
 - **Testo:**
   > An app for freelance personal trainers, with workout plans, set logging at the gym, chat, check-ins and a public profile on a map. It hasn't launched yet, and the waitlist is open.
 - **Tecnologie:** _nessuna — nascondere la riga per questo progetto_
 - **Stato:** in development
 - **Testo alternativo immagine:** The skeda.fit home page
 
-### 03 — vitrine
-- **Ruolo:** 03 · personal
+### 04 — vitrine
+- **Ruolo:** 04 · personal
 - **Testo:**
   > A transparent overlay that sits behind the Windows desktop icons, with themes written as React pages. On Ubuntu I used Conky, and Windows had nothing like it. It starts with the PC and I use it every day.
 - **Tecnologie:** C# · WPF · WebView2
@@ -133,18 +140,7 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Parola traforata:** contact
 - **Testo:**
   > Tell me what you need, what already exists and when you need it by. A few lines are enough; we can go through the details on a call.
-- **Riga sotto il testo:** or emanuele@frascella.dev
-- **Etichette dei campi:** Name · Email · Company (optional) · Message
-- **Suggerimento nel campo messaggio:** E.g. an app for our sales reps, connected to our ERP, live by March
-- **Pulsante:** Send message →
-- **Messaggi del modulo (Agenda):**
-  - Inviato: Message received. I'll get back to you within two working days.
-  - Nome mancante: Enter your name.
-  - Email non valida: Check the email address. It doesn't look valid.
-  - Messaggio vuoto: Write a couple of lines about what you need.
-  - Invio fallito: The message didn't go through. Try again in a few minutes, or email me at emanuele@frascella.dev.
-  - _Il campo Azienda solo se Agenda permette campi extra; altrimenti si toglie._
-  - _La frase sul consenso sotto il modulo è di Agenda e va scritta con la privacy, non qui._
+- **Indirizzo (al posto del modulo):** emanuele@frascella.dev →
 
 ## 7. Footer
 
@@ -152,13 +148,13 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Note legali:** © 2026 Emanuele Frascella · VAT no. 03462650734
 - **Colonna "Indice":** Index — services · work · about · contact
 - **Colonna "Altrove":** Elsewhere — github · linkedin
-- **Colonna "Legale":** Legal — privacy · cookies
+- **Colonna "Legale":** Legal — privacy
 - **Colonna "Lingua":** Language — Italiano · English
 
 ## Menu su telefono (drawer)
 
 - **Voci:** services · work · about · contact
-- **Riga in basso:** audio on | it
+- **Riga in basso:** it
 - **Note legali:** Freelance software engineer · Taranto, CET / © 2026 Emanuele Frascella · VAT no. 03462650734
 
 ---

@@ -6,7 +6,7 @@ o dentro le citazioni; lascia i titoletti in grassetto (servono a ritrovare il p
 Note di formato:
 - Le **parole traforate** (quelle giganti nel foglio) sono minuscole e brevi.
 - Gli **aria-label** sono letti dai lettori di schermo: devono iniziare con la parola visibile, se ce n'è una.
-- Il nome, la P. IVA e la città nel sito vero vengono dalle impostazioni, non sono scritti nei testi.
+- Il nome, la P. IVA e la città nel sito vero sono scritti una volta sola, in `src/i18n.ts` (`who`).
 
 ## Registro
 
@@ -29,8 +29,6 @@ Note di formato:
 
 - **Logo, aria-label:** frascella.dev, torna all'inizio
 - **Menu:** servizi · lavori · chi sono
-- **Audio, testo:** audio on / audio off
-- **Audio, aria-label:** audio: fruscio del vinile
 - **Lingua:** en
 - **Pulsante:** scrivimi
 - **Su telefono, apri / chiudi il menu:** menu / chiudi
@@ -54,11 +52,12 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 
 - **Gruppo:** oggetti della scrivania
 - **Lampada:** luce della lampada: piena / media / spenta
-- **Giradischi:** giradischi: fruscio del vinile
+- **Giradischi:** giradischi: avvia o ferma
 - **Tazza:** tazza: fai ondeggiare
 - **Pianta:** pianta: fai scintillare
 - **Telefono:** telefono: incrina lo schermo
 - **Tablet:** tablet: disegna
+- **Gufo:** gufo: fallo volare
 - **Suggerimento in modalità disegno:** Disegna sullo schermo del tablet. Premi «fatto» o Esc per tornare.
 
 ## 3. Servizi
@@ -88,7 +87,7 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 
 - **Parola traforata:** lavori
 - **Testatina:** Lavori
-- **Titolo della sezione:** Tre progetti recenti.
+- **Titolo della sezione:** Quattro progetti recenti.
 
 ### 01 — seveninktattoo.it
 - **Ruolo:** 01 · cliente
@@ -98,16 +97,24 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Stato:** online
 - **Testo alternativo immagine:** La home page di seveninktattoo.it
 
-### 02 — skeda.fit
-- **Ruolo:** 02 · cofondatore
+### 02 — CloudGround
+- **Ruolo:** 02 · mio
+- **Testo:**
+  > Un pannello di controllo per gestire siti su un server Ubuntu: WordPress, WooCommerce, PHP, Laravel o statici. Ogni sito nasce con la sua cache di pagina, il suo PHP isolato e i backup fuori dal server, e una modifica passa prima da una copia di staging, che non va in produzione se risulta più lenta.
+- **Tecnologie:** Go · Vue
+- **Stato:** versione 0.1, codice pubblico su GitHub
+- **Testo alternativo immagine:** La home page di cloudground.it
+
+### 03 — skeda.fit
+- **Ruolo:** 03 · cofondatore
 - **Testo:**
   > App per personal trainer freelance, con schede di allenamento, registrazione delle serie in palestra, chat, check-in e un profilo pubblico sulla mappa. Non è ancora uscita e la lista d'attesa è aperta.
 - **Tecnologie:** _nessuna — nascondere la riga per questo progetto_
 - **Stato:** in sviluppo
 - **Testo alternativo immagine:** La home page di skeda.fit
 
-### 03 — vitrine
-- **Ruolo:** 03 · mio
+### 04 — vitrine
+- **Ruolo:** 04 · mio
 - **Testo:**
   > Un overlay trasparente che sta dietro le icone del desktop di Windows, con i temi scritti come pagine React. Su Ubuntu usavo Conky e su Windows non c'era niente di simile. Parte con il PC e lo uso tutti i giorni.
 - **Tecnologie:** C# · WPF · WebView2
@@ -132,18 +139,7 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Parola traforata:** scrivimi
 - **Testo:**
   > Raccontami cosa ti serve, cosa esiste già ed entro quando. Bastano poche righe, i dettagli li vediamo insieme in una call.
-- **Riga sotto il testo:** oppure emanuele@frascella.dev
-- **Etichette dei campi:** Nome · Email · Azienda (facoltativo) · Messaggio
-- **Suggerimento nel campo messaggio:** Es. un'app per i nostri agenti commerciali, collegata al gestionale, da lanciare entro marzo
-- **Pulsante:** Invia il messaggio →
-- **Messaggi del modulo (Agenda):**
-  - Inviato: Messaggio ricevuto. Ti rispondo entro due giorni lavorativi.
-  - Nome mancante: Scrivi il tuo nome.
-  - Email non valida: L'indirizzo email non sembra valido.
-  - Messaggio vuoto: Scrivi due righe su cosa ti serve.
-  - Invio fallito: Il messaggio non è partito. Riprova tra qualche minuto o scrivimi a emanuele@frascella.dev.
-  - _Il campo Azienda solo se Agenda permette campi extra; altrimenti si toglie._
-  - _La frase sul consenso sotto il modulo è di Agenda e va scritta con la privacy, non qui._
+- **Indirizzo (al posto del modulo):** emanuele@frascella.dev →
 
 ## 7. Footer
 
@@ -151,13 +147,13 @@ Pulsanti da tastiera per gli oggetti (nascosti, compaiono con Tab):
 - **Note legali:** © 2026 Emanuele Frascella · P. IVA 03462650734
 - **Colonna "Indice":** servizi · lavori · chi sono · scrivimi
 - **Colonna "Altrove":** github · linkedin
-- **Colonna "Legale":** privacy · cookie
+- **Colonna "Legale":** privacy
 - **Colonna "Lingua":** Italiano · English
 
 ## Menu su telefono (drawer)
 
 - **Voci:** servizi · lavori · chi sono · scrivimi
-- **Riga in basso:** audio on | en
+- **Riga in basso:** en
 - **Note legali:** Software engineer freelance · Taranto, CET / © 2026 Emanuele Frascella · P. IVA 03462650734
 
 ---

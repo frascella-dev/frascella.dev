@@ -1,0 +1,85 @@
+---
+/**
+ * The home page, the "manifesto": the opening, the desk, the services, the work, the bio and
+ * the contact. Each poster is a station of the desk's camera (`data-stop`).
+ */
+import "../styles/site.css";
+import Cut from "./Cut.astro";
+import Desk from "./Desk.astro";
+import Works from "./Works.astro";
+import { words, who, type Lang } from "../i18n.ts";
+
+interface Props {
+    lang: Lang;
+}
+const { lang } = Astro.props;
+const w = words[lang];
+const two = (n: number) => String(n).padStart(2, "0");
+---
+<section class="poster hero" data-stop="hero">
+    <div class="hero-title">
+        <Cut word={w.hero.cut} tag="h1" lines={w.hero.lines} linesN={w.hero.linesN} class="cut-l" />
+        <p class="hero-rest">{w.hero.rest}</p>
+    </div>
+    <div class="band pane">
+        <p class="rh">{w.hero.where}</p>
+        <div class="txt"><p>{w.hero.lede}</p></div>
+        <a class="btn btn--big cta" href={"#" + w.ids.contact}>{w.hero.button}</a>
+    </div>
+</section>
+
+<Desk lang={lang} />
+
+<section class="services" id={w.ids.services}>
+    <div class="intro pane">
+        <p class="rh">{w.services.label}</p>
+        <h2 class="intro-title">{w.services.title}</h2>
+    </div>
+    {w.services.items.map((s, i) => (
+        <div class:list={["poster svc", { "poster--flip": i === 1 }]} data-stop={`s${i + 1}`}>
+            <Cut word={s.cut} linesN={s.linesN} class={i === 1 ? "cut-r" : undefined} />
+            <div class="band pane frascella-reveal">
+                <h3 class="display"><span class="no">{two(i + 1)}</span><br />{s.title}</h3>
+                <div class="txt"><p>{s.text}</p></div>
+            </div>
+        </div>
+    ))}
+</section>
+
+<section class="work" id={w.ids.works}>
+    <div class="poster window" data-stop="w0">
+        <Cut word={w.works.cut} />
+        <div class="band pane">
+            <p class="rh">{w.works.label}</p>
+            <h2 class="display">{w.works.title}</h2>
+        </div>
+    </div>
+    <Works lang={lang} />
+</section>
+
+<section class="poster bio" id={w.ids.bio} data-stop="bio">
+    <Cut word={w.bio.cut} />
+    <div class="band pane frascella-reveal">
+        <h2 class="display">{w.bio.title}</h2>
+        <div class="txt">{w.bio.text.map((p) => <p>{p}</p>)}</div>
+        <div class="bio-facts">
+            <div class="facts">{w.bio.facts.map(([value, label]) => <div><b>{value}</b><span>{label}</span></div>)}</div>
+        </div>
+    </div>
+</section>
+
+<section class="poster contact" id={w.ids.contact} data-stop="contact">
+    <Cut word={w.contact.cut} tag="h2" />
+    <div class="band band--wide pane">
+        <p class="contact-lede">{w.contact.lede}</p>
+        <p class="contact-mail"><a href={`mailto:${who.email}`}>{who.email}<span class="arr" aria-hidden="true"> →</span></a></p>
+    </div>
+</section>
+
+<script>
+    import { initReveal } from "../lib/reveal.ts";
+    import { initSheet } from "../lib/sheet.ts";
+
+    initSheet();
+    initReveal();
+</script>

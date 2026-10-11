@@ -18,9 +18,9 @@ credible to them, but never at the cost of the client's minute.
 
 ## Product Purpose
 
-The portfolio of Emanuele Frascella, freelance software engineer in Taranto, rebuilt as a WordPress
-site. It shows who he is, what he builds for clients, and the work that proves it, and ends in a
-request form. Success is a well-formed request from a client who already understood what he does.
+The portfolio of Emanuele Frascella, freelance software engineer in Taranto, a static
+Astro site. It shows who he is, what he builds for clients, and the work that proves it, and ends in an
+email address. Success is a well-formed request from a client who already understood what he does.
 
 ## Positioning
 
@@ -31,15 +31,14 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
 
 ## Operating Context
 
-- Built from the Bottega template: a theme that draws, a plugin that remembers, Elementor (Pro) for
-  pages, Polylang for Italian (default, on `/`) and English (`/en/`).
-- Requests arrive through **Agenda** (frascella-dev/agenda), replacing the old site's contact API.
-- Statistics through **Analytics Connector** (frascella-dev/analytics), with its consent banner.
+- A static site built with Astro, published on GitHub Pages (custom domain www.frascella.dev),
+  Italian (default, on `/`) and English (`/en/`).
+- No forms and no statistics: requests arrive by email, at emanuele@frascella.dev.
 
 ## Capabilities and Constraints
 
-- Everything a crawler should index is in the markup. No content painted into a canvas: the old
-  three.js work corridor is not carried over.
+- Everything a crawler should index is in the markup. The 3D desk is behind the words, never
+  instead of them.
 - Motion only as an enhancement, off under reduced motion; the page is complete without it.
 - Two languages, written separately rather than translated word for word.
 - **Services:** websites and web platforms, mobile and web apps, integrations and AI (see
@@ -63,7 +62,7 @@ repositories — Agenda, Voci, Postino, Chiaro, Bottega, Analytics — and a cli
 - **Work shown:** seveninktattoo.it (client), skeda.fit (co-founded, not launched), vitrine
   (own, public on GitHub). Kept in the plugin's Portfolio → Progetti.
 - **The owner's other products** (not shown as work): Agenda, Voci, Voci Google, Postino,
-  Chiaro, Bottega, Analytics (analytics.frascella.dev, used by this site).
+  Chiaro, Bottega, Analytics (analytics.frascella.dev).
 - Absent, never to be fabricated: testimonials, client logos, numbers of clients or projects,
   prices, service packages.
 

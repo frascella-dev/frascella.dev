@@ -1,0 +1,70 @@
+---
+/**
+ * The colophon: the mark, who and where, the index, the profiles, the privacy notice, the
+ * languages, the small print.
+ */
+import Logo from "./Logo.astro";
+import { words, langs, who, type Lang } from "../i18n.ts";
+import { href, inLang } from "../lib/url.ts";
+
+interface Props {
+    lang: Lang;
+    page: string;
+}
+const { lang, page } = Astro.props;
+const w = words[lang];
+const home = href(inLang(lang));
+const links = [
+    ...w.nav.links.map(([title, anchor]) => ({ title, url: home + anchor })),
+    { title: w.nav.cta, url: home + "#" + w.ids.contact },
+];
+const elsewhere = [
+    { title: "github", url: who.github },
+    { title: "linkedin", url: who.linkedin },
+];
+---
+<footer class="colophon">
+    <div class="colophon-band">
+        <div class="colophon-brand">
+            <a class="logo" href={home} aria-label={w.nav.logo}>
+                <Logo />
+                <span>{w.nav.brand}</span>
+            </a>
+            <p class="colophon-role">{w.footer.role}</p>
+        </div>
+
+        <nav class="colophon-list" aria-labelledby="colophon-index">
+            <h2 class="colophon-h" id="colophon-index">{w.footer.index}</h2>
+            <ul>
+                {links.map((link) => <li><a href={link.url}>{link.title}</a></li>)}
+            </ul>
+        </nav>
+
+        <nav class="colophon-list" aria-labelledby="colophon-elsewhere">
+            <h2 class="colophon-h" id="colophon-elsewhere">{w.footer.elsewhere}</h2>
+            <ul>
+                {elsewhere.map((link) => (
+                    <li><a href={link.url} rel="me noopener">{link.title}<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a></li>
+                ))}
+            </ul>
+        </nav>
+
+        <nav class="colophon-list" aria-labelledby="colophon-legal">
+            <h2 class="colophon-h" id="colophon-legal">{w.footer.legalHeading}</h2>
+            <ul>
+                <li><a href={href(inLang(lang, "privacy/"))}>{w.footer.privacy}</a></li>
+            </ul>
+        </nav>
+
+        <nav class="colophon-list" aria-labelledby="colophon-languages">
+            <h2 class="colophon-h" id="colophon-languages">{w.nav.languages}</h2>
+            <ul>
+                {langs.map((l) => (
+                    <li><a href={href(inLang(l, page))} lang={words[l].hreflang} hreflang={words[l].hreflang} aria-current={l === lang ? "page" : undefined}>{words[l].endonym}</a></li>
+                ))}
+            </ul>
+        </nav>
+
+        <p class="colophon-legal">{w.footer.legal}</p>
+    </div>
+</footer>

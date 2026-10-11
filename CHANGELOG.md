@@ -1,7 +1,32 @@
 # Changelog
 
-What changed for the people who run frascella.dev. The theme and the plugin are released
-together and carry the same version.
+What changed for the people who run frascella.dev. Up to 1.1.0 the site was a WordPress
+theme and plugin released together; from 2.0.0 it is a static Astro site on GitHub Pages.
+
+## [2.0.0] — 2026-10-11
+
+The site, rebuilt as a static Astro site and published on GitHub Pages.
+
+- **No server.** The pages are built once and served by GitHub Pages: no WordPress, no
+  database, no plugins to update. The look, the words, the 3D desk and the icons are the same.
+- **Email instead of the form.** The contact poster ends with the address,
+  emanuele@frascella.dev; there is no contact form and no Agenda any more.
+- **No statistics.** The Analytics tracker and its consent banner are gone: the site sets no
+  cookie and stores nothing in the browser.
+- **Privacy notice, short.** What the site does not collect, what GitHub Pages logs (the
+  visitor's IP address, for security), and what happens to an email.
+- **The record is silent.** The turntable still turns and its arm still moves; the vinyl
+  crackle and the header's «audio on / off» are gone.
+- **An owl on the desk.** A small owl, in the router's colours, sits between the plant and the
+  router: touched (or with its switch on Tab) it flies out of the frame and back, turns in the
+  air and lands on its spot, never touching anything on the desk. Nothing moves under reduced
+  motion.
+- **A fourth project: CloudGround**, after seveninktattoo.it: the hosting control panel for
+  Ubuntu (Go, Vue), public on GitHub, with its site at cloudground.it. On the desk its home page
+  shows on the laptop's screen like the others'.
+- **Checks.** `npm test` checks every page in a browser, in both languages, on a desktop and a
+  phone: script errors, failed requests, other hosts, cookies, axe, the desk in WebGL, the
+  owl's flight measured against everything on the desk.
 
 ## [1.1.0] — 2026-10-01
 

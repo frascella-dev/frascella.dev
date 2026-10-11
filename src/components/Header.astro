@@ -1,0 +1,71 @@
+---
+/**
+ * The header: the mark, the menu, the record's switch, the other language, «scrivimi»;
+ * on a phone, «menu» and the drawer it opens (lib/header.ts).
+ *
+ * On a page with the desk it also holds the desk's switches for the keyboard
+ * (`.scene-ctl`), which the scene drives (src/desk/CONTRACT.md §3).
+ */
+import Logo from "./Logo.astro";
+import { words, langs, type Lang } from "../i18n.ts";
+import { href, inLang } from "../lib/url.ts";
+
+interface Props {
+    lang: Lang;
+    page: string;
+    desk?: boolean;
+}
+const { lang, page, desk = false } = Astro.props;
+const w = words[lang];
+const home = href(inLang(lang));
+const links = w.nav.links.map(([title, anchor]) => ({ title, url: home + anchor }));
+const cta = home + "#" + w.ids.contact;
+const others = langs.filter((l) => l !== lang).map((l) => ({ lang: l, url: href(inLang(l, page)) }));
+---
+<header class="top">
+    <a class="logo" href={home} aria-label={w.nav.logo}>
+        <Logo />
+        <span>{w.nav.brand}</span>
+    </a>
+
+    <nav class="top-nav" aria-label={w.nav.menu}>
+        <ul>
+            {links.map((link) => <li><a href={link.url}>{link.title}</a></li>)}
+        </ul>
+        <span class="top-divider" aria-hidden="true"></span>
+        {others.map((o) => <span class="top-lang"><a href={o.url} lang={o.lang} hreflang={o.lang}>{o.lang}</a></span>)}
+        <a class="btn top-cta" href={cta}>{w.nav.cta}</a>
+    </nav>
+
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-drawer" hidden>
+        <span class="open">{w.nav.open}</span><span class="close">{w.nav.close}</span>
+    </button>
+
+    {desk && (
+        <div class="scene-ctl" role="group" aria-label={w.desk.controls}>
+            <button class="lampbtn" id="lamp-btn" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20h8"/><path d="M9 20V12l7-5"/><path d="M13.5 5.2l5 3.4-1 1.5-5-3.4z"/><path class="ray" d="M16.2 12.4l1 2.2M19 11l1.9 1.4"/></svg><span class="sr">{w.desk.lamp} </span><span class="st" id="lamp-state">{w.desk.lampFull}</span></button>
+            <button class="lampbtn" id="tt-btn" type="button" aria-pressed="false" aria-label={w.desk.turntable}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="12" r="7"/><circle cx="10" cy="12" r="1.6"/><path class="ray" d="M19.5 4.5v9l-3 3"/></svg><span class="st" aria-hidden="true">{w.desk.turntableShort}</span></button>
+            <button class="lampbtn" id="mug-btn" type="button" aria-label={w.desk.mug}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path class="ray" d="M9 3.5c-.8 1 .8 1.8 0 3M12.5 3.5c-.8 1 .8 1.8 0 3"/></svg><span class="st" aria-hidden="true">{w.desk.mugShort}</span></button>
+            <button class="lampbtn" id="plant-btn" type="button" aria-label={w.desk.plant}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 15h11l-1.4 5.5H7.9z"/><path d="M12 15c-1.6-1.8-1.6-4.2 0-6.2 1.6 2 1.6 4.4 0 6.2z"/><path d="M12 15c-2.8 0-4.9-1.5-5.6-4 2.8-.2 4.8 1.3 5.6 4zM12 15c2.8 0 4.9-1.5 5.6-4-2.8-.2-4.8 1.3-5.6 4z"/><path class="ray" d="M17.5 4.5v1.6M16.7 5.3h1.6"/></svg><span class="st" aria-hidden="true">{w.desk.plantShort}</span></button>
+            <button class="lampbtn" id="phone-btn" type="button" aria-label={w.desk.phone}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2"/><path d="M10.8 5.4h2.4"/><path class="ray" d="M10 11l2 2-1.2 1.6 2.2 2"/></svg><span class="st" aria-hidden="true">{w.desk.phoneShort}</span></button>
+            <button class="lampbtn" id="pad-btn" type="button" aria-label={w.desk.pad}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 4.5l4 4L9 19H5v-4z"/><path d="M13 7l4 4"/></svg><span class="st" aria-hidden="true">{w.desk.padShort}</span></button>
+            <button class="lampbtn" id="owl-btn" type="button" aria-label={w.desk.owl}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6.5l2 1.5h8l2-1.5V14a6 6 0 0 1-12 0z"/><circle cx="9.6" cy="11.2" r="1.5"/><circle cx="14.4" cy="11.2" r="1.5"/><path d="M12 13v1.6"/><path class="ray" d="M10 21v-1.6M14 21v-1.6"/></svg><span class="st" aria-hidden="true">{w.desk.owlShort}</span></button>
+        </div>
+    )}
+
+    <div class="drawer" id="site-drawer" hidden>
+        <nav aria-label={w.nav.drawer}>
+            <ul class="drawer-list">
+                {links.map((link) => <li><a href={link.url}>{link.title}</a></li>)}
+                <li><a href={cta}>{w.nav.cta}</a></li>
+            </ul>
+            <div class="drawer-row">
+                {others.map((o) => <a href={o.url} lang={o.lang} hreflang={o.lang}>{o.lang}</a>)}
+            </div>
+        </nav>
+        <div class="drawer-legal">
+            <p>{w.footer.role}</p>
+            <p>{w.footer.legal}</p>
+        </div>
+    </div>
+</header>

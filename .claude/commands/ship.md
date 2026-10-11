@@ -10,7 +10,7 @@ Ship the current work. Arguments: `$ARGUMENTS`
   the rest as the commit message.
 - Whatever remains is the commit message. If nothing remains, write one from the diff: a
   short subject saying what changed for the site, and a body saying why when it is not
-  obvious (`docs/guidelines/11-code-style.md`).
+  obvious.
 
 Steps:
 1. `git status` and `git diff --stat`, and skim `git diff`.

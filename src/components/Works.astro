@@ -1,0 +1,34 @@
+---
+/**
+ * The work: one card per project, each a station of the camera, which frames the laptop
+ * and shows the project's screenshot on its screen (`.card[data-screen]`,
+ * src/desk/CONTRACT.md §3). The screenshot is also in the card, for whoever does not get
+ * the scene; while the scene shows it, it is not drawn twice (sections.css).
+ */
+import { words, type Lang } from "../i18n.ts";
+
+interface Props {
+    lang: Lang;
+}
+const projects = words[Astro.props.lang].projects;
+const two = (n: number) => String(n).padStart(2, "0");
+---
+<div class="works">
+    {projects.map((p, i) => (
+        <article class="card plate" data-stop={`w${i + 1}`} data-screen={i} data-screen-src={p.image.src} aria-labelledby={`project-${p.slug}`}>
+            <div class="pl pane">
+                <p class="rh"><span class="no">{two(i + 1)}</span> · {p.role}</p>
+                <h3 class="pname" id={`project-${p.slug}`}><a href={p.url}>{p.title}</a></h3>
+                <div class="txt"><p>{p.text}</p></div>
+                <p class="meta">
+                    {p.stack}
+                    {p.stack && <br />}
+                    {p.state}
+                </p>
+            </div>
+            <figure class="plate-shot">
+                <img src={p.image.src} width={p.image.width} height={p.image.height} alt={p.alt} loading="lazy" decoding="async" />
+            </figure>
+        </article>
+    ))}
+</div>

@@ -1,0 +1,30 @@
+---
+/**
+ * A cut-out word: one of the giant Gloock words through which the desk is seen.
+ *
+ * The word is plain text in the page; lib/sheet.ts breaks it into lines, fits it to its
+ * column and cuts it out of the sheet (the text itself stays transparent).
+ *
+ * The word itself is `aria-hidden`: it repeats what the band under it says. When it is the
+ * section's heading (`tag` h1/h2), a visually hidden copy carries it for screen readers.
+ *
+ * Its look is its wrapper's: `cut-l` (the opening's smaller step), `cut-r` (set right).
+ * `lines` breaks above 760 px, `linesN` below, "|" between lines.
+ */
+interface Props {
+    word: string;
+    tag?: "h1" | "h2";
+    lines?: string;
+    linesN?: string;
+    class?: string;
+}
+const { word, tag, lines, linesN, class: variant } = Astro.props;
+const Tag = tag;
+---
+<div class:list={["cutw", variant]}>
+    {Tag ? (
+        <Tag class="cut-h"><span class="sr">{word}</span><span class="cut" aria-hidden="true" data-lines={lines || undefined} data-lines-n={linesN || undefined}>{word}</span></Tag>
+    ) : (
+        <span class="cut" aria-hidden="true" data-lines={lines || undefined} data-lines-n={linesN || undefined}>{word}</span>
+    )}
+</div>

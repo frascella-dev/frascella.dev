@@ -1,0 +1,37 @@
+/* The two faces, served by the site: fetching them from a font service would hand every
+ * visitor's address to a third party.
+ *
+ * Gloock is `block`: the cut-out words are measured in it (lib/sheet.ts waits for
+ * document.fonts.ready), and a fallback serif swapped in for a moment would be fitted, cut
+ * and then thrown away. Schibsted Grotesk is `swap`: running text should be readable at
+ * once, in whatever face is there. The two Latin files are preloaded (src/layouts/Base.astro). */
+
+@font-face {
+    font-family: "Gloock";
+    src: url("../fonts/gloock-latin.woff2") format("woff2");
+    font-weight: 400;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Gloock";
+    src: url("../fonts/gloock-latin-ext.woff2") format("woff2");
+    font-weight: 400;
+    font-display: block;
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Schibsted Grotesk";
+    src: url("../fonts/schibsted-grotesk-latin.woff2") format("woff2");
+    font-weight: 400 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Schibsted Grotesk";
+    src: url("../fonts/schibsted-grotesk-latin-ext.woff2") format("woff2");
+    font-weight: 400 900;
+    font-display: swap;
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}

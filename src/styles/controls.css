@@ -1,0 +1,57 @@
+/* The controls, once: the button.
+ *
+ * The site has one surface, Ink, so the controls are drawn for it; the values a control
+ * reads are still variables (`--ctl-*`), so a light surface later is one rule that sets
+ * them again, not a variant per control. Inside `@layer components`, so a component's own
+ * rule can still overrule a primitive. */
+
+:root {
+    --ctl-text: var(--text);
+    --ctl-muted: var(--meta);
+    --ctl-rule: color-mix(in srgb, var(--text) 40%, transparent);
+    --ctl-rule-hover: color-mix(in srgb, var(--text) 70%, transparent);
+    --ctl-fill: var(--accent);
+    --ctl-fill-hover: color-mix(in srgb, var(--accent) 82%, var(--text));
+    --ctl-fill-text: var(--accent-text);
+}
+
+@layer components {
+    /* The button: square, vermilion, one weight. `.btn--big` is the band's call to action.
+       An `<a>` drawn as a button wears the same classes as a `<button>`. */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65em;
+        padding: 0.85em 1.25em;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--ctl-fill);
+        color: var(--ctl-fill-text);
+        font-family: var(--font-body);
+        font-size: var(--t-1);
+        line-height: 1;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+        background: var(--ctl-fill-hover);
+        color: var(--ctl-fill-text);
+    }
+
+    .btn--big {
+        font-size: var(--t0);
+        padding: 1.05em 1.4em;
+    }
+
+    .btn .arr {
+        transition: transform 0.3s var(--ease);
+    }
+
+    .btn:hover .arr {
+        transform: translateX(4px);
+    }
+
+}

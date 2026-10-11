@@ -1,0 +1,10 @@
+---
+import Base from "../layouts/Base.astro";
+import Privacy from "../components/Privacy.astro";
+import { words, who } from "../i18n.ts";
+
+const w = words.it;
+---
+<Base lang="it" page="privacy/" title={`${w.privacy.title} - ${who.name}`} description={w.privacy.description} doc>
+    <Privacy lang="it" />
+</Base>

@@ -1,0 +1,184 @@
+/* The home page's sections, after the opening: the services, the work, the bio
+ * (src/components/Home.astro, Works.astro). */
+
+/* --- services: the intro, then a poster per service -------------------------- */
+
+.intro {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: end;
+    padding: 14vh var(--page-margin) 10vh;
+}
+
+.intro > :nth-child(1) {
+    grid-column: 1 / span 4;
+    padding-bottom: 0.8em;
+}
+
+.intro > :nth-child(2) {
+    grid-column: 5 / span 8;
+}
+
+.intro-title {
+    font-family: var(--font-heading);
+    font-size: var(--t7);
+    line-height: var(--lh7);
+    letter-spacing: -0.018em;
+    max-width: 14ch;
+    text-wrap: balance;
+}
+
+@media (max-width: 900px) {
+    /* Sketch: "Servizi" 50 px under the header, the title 18 px under it. */
+    .intro {
+        row-gap: calc(var(--s-4) + 2 * var(--s-1));
+        padding: calc(var(--hh) + var(--s-11) - var(--s-4)) var(--page-margin) 8vh;
+    }
+
+    .intro > :nth-child(n) {
+        grid-column: 1 / -1;
+        padding-bottom: 0;
+    }
+
+    .intro-title {
+        font-size: var(--t5);
+        line-height: var(--lh5);
+    }
+}
+
+/* --- work: each project on the laptop's screen, its words beside it -------------- */
+
+.plate {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: calc(var(--hh) + 4vh) var(--page-margin) 6vh;
+}
+
+.pl {
+    grid-column: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-6);
+}
+
+.pname {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: min(var(--t5), 3.3vw);
+    line-height: var(--lh5);
+    letter-spacing: -0.012em;
+    overflow-wrap: anywhere;
+}
+
+.pname a {
+    text-decoration: none;
+}
+
+.pname a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+.plate .meta {
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+/* The screenshot, for whoever does not get the scene: no script, still pictures, a reader
+   that does not draw. While the scene shows it on the laptop's screen, it is not drawn twice. */
+.plate-shot {
+    grid-column: 6 / span 7;
+    margin: 0;
+}
+
+.plate-shot img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--line);
+}
+
+html.desk-webgl .plate-shot,
+html.desk-loading .plate-shot {
+    visibility: hidden;
+}
+
+@media (max-width: 900px) {
+    /* phone: the screen in the top half, the project's words in the bottom half */
+    .plate {
+        align-items: end;
+        align-content: space-between;
+        row-gap: 3vh;
+        padding-bottom: 4.5vh;
+    }
+
+    .pl,
+    .plate-shot {
+        grid-column: 1 / -1;
+    }
+
+    /* The screen above, the words below: where the laptop's screen is when the desk draws it. */
+    .plate-shot {
+        order: -1;
+    }
+
+    .pname {
+        font-size: var(--t4);
+        line-height: var(--lh4);
+    }
+}
+
+/* --- the bio: a title, the text, and three facts ------------------------------ */
+
+.facts {
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+}
+
+.facts > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: var(--s-3);
+}
+
+.facts b {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: var(--t3);
+    line-height: 1;
+    font-variant-numeric: lining-nums;
+    white-space: nowrap;
+}
+
+.facts span {
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+@media (max-width: 900px) {
+    .facts > div {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--s-4);
+    }
+
+    .facts span {
+        text-align: right;
+    }
+}

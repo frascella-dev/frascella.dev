@@ -1,0 +1,64 @@
+/* The contact poster: the cut-out "scrivimi", a sentence, and the email address. */
+
+.contact {
+    --poster-top: calc(var(--hh) + 3.2vh + 5.5em);
+}
+
+/* Sketch, on a phone: the word sits just above the band (70 px), not under the header. */
+@media (max-width: 900px) {
+    .contact {
+        --poster-top: calc(var(--hh) + 3.2vh);
+    }
+
+    .contact > :first-child {
+        align-self: end;
+        padding-bottom: calc(var(--s-11) + var(--s-2));
+    }
+}
+
+.contact-lede {
+    max-width: 34ch;
+    color: var(--soft);
+    font-size: var(--t1);
+    line-height: var(--lh1);
+    text-wrap: pretty;
+}
+
+.contact-mail {
+    justify-self: end;
+    font-family: var(--font-heading);
+    /* one line, always: on a phone the address scales with the screen instead of breaking */
+    font-size: min(var(--t4), 6.8vw);
+    line-height: var(--lh4);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+}
+
+.contact-mail a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    transition: color 0.2s;
+}
+
+.contact-mail a:hover,
+.contact-mail a:focus-visible {
+    color: var(--accent);
+}
+
+.contact-mail .arr {
+    display: inline-block;
+    color: var(--accent);
+    transition: transform 0.3s var(--ease);
+}
+
+.contact-mail a:hover .arr {
+    transform: translateX(4px);
+}
+
+@media (max-width: 900px) {
+    .contact-mail {
+        justify-self: start;
+    }
+}

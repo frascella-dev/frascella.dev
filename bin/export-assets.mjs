@@ -1,25 +1,24 @@
 /**
  * frascella.dev's banner and icons, from their SVG sources in design/:
  * - the PNGs the README shows (.github/assets/);
- * - the site's icons, shipped with the theme (wp-content/themes/frascella/assets/icons/):
- *   favicon.ico (16, 32, 48), favicon.svg, the Apple touch icon, and the web app
- *   manifest's 192 and 512 (rounded, "any") and 512 maskable (full bleed).
+ * - the site's icons (public/): favicon.ico (16, 32, 48) and the Apple touch icon at the root,
+ *   where browsers ask for them; favicon.svg and the web app manifest's 192, 512 (rounded,
+ *   "any") and 512 maskable (full bleed) in public/icons/.
  *
  * Run after changing a source:
  *
- *   node bin/export-assets.mjs
+ *   npm run export-assets
  *
- * Uses the Playwright installed for the plugin's tests (cd wp-content/plugins/frascella && npm install).
  * The project's own mark, drawn from the Sketch file.
  */
-import { chromium } from '../wp-content/plugins/frascella/node_modules/playwright/index.mjs';
+import { chromium } from 'playwright';
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = path.resolve( path.dirname( fileURLToPath( import.meta.url ) ), '..' );
 const readme = '.github/assets';
-const icons = 'wp-content/themes/frascella/assets/icons';
+const icons = 'public/icons';
 const jobs = [
 	[ 'icon.svg', `${ readme }/icon-512.png`, 512, 512 ],
 	[ 'banner-light.svg', `${ readme }/banner-light.png`, 2560, 640 ],
@@ -28,7 +27,7 @@ const jobs = [
 	[ 'icon.svg', `${ icons }/icon-512.png`, 512, 512 ],
 	[ 'icon-square.svg', `${ icons }/icon-maskable-512.png`, 512, 512 ],
 	// iOS rounds the corners itself, and fills transparency with black.
-	[ 'icon-square.svg', `${ icons }/apple-touch-icon.png`, 180, 180 ],
+	[ 'icon-square.svg', 'public/apple-touch-icon.png', 180, 180 ],
 ];
 const ico = [ 16, 32, 48 ];
 
@@ -76,8 +75,8 @@ try {
 	for ( const size of ico ) {
 		pngs.push( { size, data: await render( browser, 'icon.svg', size, size ) } );
 	}
-	writeFileSync( path.join( root, icons, 'favicon.ico' ), icoFrom( pngs ) );
-	console.log( `✓ ${ icons }/favicon.ico` );
+	writeFileSync( path.join( root, 'public/favicon.ico' ), icoFrom( pngs ) );
+	console.log( '✓ public/favicon.ico' );
 	copyFileSync( path.join( root, 'design/icon.svg' ), path.join( root, icons, 'favicon.svg' ) );
 	console.log( `✓ ${ icons }/favicon.svg` );
 } finally {

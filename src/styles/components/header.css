@@ -1,0 +1,304 @@
+/* The header (src/components/Header.astro): fixed, Ink, a hairline under it.
+ *
+ * Desktop (Sketch, Web → header): the logo; then the menu, a divider, the "audio" switch,
+ * the other language and the square vermilion "scrivimi". Phone: the logo and "menu",
+ * which opens a drawer over the page (`.drawer`, lib/header.ts). */
+
+.top {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    height: var(--hh);
+    padding: 0 var(--page-margin);
+    border-bottom: 1px solid var(--line);
+    background: var(--ground);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    color: var(--text);
+    font-size: var(--t1);
+    text-decoration: none;
+}
+
+.logo svg {
+    width: 1.5em;
+    height: 1.5em;
+    flex: none;
+}
+
+.logo .logo-paper {
+    fill: var(--text);
+}
+
+.logo .logo-square {
+    fill: var(--accent);
+}
+
+.logo span {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.005em;
+}
+
+.top-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.9em;
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+    font-weight: 500;
+}
+
+.top-nav ul {
+    display: flex;
+    gap: 1.9em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.top-nav a:not(.btn) {
+    color: var(--soft);
+    text-decoration: none;
+}
+
+.top-nav a:not(.btn):hover {
+    color: var(--text);
+    text-decoration: underline;
+}
+
+.top-divider {
+    width: 1px;
+    height: 1.35em;
+    background: var(--line);
+}
+
+.top-lang a:not(.btn) {
+    color: var(--meta);
+}
+
+.top-cta {
+    min-height: 2.7em;
+}
+
+/* "menu" / "chiudi": only on a phone. */
+.menu-btn {
+    display: none;
+    padding: 0.6em 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: var(--t-1);
+    line-height: 1;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.menu-btn[hidden] {
+    display: none;
+}
+
+/* The two words share one cell, right-aligned, and swap by visibility: the button keeps
+   one width, so nothing in the header moves when "menu" becomes "chiudi". */
+
+.menu-btn span {
+    grid-area: 1 / 1;
+    text-align: right;
+}
+
+.menu-btn .close,
+.menu-btn[aria-expanded="true"] .open {
+    visibility: hidden;
+}
+
+.menu-btn[aria-expanded="true"] .close {
+    visibility: visible;
+}
+
+/* --- the drawer: the menu on a phone ---------------------------------------
+ *
+ * An overlay over the whole screen, inside the header's stacking context (z-index 10, above
+ * the canvas, the sheet and the page) and under the header's own bar (z-index -1 in that
+ * context), so the logo and "chiudi" stay where they were. It is never in the page's flow:
+ * opening it moves nothing. lib/header.ts adds `.is-open` one frame after showing it, so the
+ * panel wipes down from the header and the links rise in one after the other; closing
+ * reverses, faster. With reduced motion (no `html.motion`) it simply appears. */
+
+.drawer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5em;
+    padding: calc(var(--hh) + 3.5em) var(--page-margin) max(2.5em, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--ground);
+}
+
+/* The header's hairline, drawn again over the panel. */
+.drawer::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--hh) - 1px);
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+}
+
+html.motion .drawer {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.22s cubic-bezier(0.4, 0, 1, 1);
+}
+
+html.motion .drawer.is-open {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.35s var(--ease);
+}
+
+html.motion .drawer-list li,
+html.motion .drawer-row,
+html.motion .drawer-legal {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+        opacity 0.15s ease-in,
+        transform 0.15s ease-in;
+}
+
+html.motion .drawer.is-open .drawer-list li,
+html.motion .drawer.is-open .drawer-row,
+html.motion .drawer.is-open .drawer-legal {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 0.4s var(--ease),
+        transform 0.4s var(--ease);
+}
+
+/* The stagger: after the panel has mostly opened, 50 ms a link, then the bottom row. */
+html.motion .drawer.is-open .drawer-list li:nth-child(1) { transition-delay: 0.15s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(2) { transition-delay: 0.2s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(3) { transition-delay: 0.25s; }
+html.motion .drawer.is-open .drawer-list li:nth-child(4) { transition-delay: 0.3s; }
+html.motion .drawer.is-open .drawer-row { transition-delay: 0.36s; }
+html.motion .drawer.is-open .drawer-legal { transition-delay: 0.4s; }
+
+.drawer[hidden] {
+    display: none;
+}
+
+.drawer-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: drawer;
+}
+
+.drawer-list li {
+    counter-increment: drawer;
+    border-bottom: 1px solid var(--line);
+}
+
+.drawer-list a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    column-gap: var(--gutter);
+    align-items: baseline;
+    /* Sketch: 9 px from the rule above to the word, 24 px from the word to the rule below. */
+    padding: var(--s-3) 0 calc(var(--s-4) + var(--s-3));
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: var(--t6);
+    line-height: var(--lh5);
+    letter-spacing: -0.012em;
+    text-decoration: none;
+}
+
+.drawer-list a::before {
+    content: counter(drawer, decimal-leading-zero);
+    color: var(--accent);
+    font-size: var(--t0);
+    font-variant-numeric: lining-nums tabular-nums;
+    letter-spacing: 0;
+}
+
+.drawer-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25em;
+    margin-top: var(--s-10);
+    font-size: var(--t-1);
+    font-weight: 500;
+}
+
+.drawer-row .top-divider {
+    height: 1.4em;
+}
+
+.drawer-row a {
+    color: var(--meta);
+    text-decoration: none;
+}
+
+.drawer-legal {
+    display: grid;
+    gap: var(--s-2);
+    color: var(--meta);
+    font-size: var(--t-1);
+    line-height: var(--lh-1);
+}
+
+.drawer-legal p:first-child {
+    color: var(--soft);
+}
+
+/* While the drawer is open the page behind it does not scroll. The scrollbar's width, if
+   the system draws one, is given back as padding, so the page does not move sideways. */
+html.drawer-open,
+html.drawer-open body {
+    overflow: hidden;
+}
+
+html.drawer-open body {
+    padding-right: var(--scrollbar, 0px);
+}
+
+@media (max-width: 900px) {
+    .top-nav {
+        display: none;
+    }
+
+    .menu-btn:not([hidden]) {
+        display: grid;
+    }
+}
+
+@media (min-width: 901px) {
+    .drawer {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .logo {
+        font-size: var(--t0);
+    }
+}
+
+/* Pages with no poster under the header: the document starts below it. */
+.doc-main {
+    padding-top: var(--hh);
+}

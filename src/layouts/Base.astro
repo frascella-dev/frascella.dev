@@ -1,0 +1,101 @@
+---
+/**
+ * Every page: the `<head>` (title, description, canonical, languages, sharing card, icons,
+ * structured data, the boot script), the header, `main`, the footer.
+ *
+ * The boot script is blocking on purpose, and tiny: the stylesheet holds back what the
+ * reveal brings in only under `html.motion`, so it has to land before the first paint or
+ * the page flashes its static self and jumps. With no JavaScript, or with reduced motion,
+ * `motion` is never set and nothing is held back.
+ */
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Stage from "../components/Stage.astro";
+import { words, langs, who, type Lang } from "../i18n.ts";
+import { href, canonical, inLang } from "../lib/url.ts";
+import gloock from "../fonts/gloock-latin.woff2?url";
+import grotesk from "../fonts/schibsted-grotesk-latin.woff2?url";
+
+interface Props {
+    lang: Lang;
+    /** The page, without the language: "" (home), "privacy/". */
+    page: string;
+    title: string;
+    description: string;
+    desk?: boolean;
+    noindex?: boolean;
+    /** A page of prose (the privacy notice, the 404), in the documents' style. */
+    doc?: boolean;
+}
+const { lang, page, title, description, desk = false, noindex = false, doc = false } = Astro.props;
+const w = words[lang];
+const url = canonical(inLang(lang, page));
+const root = "https://www.frascella.dev/";
+
+// Only what the page shows, and the same person in every language.
+const graph = [
+    {
+        "@type": "Person",
+        "@id": root + "#business",
+        name: who.name,
+        jobTitle: w.meta.jobTitle,
+        url: canonical(inLang(lang)),
+        email: who.email,
+        address: { "@type": "PostalAddress", addressLocality: who.city, addressCountry: who.country },
+        vatID: who.vat,
+        sameAs: [who.github, who.linkedin],
+    },
+    {
+        "@type": "WebSite",
+        "@id": root + "#website",
+        url: canonical(inLang(lang)),
+        name: who.name,
+        inLanguage: w.htmlLang,
+        publisher: { "@id": root + "#business" },
+    },
+    { "@type": "WebPage", "@id": url + "#webpage", url, name: title, inLanguage: w.htmlLang, isPartOf: { "@id": root + "#website" } },
+];
+const json = JSON.stringify({ "@context": "https://schema.org", "@graph": graph }).replace(/</g, "\\u003c");
+const boot = '(function(){var d=document.documentElement;d.classList.add("js");if(!matchMedia("(prefers-reduced-motion: reduce)").matches){d.classList.add("motion");}})();';
+---
+<!doctype html>
+<html lang={w.htmlLang}>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={url} />}
+        {!noindex && langs.map((l) => <link rel="alternate" hreflang={words[l].hreflang} href={canonical(inLang(l, page))} />)}
+        {!noindex && <link rel="alternate" hreflang="x-default" href={canonical(inLang("it", page))} />}
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={url} />
+        <meta property="og:site_name" content={who.name} />
+        <meta property="og:locale" content={w.ogLocale} />
+        <link rel="icon" href={href("favicon.ico")} sizes="32x32" />
+        <link rel="icon" href={href("icons/favicon.svg")} type="image/svg+xml" />
+        <link rel="apple-touch-icon" href={href("apple-touch-icon.png")} />
+        <link rel="manifest" href={href("icons/site.webmanifest")} />
+        <meta name="theme-color" content="#0E0E11" />
+        <link rel="preload" href={grotesk} as="font" type="font/woff2" crossorigin />
+        <link rel="preload" href={gloock} as="font" type="font/woff2" crossorigin />
+        {!noindex && <script type="application/ld+json" set:html={json} />}
+        <script is:inline set:html={boot} />
+    </head>
+    <body class:list={{ "has-desk": desk }}>
+        {desk && <Stage />}
+        <a class="skip-link" href="#content">{w.nav.skip}</a>
+        <Header lang={lang} page={page} desk={desk} />
+        <main id="content" class:list={{ "doc-main": doc }}>
+            <slot />
+        </main>
+        <Footer lang={lang} page={page} />
+        <script>
+            import { initHeader } from "../lib/header.ts";
+
+            initHeader();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,20 @@
+---
+/**
+ * The 404, which GitHub Pages serves for any address it does not have. It cannot know the
+ * reader's language, so it says it in both.
+ */
+import "../styles/doc-page.css";
+import Base from "../layouts/Base.astro";
+import { words, who } from "../i18n.ts";
+import { href } from "../lib/url.ts";
+---
+<Base lang="it" page="" title={`${words.it.notFound.title} - ${who.name}`} description={words.it.meta.description} doc noindex>
+    <section class="doc not-found">
+        <div class="doc-inner">
+            <p class="rh">404</p>
+            <h1 class="page-title">{words.it.notFound.title}</h1>
+            <p lang="en">{words.en.notFound.title}.</p>
+            <p><a href={href()}>{words.it.notFound.back}</a> · <a href={href("en/")} lang="en">{words.en.notFound.back}</a></p>
+        </div>
+    </section>
+</Base>
