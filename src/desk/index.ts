@@ -45,6 +45,14 @@ async function afterWordsIdle(timeout: number): Promise<void> {
     await new Promise<void>((r) => ("requestIdleCallback" in window ? requestIdleCallback(() => r(), { timeout }) : setTimeout(r, 1)));
 }
 
+/** The scene's chunks (named by the build in `<meta name="desk-chunks">`), fetched at low priority once the faces are in. */
+function prefetchScene(): void {
+    const list = document.querySelector<HTMLMetaElement>('meta[name="desk-chunks"]')?.content.split(" ").filter(Boolean) ?? [];
+    void document.fonts.ready.then(() => {
+        for (const href of list) document.head.append(Object.assign(document.createElement("link"), { rel: "modulepreload", href, fetchPriority: "low" }));
+    });
+}
+
 export function mountDesk(options: DeskOptions = {}): Promise<DeskMode> {
     const opts = { ...window.frascellaDeskOptions, ...options };
     const canvas = opts.canvas ?? document.querySelector<HTMLCanvasElement>("canvas#desk");
@@ -95,6 +103,7 @@ export function mountDesk(options: DeskOptions = {}): Promise<DeskMode> {
     const ready = (async (): Promise<DeskMode> => {
         if (opts.forceFallback || !("WebGL2RenderingContext" in window)) return still(opts.forceFallback ? "asked" : "no WebGL 2");
         if (conn?.saveData) return still("Save-Data");
+        prefetchScene();
         await afterWordsIdle(1500);
         const pool = createPool({ shot });
         pool.prefetch();

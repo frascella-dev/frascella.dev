@@ -5,12 +5,16 @@
  * src/desk/CONTRACT.md §3). The screenshot is also in the card, for whoever does not get
  * the scene; while the scene shows it, it is not drawn twice (sections.css).
  */
+import { getImage } from "astro:assets";
 import { words, type Lang } from "../i18n.ts";
 
 interface Props {
     lang: Lang;
 }
 const projects = words[Astro.props.lang].projects;
+// the card's picture at the widths a card is shown at (a phone needs a fifth of the pixels); the
+// laptop's screen in the scene keeps the full screenshot (data-screen-src)
+const pictures = await Promise.all(projects.map((p) => getImage({ src: p.image, widths: [480, 960, 1440], format: "webp", quality: 78 })));
 const two = (n: number) => String(n).padStart(2, "0");
 ---
 <div class="works">
@@ -27,7 +31,7 @@ const two = (n: number) => String(n).padStart(2, "0");
                 </p>
             </div>
             <figure class="plate-shot">
-                <img src={p.image.src} width={p.image.width} height={p.image.height} alt={p.alt} loading="lazy" decoding="async" />
+                <img src={pictures[i].src} srcset={pictures[i].srcSet.attribute} sizes="(max-width: 900px) 100vw, 58vw" width={p.image.width} height={p.image.height} alt={p.alt} loading="lazy" decoding="async" />
             </figure>
         </article>
     ))}

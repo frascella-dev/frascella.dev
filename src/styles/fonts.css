@@ -4,13 +4,14 @@
  * Gloock is `block`: the cut-out words are measured in it (lib/sheet.ts waits for
  * document.fonts.ready), and a fallback serif swapped in for a moment would be fitted, cut
  * and then thrown away. Schibsted Grotesk is `swap`: running text should be readable at
- * once, in whatever face is there. The two Latin files are preloaded (src/layouts/Base.astro). */
+ * once, in whatever face is there. The two core files (below) are preloaded (src/layouts/Base.astro). */
 
 @font-face {
     font-family: "Gloock";
     src: url("../fonts/gloock-latin.woff2") format("woff2");
     font-weight: 400;
     font-display: block;
+    unicode-range: U+0000-0008, U+000E-001F, U+007F-009F, U+00A1-00A8, U+00AA, U+00AC, U+00AE-00B6, U+00B8-00BA, U+00BC-00BF, U+00C1-00C7, U+00CA-00CB, U+00CD-00D1, U+00D3-00D6, U+00D8, U+00DA-00DF, U+00E1-00E7, U+00EA-00EB, U+00EE-00F1, U+00F4-00F8, U+00FB-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-2012, U+2015-2017, U+201A-201B, U+201E-2025, U+2027-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -26,6 +27,7 @@
     src: url("../fonts/schibsted-grotesk-latin.woff2") format("woff2");
     font-weight: 400 900;
     font-display: swap;
+    unicode-range: U+0000-0008, U+000E-001F, U+007F-009F, U+00A1-00A8, U+00AA, U+00AC, U+00AE-00B6, U+00B8-00BA, U+00BC-00BF, U+00C1-00C7, U+00CA-00CB, U+00CD-00D1, U+00D3-00D6, U+00D8, U+00DA-00DF, U+00E1-00E7, U+00EA-00EB, U+00EE-00F1, U+00F4-00F8, U+00FB-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-2012, U+2015-2017, U+201A-201B, U+201E-2025, U+2027-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -34,4 +36,24 @@
     font-weight: 400 900;
     font-display: swap;
     unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* The core of each face: the characters these pages use (ASCII, the Italian accented letters,
+ * typographic quotes, dashes and arrows, the soft hyphen), cut from the latin files with
+ * fonttools' pyftsubset, kerning, ligatures and the weight axis kept. The full latin files above
+ * cover only the rest of their range, so they load only for a character the core does not have. These two are the ones the page preloads (src/layouts/Base.astro). */
+@font-face {
+    font-family: "Gloock";
+    src: url("../fonts/gloock-core.woff2") format("woff2");
+    font-weight: 400;
+    font-display: block;
+    unicode-range: U+0009-000D, U+0020-007E, U+00A0, U+00A9, U+00AB, U+00AD, U+00B7, U+00BB, U+00C0, U+00C8, U+00C9, U+00CC, U+00D2, U+00D9, U+00D7, U+00E0, U+00E8, U+00E9, U+00EC, U+00ED, U+00F2, U+00F3, U+00F9, U+00FA, U+2013, U+2014, U+2018, U+2019, U+201C, U+201D, U+2026, U+2190, U+2192;
+}
+
+@font-face {
+    font-family: "Schibsted Grotesk";
+    src: url("../fonts/schibsted-grotesk-core.woff2") format("woff2");
+    font-weight: 400 900;
+    font-display: swap;
+    unicode-range: U+0009-000D, U+0020-007E, U+00A0, U+00A9, U+00AB, U+00AD, U+00B7, U+00BB, U+00C0, U+00C8, U+00C9, U+00CC, U+00D2, U+00D9, U+00D7, U+00E0, U+00E8, U+00E9, U+00EC, U+00ED, U+00F2, U+00F3, U+00F9, U+00FA, U+2013, U+2014, U+2018, U+2019, U+201C, U+201D, U+2026, U+2190, U+2192;
 }

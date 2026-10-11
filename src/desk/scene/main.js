@@ -83,8 +83,9 @@ initMats();
 const K = 9.2, L = (x, y, z) => V(x * K, y * K, z * K);
 
 /* ---------- the room ---------- */
-// Gloock, for the glyphs on the two canvases (the page has it already, or soon)
-const fontsIn = document.fonts ? Promise.race([document.fonts.load('400 40px Gloock'), new Promise(r => setTimeout(r, 3000))]).catch(() => null) : Promise.resolve();
+// Gloock, for the glyphs on the two canvases (the page has it already, or soon). The glyphs are
+// named: without them the browser asks for a space, and loads every Gloock file whose range has one
+const fontsIn = document.fonts ? Promise.race([document.fonts.load('400 40px Gloock', 'a&fg'), new Promise(r => setTimeout(r, 3000))]).catch(() => null) : Promise.resolve();
 const { room } = buildRoom({ shot: SHOT, fontsIn });
 scene.add(room);
 progress(.05); await tick();

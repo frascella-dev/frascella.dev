@@ -39,9 +39,10 @@ function tokens() {
 }
 
 /**
- * The desk's chunks, fetched at low priority while the page renders: the scene imports them
- * once the words are painted (src/desk/index.ts), and by then they are here. Only on the pages
- * that have the desk, and never the stills' chunk or the owl's, which most visitors never need.
+ * The desk's chunks, named in the page (`<meta name="desk-chunks">`): src/desk/index.ts fetches
+ * them at low priority once the fonts have arrived, so they are here when the scene starts and
+ * never compete with the opening's faces. Only on the pages that have the desk, and never the
+ * stills' chunk or the owl's, which most visitors never need.
  */
 function preloadDesk() {
     let base = "/";
@@ -52,7 +53,7 @@ function preloadDesk() {
             "astro:build:done": ({ dir }) => {
                 const root = fileURLToPath(dir);
                 const chunks = readdirSync(root + "assets").filter((f) => /^(main|three|gen)\.[\w-]+\.js$/.test(f));
-                const links = chunks.map((f) => `<link rel="modulepreload" href="${base}assets/${f}" fetchpriority="low">`).join("");
+                const links = `<meta name="desk-chunks" content="${chunks.map((f) => base + "assets/" + f).join(" ")}">`;
                 const pages = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? pages(d + e.name + "/") : e.name.endsWith(".html") ? [d + e.name] : []);
                 for (const page of pages(root)) {
                     const html = readFileSync(page, "utf8");
